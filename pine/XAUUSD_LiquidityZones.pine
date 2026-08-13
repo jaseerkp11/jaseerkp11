@@ -1,0 +1,74 @@
+//@version=5
+indicator("XAUUSD Liquidity Zones", overlay=true, max_boxes_count=100, max_lines_count=100)
+
+// Visual map of gold round-number magnets and swing liquidity.
+// This is a chart indicator, not an auto-trading bot.
+// Use with the Python scanner (scan.py) for a scored 1-week power ranking.
+
+step5   = input.bool(true, "Show $5 levels (prices ending 0 or 5)")
+step10  = input.bool(true, "Highlight $10 levels")
+step50  = input.bool(true, "Highlight $50 / $100 magnets")
+swingLen = input.int(3, "Swing fractal length", minval=2, maxval=10)
+eqTol   = input.float(0.6, "Equal high/low tolerance ($)", minval=0.1)
+
+f_round(px, step) =>
+    math.round(px / step) * step
+
+lo = ta.lowest(low, 96)   // ~1 day of M15, rolling
+hi = ta.highest(high, 96)
+mid = (lo + hi) / 2.0
+
+if barstate.islast
+    startP = f_round(lo, 5) - 10
+    endP   = f_round(hi, 5) + 10
+    p = startP
+    for i = 0 to 80
+        if p > endP
+            break
+        col = color.new(color.gray, 80)
+        w = 1
+        if step50 and (p % 100 == 0)
+            col := color.new(color.orange, 40)
+            w := 3
+        else if step50 and (p % 50 == 0)
+            col := color.new(color.orange, 55)
+            w := 2
+        else if step10 and (p % 10 == 0)
+            col := color.new(color.teal, 65)
+            w := 2
+        else if step5
+            col := color.new(color.gray, 78)
+            w := 1
+        line.new(bar_index - 200, p, bar_index + 10, p, color=col, width=w)
+        p += 5.0
+
+pivotH = ta.pivothigh(high, swingLen, swingLen)
+pivotL = ta.pivotlow(low, swingLen, swingLen)
+
+var float lastH1 = na
+var float lastH2 = na
+var float lastL1 = na
+var float lastL2 = na
+
+if not na(pivotH)
+    lastH2 := lastH1
+    lastH1 := pivotH
+    if not na(lastH2) and math.abs(lastH1 - lastH2) <= eqTol
+        box.new(bar_index - swingLen - 30, math.max(lastH1, lastH2) + 0.4, bar_index + 5, math.min(lastH1, lastH2) - 0.15, bgcolor=color.new(color.red, 85), border_color=color.new(color.red, 50))
+
+if not na(pivotL)
+    lastL2 := lastL1
+    lastL1 := pivotL
+    if not na(lastL2) and math.abs(lastL1 - lastL2) <= eqTol
+        box.new(bar_index - swingLen - 30, math.max(lastL1, lastL2) + 0.15, bar_index + 5, math.min(lastL1, lastL2) - 0.4, bgcolor=color.new(color.green, 85), border_color=color.new(color.green, 50))
+
+// Sweep markers: wick through prior swing then close back.
+sweptHigh = not na(lastH1) and high > lastH1 and close < lastH1
+sweptLow  = not na(lastL1) and low < lastL1 and close > lastL1
+plotshape(sweptHigh, title="Sell-side sweep", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.tiny)
+plotshape(sweptLow, title="Buy-side sweep", style=shape.triangleup, location=location.belowbar, color=color.lime, size=size.tiny)
+
+atrVal = ta.atr(14)
+dispUp = sweptLow and (close - open) > 0.5 * atrVal
+dispDn = sweptHigh and (open - close) > 0.5 * atrVal
+bgcolor(dispUp ? color.new(color.green, 92) : dispDn ? color.new(color.red, 92) : na)
