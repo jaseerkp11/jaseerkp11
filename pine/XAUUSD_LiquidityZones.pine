@@ -1,50 +1,58 @@
 //@version=6
-indicator("XAUUSD Liquidity Zones", overlay = true, max_boxes_count = 500, max_lines_count = 500)
+indicator("XAUUSD Liquidity Zones", overlay = true, max_boxes_count = 50, max_lines_count = 200, max_labels_count = 50)
 
-// Visual map of gold round-number magnets and swing liquidity.
-// This is a chart indicator, not an auto-trading bot.
-// Use with the Python scanner (scan.py) for a scored 1-week power ranking.
+// Clean map for gold: round-number magnets + equal highs/lows + strong sweeps only.
+// Lines stay put. They do not rebuild on every tick.
 
-bool step5     = input.bool(true, "Show $5 levels (prices ending 0 or 5)")
-bool step10    = input.bool(true, "Highlight $10 levels")
-bool step50    = input.bool(true, "Highlight $50 / $100 magnets")
-int swingLen   = input.int(3, "Swing fractal length", minval = 2, maxval = 10)
-float eqTol    = input.float(0.6, "Equal high/low tolerance ($)", minval = 0.1)
+bool show5     = input.bool(false, "Show $5 lines (very noisy)", group = "Round numbers")
+bool show10    = input.bool(true, "Show $10 lines", group = "Round numbers")
+bool show50    = input.bool(true, "Show $50 / $100 magnets", group = "Round numbers")
+float span     = input.float(120.0, "Grid span above/below price ($)", minval = 40, maxval = 300, group = "Round numbers")
+
+int swingLen   = input.int(5, "Swing length (higher = fewer zones)", minval = 3, maxval = 15, group = "Liquidity")
+float eqTol    = input.float(2.5, "Equal high/low tolerance ($)", minval = 0.5, maxval = 15, group = "Liquidity")
+int maxZones   = input.int(6, "Max equal-high/low boxes", minval = 2, maxval = 20, group = "Liquidity")
+bool strongOnly = input.bool(true, "Mark only strong sweeps (reclaim + big body)", group = "Liquidity")
 
 f_round(float px, float step) =>
     math.round(px / step) * step
 
-float lo = ta.lowest(low, 96)
-float hi = ta.highest(high, 96)
+var array<line>  roundLines  = array.new<line>()
+var array<label> roundLabels = array.new<label>()
+var float builtAnchor = na
 
-var array<line> roundLines = array.new<line>()
-
-if barstate.islast
+float anchor = f_round(close, 50.0)
+bool rebuild = barstate.isfirst or na(builtAnchor) or anchor != builtAnchor
+if barstate.islast and rebuild
     while array.size(roundLines) > 0
         line.delete(array.shift(roundLines))
-    float startP = f_round(lo, 5.0) - 10.0
-    float endP = f_round(hi, 5.0) + 10.0
+    while array.size(roundLabels) > 0
+        label.delete(array.shift(roundLabels))
+    builtAnchor := anchor
+    float startP = f_round(close - span, show5 ? 5.0 : 10.0)
+    float endP = f_round(close + span, show5 ? 5.0 : 10.0)
     float p = startP
-    for i = 0 to 80
-        if p > endP
-            break
+    int safety = 0
+    while p <= endP and safety < 80
         int lvl = int(math.round(p))
-        color col = color.new(color.gray, 80)
-        int w = 1
-        if step50 and (lvl % 100 == 0)
-            col := color.new(color.orange, 40)
-            w := 3
-        else if step50 and (lvl % 50 == 0)
-            col := color.new(color.orange, 55)
-            w := 2
-        else if step10 and (lvl % 10 == 0)
-            col := color.new(color.teal, 65)
-            w := 2
-        else if step5
-            col := color.new(color.gray, 78)
-            w := 1
-        array.push(roundLines, line.new(bar_index - 200, p, bar_index + 10, p, color = col, width = w))
-        p += 5.0
+        bool is100 = lvl % 100 == 0
+        bool is50  = lvl % 50 == 0
+        bool is10  = lvl % 10 == 0
+        bool draw = false
+        if is100 or is50
+            draw := show50 or show10
+        else if is10
+            draw := show10
+        else
+            draw := show5
+        if draw
+            color col = is100 ? color.new(color.orange, 0) : is50 ? color.new(color.orange, 30) : is10 ? color.new(#4dd0e1, 55) : color.new(color.gray, 75)
+            int w = is100 ? 2 : is50 ? 2 : 1
+            array.push(roundLines, line.new(bar_index, p, bar_index + 1, p, extend = extend.both, color = col, width = w))
+            if is50 or is100
+                array.push(roundLabels, label.new(bar_index + 8, p, str.tostring(lvl), style = label.style_label_left, color = color.new(color.black, 70), textcolor = color.orange, size = size.small))
+        p += show5 ? 5.0 : 10.0
+        safety += 1
 
 float pivotH = ta.pivothigh(high, swingLen, swingLen)
 float pivotL = ta.pivotlow(low, swingLen, swingLen)
@@ -53,30 +61,44 @@ var float lastH1 = float(na)
 var float lastH2 = float(na)
 var float lastL1 = float(na)
 var float lastL2 = float(na)
+var array<box> liqBoxes = array.new<box>()
 
 if not na(pivotH)
     lastH2 := lastH1
     lastH1 := pivotH
     if not na(lastH2) and math.abs(lastH1 - lastH2) <= eqTol
-        box.new(bar_index - swingLen - 30, math.max(lastH1, lastH2) + 0.4, bar_index + 5, math.min(lastH1, lastH2) - 0.15, bgcolor = color.new(color.red, 85), border_color = color.new(color.red, 50))
+        float top = math.max(lastH1, lastH2) + 0.8
+        float bot = math.min(lastH1, lastH2) - 0.3
+        array.push(liqBoxes, box.new(bar_index - swingLen - 20, top, bar_index + 40, bot, bgcolor = color.new(color.red, 82), border_color = color.new(color.red, 40)))
+        while array.size(liqBoxes) > maxZones
+            box.delete(array.shift(liqBoxes))
 
 if not na(pivotL)
     lastL2 := lastL1
     lastL1 := pivotL
     if not na(lastL2) and math.abs(lastL1 - lastL2) <= eqTol
-        box.new(bar_index - swingLen - 30, math.max(lastL1, lastL2) + 0.15, bar_index + 5, math.min(lastL1, lastL2) - 0.4, bgcolor = color.new(color.green, 85), border_color = color.new(color.green, 50))
-
-bool sweptHigh = not na(lastH1) and high > lastH1 and close < lastH1
-bool sweptLow = not na(lastL1) and low < lastL1 and close > lastL1
-plotshape(sweptHigh, title = "Sell-side sweep", style = shape.triangledown, location = location.abovebar, color = color.red, size = size.tiny)
-plotshape(sweptLow, title = "Buy-side sweep", style = shape.triangleup, location = location.belowbar, color = color.lime, size = size.tiny)
+        float top = math.max(lastL1, lastL2) + 0.3
+        float bot = math.min(lastL1, lastL2) - 0.8
+        array.push(liqBoxes, box.new(bar_index - swingLen - 20, top, bar_index + 40, bot, bgcolor = color.new(color.green, 82), border_color = color.new(color.green, 40)))
+        while array.size(liqBoxes) > maxZones
+            box.delete(array.shift(liqBoxes))
 
 float atrVal = ta.atr(14)
-bool dispUp = sweptLow and (close - open) > 0.5 * atrVal
-bool dispDn = sweptHigh and (open - close) > 0.5 * atrVal
-color bg = color(na)
-if dispUp
-    bg := color.new(color.green, 92)
-else if dispDn
-    bg := color.new(color.red, 92)
-bgcolor(bg)
+bool rawHigh = not na(lastH1) and high > lastH1 and close < lastH1
+bool rawLow  = not na(lastL1) and low < lastL1 and close > lastL1
+bool dispUp  = rawLow and (close - open) > 0.5 * atrVal
+bool dispDn  = rawHigh and (open - close) > 0.5 * atrVal
+bool markHigh = strongOnly ? dispDn : rawHigh
+bool markLow  = strongOnly ? dispUp : rawLow
+
+plotshape(markHigh, title = "Sell-side sweep", style = shape.triangledown, location = location.abovebar, color = color.red, size = size.small)
+plotshape(markLow, title = "Buy-side sweep", style = shape.triangleup, location = location.belowbar, color = color.lime, size = size.small)
+
+var table legend = table.new(position.top_right, 1, 6, bgcolor = color.new(#111111, 20), border_width = 1)
+if barstate.islast
+    table.cell(legend, 0, 0, "HOW TO READ", text_color = color.white, text_size = size.small)
+    table.cell(legend, 0, 1, "Orange line = $50 / $100 magnet", text_color = color.orange, text_size = size.tiny)
+    table.cell(legend, 0, 2, "Teal line = $10 round number", text_color = #4dd0e1, text_size = size.tiny)
+    table.cell(legend, 0, 3, "Red box = equal highs (sell-side stops)", text_color = color.red, text_size = size.tiny)
+    table.cell(legend, 0, 4, "Green box = equal lows (buy-side stops)", text_color = color.lime, text_size = size.tiny)
+    table.cell(legend, 0, 5, "Triangle = sweep then close back. Wait, do not chase.", text_color = color.silver, text_size = size.tiny)
