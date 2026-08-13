@@ -75,7 +75,7 @@ CSV needs `Open,High,Low,Close` and a `Date` or `Datetime` column (UTC preferred
 
 ### TradingView
 
-Copy `pine/XAUUSD_LiquidityZones.pine` into TradingView → Pine Editor → Add to chart on XAUUSD. Use M15 or M5. It draws the 0/5 grid, marks equal highs/lows, and flags sweep candles.
+Copy `pine/XAUUSD_LiquidityZones.pine` into TradingView → Pine Editor → Save → Add to chart on XAUUSD. Use M15 or M5. The script is Pine v6 (TradingView will warn if you keep v5). It draws the 0/5 grid, marks equal highs/lows, and flags sweep candles.
 
 ## Tests
 
