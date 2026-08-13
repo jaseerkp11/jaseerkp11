@@ -20,7 +20,7 @@ bool useSession = input.bool(true, "Only London + New York (UTC 07:00–21:00)",
 int cooldownBars = input.int(16, "Min bars between signals", minval = 4, maxval = 48, group = grpFil)
 bool needConfluence = input.bool(true, "Require 1H S/R or round number or equal swings", group = grpFil)
 
-bool showSr = input.bool(true, "Show 1H support / resistance", group = grpVis)
+bool showSr = input.bool(false, "Show 1H support / resistance", group = grpVis)
 bool showTable = input.bool(true, "Show bias table", group = grpVis)
 
 // --- 4H / 1H bias (no lookahead) ---
@@ -152,8 +152,8 @@ if buySignal or sellSignal
     pendingLvl := float(na)
     pendingAge := 0
 
-plotshape(buySignal, title = "BUY", style = shape.labelup, location = location.belowbar, color = color.new(color.lime, 0), text = "BUY", textcolor = color.black, size = size.normal)
-plotshape(sellSignal, title = "SELL", style = shape.labeldown, location = location.abovebar, color = color.new(color.red, 0), text = "SELL", textcolor = color.white, size = size.normal)
+plotshape(buySignal, title = "BUY arrow", style = shape.triangleup, location = location.belowbar, color = color.lime, size = size.large)
+plotshape(sellSignal, title = "SELL arrow", style = shape.triangledown, location = location.abovebar, color = color.red, size = size.large)
 
 plot(showSr ? h1Res : na, "1H resistance", color.new(color.red, 50), style = plot.style_stepline)
 plot(showSr ? h1Sup : na, "1H support", color.new(color.lime, 50), style = plot.style_stepline)
