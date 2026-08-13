@@ -1,14 +1,14 @@
 //@version=6
-indicator("XAUUSD Buy Sell Structure", overlay = true, max_labels_count = 50, max_lines_count = 10)
+indicator("XAUUSD Buy Sell Structure", overlay = true, max_labels_count = 50, max_lines_count = 10, max_boxes_count = 80)
 
 // 15m execution. 4H + 1H decide bias. Signal only after a REAL liquidity sweep
 // (wick through, close back, then displacement). Fake sweeps are cancelled.
 // This is a confluence signal, not a guaranteed win.
 
-string grpHTF = "Higher timeframe bias"
 string grpPA  = "Price action / liquidity"
 string grpFil = "Filters"
 string grpVis = "Display"
+string grpFvg = "Fair value gaps (15m)"
 
 int swingLen = input.int(5, "15m swing length", minval = 3, maxval = 12, group = grpPA)
 float eqTol  = input.float(2.5, "Equal high/low tolerance ($)", minval = 0.5, group = grpPA)
@@ -22,6 +22,11 @@ bool needConfluence = input.bool(true, "Require 1H S/R or round number or equal 
 
 bool showSr = input.bool(false, "Show 1H support / resistance", group = grpVis)
 bool showTable = input.bool(true, "Show bias table", group = grpVis)
+
+bool showFvg = input.bool(true, "Draw valid 15m FVG boxes", group = grpFvg)
+bool fvgWith4h = input.bool(true, "Only FVGs in 4H trend direction", group = grpFvg)
+float minFvgAtr = input.float(0.28, "Min FVG size (ATR)", minval = 0.1, maxval = 1.5, step = 0.02, group = grpFvg)
+int maxFvg = input.int(8, "Max unfilled FVG boxes", minval = 2, maxval = 20, group = grpFvg)
 
 // --- 4H / 1H bias (no lookahead) ---
 [h4c, h4e20, h4e50, h4atr] = request.security(syminfo.tickerid, "240", [close, ta.ema(close, 20), ta.ema(close, 50), ta.atr(14)], barmerge.gaps_off, barmerge.lookahead_off)
@@ -57,6 +62,41 @@ int hr = hour(time, "UTC")
 bool inSession = not useSession or (hr >= 7 and hr < 21)
 
 float atr15 = ta.atr(14)
+
+// --- Valid 15m FVGs: 3-candle imbalance + impulse middle candle + unfilled ---
+var array<box> fvgBoxes = array.new<box>()
+var array<int> fvgDirs = array.new<int>()
+
+bool midBull = close[1] > open[1] and math.abs(close[1] - open[1]) >= 0.5 * math.max(high[1] - low[1], 0.01) and (high[1] - low[1]) >= 0.55 * atr15
+bool midBear = close[1] < open[1] and math.abs(close[1] - open[1]) >= 0.5 * math.max(high[1] - low[1], 0.01) and (high[1] - low[1]) >= 0.55 * atr15
+float bullGap = low - high[2]
+float bearGap = low[2] - high
+bool validBullFvg = showFvg and barstate.isconfirmed and atr15 > 0 and low > high[2] and bullGap >= minFvgAtr * atr15 and midBull and (not fvgWith4h or bias4h == 1)
+bool validBearFvg = showFvg and barstate.isconfirmed and atr15 > 0 and high < low[2] and bearGap >= minFvgAtr * atr15 and midBear and (not fvgWith4h or bias4h == -1)
+
+if validBullFvg
+    array.push(fvgBoxes, box.new(bar_index - 2, low, bar_index + 3, high[2], border_color = color.new(color.lime, 20), bgcolor = color.new(color.lime, 78), border_width = 1))
+    array.push(fvgDirs, 1)
+if validBearFvg
+    array.push(fvgBoxes, box.new(bar_index - 2, low[2], bar_index + 3, high, border_color = color.new(color.red, 20), bgcolor = color.new(color.red, 78), border_width = 1))
+    array.push(fvgDirs, -1)
+
+if array.size(fvgBoxes) > 0
+    for i = array.size(fvgBoxes) - 1 to 0
+        box b = array.get(fvgBoxes, i)
+        int d = array.get(fvgDirs, i)
+        float top = box.get_top(b)
+        float bot = box.get_bottom(b)
+        bool filled = d == 1 ? low <= bot : high >= top
+        if filled
+            box.delete(b)
+            array.remove(fvgBoxes, i)
+            array.remove(fvgDirs, i)
+        else
+            box.set_right(b, bar_index + 2)
+    while array.size(fvgBoxes) > maxFvg
+        box.delete(array.shift(fvgBoxes))
+        array.shift(fvgDirs)
 
 // --- 15m market structure swings ---
 float ph = ta.pivothigh(high, swingLen, swingLen)

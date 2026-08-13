@@ -78,7 +78,7 @@ CSV needs `Open,High,Low,Close` and a `Date` or `Datetime` column (UTC preferred
 2. Remove the old “XAUUSD Liquidity Zones” indicator from the chart.
 3. Pine Editor → paste `pine/XAUUSD_BuySell_Structure.pine` → Save → Add to chart.
 
-A signal prints only when **all** of this is true:
+Green triangle under the bar = BUY. Red triangle above the bar = SELL. Valid **15m FVG** boxes: green = bullish imbalance, red = bearish. Boxes vanish when the gap is fully filled. Only impulse gaps in the **4H direction** are drawn (tiny gaps are ignored).
 
 - **4H and 1H bias agree** (both bull or both bear). If either is chop, no trade.
 - **BUY** only in that bullish bias after a **real buy-side sweep**: wick under a 15m swing low, close back above, then the next bar displaces up. A close that stays below the low is a break, not a sweep.
