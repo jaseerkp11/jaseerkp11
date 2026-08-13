@@ -8,10 +8,9 @@ Scan about **one week** of XAUUSD history and rank **where price actually reacte
 
 | Tool | Role |
 | --- | --- |
-| **Python scanner** (`scan.py`) | Best for a 1-week forensic map: scores every candidate, prints how it swept/reacted, dumps JSON. This is the research brain. |
-| **TradingView indicator** (`pine/XAUUSD_LiquidityZones.pine`) | Best for live eyes: round-number grid, equal-high/low boxes, sweep triangles. Humans still decide. |
-| **Alert bot (later)** | Notify when price is within ~0.3 ATR of a high-power zone, or when a sweep reclaims. No orders. |
-| **Execution bot** | Last, and only after you paper-trade the map. Liquidity is a *location*, not a signal. Blind entries at 2400.00 will get run over. |
+| **Python scanner** (`scan.py`) | Optional 1-week forensic map of round numbers and pools. Not needed to trade. |
+| **TradingView signal** (`pine/XAUUSD_BuySell_Structure.pine`) | **Use this on the 15m chart.** BUY/SELL from 4H+1H bias, real liquidity sweeps, 1H S/R, and displacement. |
+| **Old overlay** (`pine/XAUUSD_LiquidityZones.pine`) | Left in the repo. Do not add it if you want a clean chart. |
 
 A bot that “trades liquidity” without a scored map will chase every wick. Gold is a magnet market: round numbers attract price, then either **grab and reverse** or **grab and continue**. The job of this project is to tell those two apart from last week’s tape, not to auto-click buy.
 
@@ -73,9 +72,30 @@ python scan.py --csv path/to/xauusd_m15.csv --top 15
 
 CSV needs `Open,High,Low,Close` and a `Date` or `Datetime` column (UTC preferred).
 
-### TradingView
+### TradingView — BUY / SELL (use this)
 
-Copy `pine/XAUUSD_LiquidityZones.pine` into TradingView → Pine Editor → Save → Add to chart on XAUUSD (M15 or M5). Pine v6. It draws a **stable** $10 / $50 / $100 grid (not a moving $5 mesh), a few equal-high/low boxes, and only strong sweep triangles. Hide your other drawings if the chart still looks busy.
+1. Open **XAUUSD** on **15 minutes**.
+2. Remove the old “XAUUSD Liquidity Zones” indicator from the chart.
+3. Pine Editor → paste `pine/XAUUSD_BuySell_Structure.pine` → Save → Add to chart.
+
+A signal prints only when **all** of this is true:
+
+- **4H and 1H bias agree** (both bull or both bear). If either is chop, no trade.
+- **BUY** only in that bullish bias after a **real buy-side sweep**: wick under a 15m swing low, close back above, then the next bar displaces up. A close that stays below the low is a break, not a sweep.
+- **SELL** only in bearish bias after a **real sell-side sweep**: wick above a 15m swing high, close back under, then displacement down.
+- If the next bars fail to displace and close back through the level, the sweep is treated as **fake** and cancelled.
+- Extra confluence: 1H support/resistance, a $10 round number, or equal highs/lows.
+- Default session filter: London + New York (UTC 07:00–21:00).
+
+The table (top right) shows 4H bias, 1H bias, aligned YES/NO, session, and whether a sweep is waiting for displacement. Dashed lines are the last 1H resistance (red) and support (green).
+
+Create alerts from the indicator: “XAUUSD BUY” / “XAUUSD SELL”.
+
+No indicator is a guaranteed win. Paper-trade it before using size.
+
+### Old overlay (do not use for entries)
+
+`pine/XAUUSD_LiquidityZones.pine` is the noisy round-number map. Leave it off the trade chart.
 
 ## Tests
 

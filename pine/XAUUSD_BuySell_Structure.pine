@@ -1,0 +1,181 @@
+//@version=6
+indicator("XAUUSD Buy Sell Structure", overlay = true, max_labels_count = 50, max_lines_count = 10)
+
+// 15m execution. 4H + 1H decide bias. Signal only after a REAL liquidity sweep
+// (wick through, close back, then displacement). Fake sweeps are cancelled.
+// This is a confluence signal, not a guaranteed win.
+
+string grpHTF = "Higher timeframe bias"
+string grpPA  = "Price action / liquidity"
+string grpFil = "Filters"
+string grpVis = "Display"
+
+int swingLen = input.int(5, "15m swing length", minval = 3, maxval = 12, group = grpPA)
+float eqTol  = input.float(2.5, "Equal high/low tolerance ($)", minval = 0.5, group = grpPA)
+int confirmBars = input.int(2, "Bars allowed to confirm displacement", minval = 1, maxval = 4, group = grpPA)
+float minBodyAtr = input.float(0.45, "Min confirm body (ATR)", minval = 0.2, maxval = 1.5, step = 0.05, group = grpPA)
+float maxPierceAtr = input.float(1.8, "Max sweep pierce (ATR) — deeper is a break", minval = 0.6, maxval = 4.0, group = grpPA)
+
+bool useSession = input.bool(true, "Only London + New York (UTC 07:00–21:00)", group = grpFil)
+int cooldownBars = input.int(16, "Min bars between signals", minval = 4, maxval = 48, group = grpFil)
+bool needConfluence = input.bool(true, "Require 1H S/R or round number or equal swings", group = grpFil)
+
+bool showSr = input.bool(true, "Show 1H support / resistance", group = grpVis)
+bool showTable = input.bool(true, "Show bias table", group = grpVis)
+
+// --- 4H / 1H bias (no lookahead) ---
+[h4c, h4e20, h4e50, h4atr] = request.security(syminfo.tickerid, "240", [close, ta.ema(close, 20), ta.ema(close, 50), ta.atr(14)], barmerge.gaps_off, barmerge.lookahead_off)
+[h1c, h1e20, h1e50, h1atr, h1ph, h1pl] = request.security(syminfo.tickerid, "60", [close, ta.ema(close, 20), ta.ema(close, 50), ta.atr(14), ta.pivothigh(high, 4, 4), ta.pivotlow(low, 4, 4)], barmerge.gaps_off, barmerge.lookahead_off)
+
+biasFrom(float c, float e20, float e50, float a) =>
+    float band = math.max(a * 0.12, 0.5)
+    int b = 0
+    if math.abs(c - e50) < band
+        b := 0
+    else if c > e50 and e20 >= e50
+        b := 1
+    else if c < e50 and e20 <= e50
+        b := -1
+    else
+        b := 0
+    b
+
+int bias4h = biasFrom(h4c, h4e20, h4e50, h4atr)
+int bias1h = biasFrom(h1c, h1e20, h1e50, h1atr)
+bool htfBull = bias4h == 1 and bias1h == 1
+bool htfBear = bias4h == -1 and bias1h == -1
+bool htfAligned = htfBull or htfBear
+
+var float h1Res = float(na)
+var float h1Sup = float(na)
+if not na(h1ph)
+    h1Res := h1ph
+if not na(h1pl)
+    h1Sup := h1pl
+
+int hr = hour(time, "UTC")
+bool inSession = not useSession or (hr >= 7 and hr < 21)
+
+float atr15 = ta.atr(14)
+
+// --- 15m market structure swings ---
+float ph = ta.pivothigh(high, swingLen, swingLen)
+float pl = ta.pivotlow(low, swingLen, swingLen)
+var float swingH = float(na)
+var float swingH2 = float(na)
+var float swingL = float(na)
+var float swingL2 = float(na)
+if not na(ph)
+    swingH2 := swingH
+    swingH := ph
+if not na(pl)
+    swingL2 := swingL
+    swingL := pl
+
+bool equalHighs = not na(swingH) and not na(swingH2) and math.abs(swingH - swingH2) <= eqTol
+bool equalLows  = not na(swingL) and not na(swingL2) and math.abs(swingL - swingL2) <= eqTol
+
+nearRound(float px) =>
+    math.abs(px - math.round(px / 10.0) * 10.0) <= 2.0
+
+nearLevel(float px, float lvl, float tol) =>
+    not na(lvl) and math.abs(px - lvl) <= tol
+
+// Real sweep: pierce the pool, CLOSE BACK, pierce not a runaway break.
+bool realBuySweep = false
+bool realSellSweep = false
+float buyLevel = float(na)
+float sellLevel = float(na)
+
+if not na(swingL) and not na(atr15) and atr15 > 0
+    float pierceL = swingL - low
+    bool reclaimL = close > swingL
+    bool notBreakL = close > swingL  // close back above the low
+    bool notRunawayL = pierceL > 0.08 * atr15 and pierceL <= maxPierceAtr * atr15
+    realBuySweep := low < swingL and reclaimL and notBreakL and notRunawayL
+    buyLevel := swingL
+
+if not na(swingH) and not na(atr15) and atr15 > 0
+    float pierceH = high - swingH
+    bool reclaimH = close < swingH
+    bool notRunawayH = pierceH > 0.08 * atr15 and pierceH <= maxPierceAtr * atr15
+    realSellSweep := high > swingH and reclaimH and notRunawayH
+    sellLevel := swingH
+
+// Extra confluence: 1H S/R, round number, or stacked equal swings.
+float srTol = math.max(nz(h1atr, atr15) * 0.35, 1.5)
+bool buyConf = not needConfluence or equalLows or nearRound(nz(buyLevel, low)) or nearLevel(nz(buyLevel, low), h1Sup, srTol)
+bool sellConf = not needConfluence or equalHighs or nearRound(nz(sellLevel, high)) or nearLevel(nz(sellLevel, high), h1Res, srTol)
+
+// Pending: wait for displacement. If price closes back through the level, it was fake.
+var int pendingDir = 0
+var float pendingLvl = float(na)
+var int pendingAge = 0
+var int lastSignalBar = -999
+
+if pendingDir == 0
+    if realBuySweep and htfBull and inSession and buyConf
+        pendingDir := 1
+        pendingLvl := buyLevel
+        pendingAge := 0
+    else if realSellSweep and htfBear and inSession and sellConf
+        pendingDir := -1
+        pendingLvl := sellLevel
+        pendingAge := 0
+else
+    pendingAge += 1
+
+bool failed = false
+if pendingDir == 1 and not na(pendingLvl) and pendingAge >= 1 and close < pendingLvl
+    failed := true
+if pendingDir == -1 and not na(pendingLvl) and pendingAge >= 1 and close > pendingLvl
+    failed := true
+if pendingDir != 0 and pendingAge > confirmBars
+    failed := true
+if failed
+    pendingDir := 0
+    pendingLvl := float(na)
+    pendingAge := 0
+
+float body = math.abs(close - open)
+bool strongBody = body >= minBodyAtr * atr15
+bool buyConfirm = pendingDir == 1 and pendingAge >= 1 and close > high[1] and close > open and strongBody and close > nz(pendingLvl, close)
+bool sellConfirm = pendingDir == -1 and pendingAge >= 1 and close < low[1] and close < open and strongBody and close < nz(pendingLvl, close)
+
+bool cooled = (bar_index - lastSignalBar) >= cooldownBars
+bool buySignal = buyConfirm and htfBull and inSession and cooled
+bool sellSignal = sellConfirm and htfBear and inSession and cooled
+
+if buySignal or sellSignal
+    lastSignalBar := bar_index
+    pendingDir := 0
+    pendingLvl := float(na)
+    pendingAge := 0
+
+plotshape(buySignal, title = "BUY", style = shape.labelup, location = location.belowbar, color = color.new(color.lime, 0), text = "BUY", textcolor = color.black, size = size.normal)
+plotshape(sellSignal, title = "SELL", style = shape.labeldown, location = location.abovebar, color = color.new(color.red, 0), text = "SELL", textcolor = color.white, size = size.normal)
+
+plot(showSr ? h1Res : na, "1H resistance", color.new(color.red, 50), style = plot.style_stepline)
+plot(showSr ? h1Sup : na, "1H support", color.new(color.lime, 50), style = plot.style_stepline)
+
+biasText(int b) =>
+    b == 1 ? "BULL" : b == -1 ? "BEAR" : "CHOP"
+
+var table panel = table.new(position.top_right, 2, 6, bgcolor = color.new(#101418, 15), border_width = 1)
+if showTable and barstate.islast
+    table.cell(panel, 0, 0, "XAUUSD 15m", text_color = color.white, text_size = size.small)
+    table.cell(panel, 1, 0, "signal engine", text_color = color.gray, text_size = size.tiny)
+    table.cell(panel, 0, 1, "4H bias", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 1, biasText(bias4h), text_color = bias4h == 1 ? color.lime : bias4h == -1 ? color.red : color.orange, text_size = size.small)
+    table.cell(panel, 0, 2, "1H bias", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 2, biasText(bias1h), text_color = bias1h == 1 ? color.lime : bias1h == -1 ? color.red : color.orange, text_size = size.small)
+    table.cell(panel, 0, 3, "Aligned", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 3, htfAligned ? "YES" : "NO TRADE", text_color = htfAligned ? color.lime : color.orange, text_size = size.small)
+    table.cell(panel, 0, 4, "Session", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 4, inSession ? "London/NY" : "WAIT", text_color = inSession ? color.lime : color.gray, text_size = size.small)
+    string pend = pendingDir == 1 ? "BUY sweep, wait displace" : pendingDir == -1 ? "SELL sweep, wait displace" : "none"
+    table.cell(panel, 0, 5, "Pending", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 5, pend, text_color = color.white, text_size = size.tiny)
+
+alertcondition(buySignal, title = "XAUUSD BUY", message = "XAUUSD BUY: 4H+1H bull, real buy-side sweep confirmed")
+alertcondition(sellSignal, title = "XAUUSD SELL", message = "XAUUSD SELL: 4H+1H bear, real sell-side sweep confirmed")
