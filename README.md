@@ -2,7 +2,7 @@
 
 Downloadable curriculum vitae for **Mohammed Jaseer**.
 
-Navy-and-gold layout with a clear header, at-a-glance facts, skill cards, and standard section headings. Core experience, dates, and wording are unchanged.
+The Word file now uses the **same visual layout as the PDF** (navy header, gold rule, highlight cards, skill tiles, language boxes, section bars).
 
 ## Download
 
