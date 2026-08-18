@@ -16,6 +16,7 @@ const links = [
   { href: "/admin/suppliers", label: "Suppliers" },
   { href: "/admin/coupons", label: "Coupons" },
   { href: "/admin/content", label: "Content" },
+  { href: "/admin/tickets", label: "Support" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/settings", label: "Settings" },
 ];
@@ -31,7 +32,7 @@ export default async function AdminLayout({
 
   return (
     <div className="flex min-h-screen bg-[#ece7e0] text-foreground">
-      <aside className="hidden w-60 shrink-0 border-r border-line bg-[#161513] text-[#f6f1ea] md:block">
+      <aside className="hidden w-60 shrink-0 border-r border-line bg-[#161513] text-[#f6f1ea] print:hidden md:block">
         <div className="px-5 py-6">
           <p className="text-xs uppercase tracking-widest text-[#b7b0a6]">Admin</p>
           <p className="font-display text-2xl">{brand.brandName}</p>
@@ -48,7 +49,7 @@ export default async function AdminLayout({
         </nav>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-line bg-card px-4 py-3">
+        <header className="flex items-center justify-between border-b border-line bg-card px-4 py-3 print:hidden">
           <p className="text-sm">
             {user.name} · {user.role}
           </p>

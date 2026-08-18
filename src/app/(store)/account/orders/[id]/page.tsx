@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { getCurrentUser, isStaff } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
@@ -26,6 +27,9 @@ export default async function OrderDetailPage({
       <p className="mt-2 text-sm text-muted">
         {order.status} · payment {order.paymentStatus} · {formatMoney(order.totalPaise)}
       </p>
+      <Link href={`/orders/${order.id}/invoice`} className="mt-4 inline-flex h-10 items-center rounded-full border border-line px-4 text-sm">
+        View invoice
+      </Link>
       <ul className="mt-6 space-y-2 text-sm">
         {order.items.map((item) => (
           <li key={item.id} className="flex justify-between rounded-xl border border-line bg-card px-4 py-3">

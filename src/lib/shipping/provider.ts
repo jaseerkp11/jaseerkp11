@@ -39,12 +39,15 @@ export class TableShippingProvider implements ShippingProvider {
         },
       ];
     }
+    const { getStoreSettings, shippingFeesPaise } = await import("@/lib/services/store-settings");
+    const fees = shippingFeesPaise(await getStoreSettings());
     const metro = METRO.has(pincode);
+    const expressPaise = metro ? Math.max(0, fees.expressPaise - 5000) : fees.expressPaise;
     return [
       {
         method: "standard",
         label: metro ? "Standard — metro" : "Standard",
-        amountPaise: metro ? 0 : 4900,
+        amountPaise: fees.standardPaise,
         etaDaysMin: metro ? 2 : 4,
         etaDaysMax: metro ? 4 : 8,
         available: true,
@@ -52,7 +55,7 @@ export class TableShippingProvider implements ShippingProvider {
       {
         method: "express",
         label: "Express",
-        amountPaise: metro ? 9900 : 14900,
+        amountPaise: expressPaise,
         etaDaysMin: 1,
         etaDaysMax: metro ? 2 : 3,
         available: true,

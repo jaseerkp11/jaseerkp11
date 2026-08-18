@@ -5,6 +5,8 @@ import { Footer } from "@/components/store/footer";
 import { loadCart } from "@/lib/services/cart";
 import { connection } from "next/server";
 import { SetupRequired } from "@/components/store/setup-required";
+import { WhatsAppButton } from "@/components/store/whatsapp-button";
+import { ensureBusinessPages } from "@/lib/services/business-pages";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +36,7 @@ export default async function StoreLayout({
       where: { id: "announcement" },
     });
     announcement = setting?.value ?? null;
+    await ensureBusinessPages();
   } catch {
     dbOk = false;
   }
@@ -52,6 +55,7 @@ export default async function StoreLayout({
       <Header categories={categories} cartCount={cartCount} brandName={brand.brandName} />
       <main className="flex-1">{children}</main>
       <Footer categories={categories} />
+      <WhatsAppButton />
     </>
   );
 }

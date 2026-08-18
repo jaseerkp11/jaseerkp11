@@ -71,3 +71,9 @@ h3,
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@media print {
+  body {
+    background: #fff;
+  }
+}

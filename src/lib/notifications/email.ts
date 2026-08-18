@@ -9,35 +9,49 @@ export interface EmailProvider {
   send(message: EmailMessage): Promise<{ sent: boolean; reason?: string }>;
 }
 
-class ConsoleEmailProvider implements EmailProvider {
+class ResendEmailProvider implements EmailProvider {
   get configured() {
-    return Boolean(process.env.SMTP_HOST || process.env.RESEND_API_KEY);
+    return Boolean(process.env.RESEND_API_KEY);
   }
+
   async send(message: EmailMessage) {
-    if (!this.configured) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) {
       return {
         sent: false,
-        reason:
-          "No email provider is configured. Set SMTP_HOST or RESEND_API_KEY to send mail. The message was not delivered.",
+        reason: "No email provider is configured. Set RESEND_API_KEY to send mail.",
       };
     }
-    void message;
-    return {
-      sent: false,
-      reason: "An email provider is configured but the transport adapter is not connected yet.",
-    };
+    const from = process.env.EMAIL_FROM?.trim() || "Atria <beth.t@example.com>";
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to: [message.to],
+        subject: message.subject,
+        text: message.text,
+      }),
+    });
+    if (!res.ok) {
+      return { sent: false, reason: `Email provider returned ${res.status}.` };
+    }
+    return { sent: true };
   }
 }
 
-export const emailProvider: EmailProvider = new ConsoleEmailProvider();
+export const emailProvider: EmailProvider = new ResendEmailProvider();
 
 export const notificationTemplates = {
   welcome: (name: string) => ({
     subject: `Welcome`,
     text: `Hello ${name}, your account is ready.`,
   }),
-  orderConfirmed: (orderNumber: string) => ({
-    subject: `Order ${orderNumber} confirmed`,
-    text: `We received order ${orderNumber}.`,
+  orderConfirmed: (orderNumber: string, totalLabel: string, payment: string) => ({
+    subject: `Order ${orderNumber} received`,
+    text: `We received order ${orderNumber} for ${totalLabel}. Payment: ${payment}. We will update you when it is packed and shipped.`,
   }),
 };

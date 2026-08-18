@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { checkoutSchema, jsonError } from "@/lib/validation";
 import { placeOrder } from "@/lib/services/checkout";
-import { getBrand } from "@/config/brand";
 import { rateLimit } from "@/lib/rate-limit";
+import { redirectTo } from "@/lib/http";
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") ?? "local";
@@ -28,15 +28,12 @@ export async function POST(request: NextRequest) {
     },
   });
   if (!parsed.success) {
-    return Response.redirect(new URL("/checkout/failure", getBrand().siteUrl), 303);
+    return redirectTo(request, "/checkout/failure");
   }
   try {
     const order = await placeOrder(parsed.data);
-    return Response.redirect(
-      new URL(`/checkout/success?order=${order.orderNumber}`, getBrand().siteUrl),
-      303,
-    );
+    return redirectTo(request, `/checkout/success?order=${order.orderNumber}`);
   } catch {
-    return Response.redirect(new URL("/checkout/failure", getBrand().siteUrl), 303);
+    return redirectTo(request, "/checkout/failure");
   }
 }

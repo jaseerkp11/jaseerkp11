@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
+import { getStoreSettings, whatsappUrl } from "@/lib/services/store-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,8 @@ export default async function CheckoutSuccessPage({
     include: { items: true, payments: true },
   });
   if (!order) notFound();
+  const settings = await getStoreSettings();
+  const wa = whatsappUrl(settings.whatsapp, `Hi, I just placed order ${order.orderNumber}`);
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16 text-center">
@@ -25,7 +28,7 @@ export default async function CheckoutSuccessPage({
         {order.orderNumber} · {formatMoney(order.totalPaise)} · payment {order.paymentStatus.replaceAll("_", " ").toLowerCase()}
       </p>
       <p className="mt-4 text-sm">
-        This is not a fake success screen. The order exists in the database. Online payment confirmation only happens when a gateway webhook is configured.
+        Save this order number. For cash on delivery, keep the exact amount ready. We will pack the order and add tracking in your Track order page.
       </p>
       <ul className="mt-6 space-y-1 text-left text-sm">
         {order.items.map((item) => (
@@ -34,9 +37,19 @@ export default async function CheckoutSuccessPage({
           </li>
         ))}
       </ul>
-      <Link href="/account/orders" className="mt-8 inline-flex h-11 items-center rounded-full bg-primary px-5 text-sm text-[#f6f1ea]">
-        View orders
-      </Link>
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <Link href={`/track`} className="inline-flex h-11 items-center rounded-full bg-primary px-5 text-sm text-[#f6f1ea]">
+          Track order
+        </Link>
+        {wa ? (
+          <Link href={wa} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center rounded-full border border-line px-5 text-sm">
+            WhatsApp us
+          </Link>
+        ) : null}
+        <Link href="/account/orders" className="inline-flex h-11 items-center rounded-full border border-line px-5 text-sm">
+          Account
+        </Link>
+      </div>
     </div>
   );
 }

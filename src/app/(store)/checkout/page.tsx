@@ -20,7 +20,7 @@ export default async function CheckoutPage() {
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <h1 className="font-display text-4xl">Checkout</h1>
       <p className="mt-2 text-sm text-muted">
-        Totals are calculated on the server. Online UPI/card checkout needs a payment gateway. Cash on delivery is available now.
+        Cash on delivery is available now. Totals are calculated on the server.
       </p>
       <form action="/api/checkout" method="post" className="mt-8 space-y-6">
         <section className="rounded-2xl border border-line bg-card p-5">

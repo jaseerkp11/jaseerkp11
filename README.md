@@ -28,6 +28,18 @@ This repository started as an empty GitHub profile README. There was no existing
 
 Reseller-ready tables: `Role.RESELLER`, `ResellerProfile`, `Product.resellerEligible`. Payouts are not simulated.
 
+## Launch (before real customers)
+
+You can take **cash on delivery** orders on the live site now. Do this in Admin:
+
+1. **Settings** — GSTIN (if you have it), business address, WhatsApp, shipping fees.
+2. **Content** — read About / Privacy / Terms / Shipping / Returns and put your real city and rules.
+3. **Categories** then **Products** — add your catalogue (main + 4 extra photo URLs).
+4. **Orders** — Confirm → Packed → Shipped (add tracking) → Delivered (marks COD as paid). Print **Invoice / packing slip**.
+5. Optional later: Razorpay keys for UPI, Resend for order emails, custom domain in Vercel.
+
+Do not re-run seed on the live database; it wipes products and orders.
+
 ## Local setup
 
 ```bash

@@ -193,6 +193,12 @@ export async function quoteCart(pincode?: string, shippingMethod = "standard") {
     if (selected?.available) {
       shippingPaise = selected.amountPaise;
       shippingLabel = selected.label;
+      const { getStoreSettings, shippingFeesPaise } = await import("@/lib/services/store-settings");
+      const fees = shippingFeesPaise(await getStoreSettings());
+      if (shippingMethod === "standard" && fees.freeOverPaise > 0 && subtotalPaise - discountPaise >= fees.freeOverPaise) {
+        shippingPaise = 0;
+        shippingLabel = `${selected.label} (free over threshold)`;
+      }
     }
   }
 

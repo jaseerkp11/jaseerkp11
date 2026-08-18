@@ -28,8 +28,11 @@ export default async function AdminDashboard() {
     <div>
       <h1 className="font-display text-3xl">Dashboard</h1>
       <p className="mt-1 text-sm text-muted">
-        Figures come from stored orders. Empty charts mean no orders yet — they are not filled with sample sales.
+        Open Settings for the launch checklist. Figures come from stored orders.
       </p>
+      <Link href="/admin/settings" className="mt-4 inline-flex h-10 items-center rounded-full bg-primary px-4 text-sm text-[#f6f1ea]">
+        Launch checklist
+      </Link>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Stat label="Recognised revenue" value={formatMoney(revenue)} hint="Paid + COD pending totals" />
         <Stat label="Estimated product cost" value={formatMoney(cost)} hint="From order-line cost snapshots" />

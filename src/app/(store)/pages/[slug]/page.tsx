@@ -22,16 +22,22 @@ export async function generateMetadata({
 
 export default async function CmsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ sent?: string }>;
 }) {
   const { slug } = await params;
+  const { sent } = await searchParams;
   const page = await prisma.cmsPage.findUnique({ where: { slug } });
   if (!page) notFound();
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <h1 className="font-display text-4xl">{page.title}</h1>
       <p className="mt-6 whitespace-pre-wrap text-sm leading-7 text-[#3f3a34]">{page.body}</p>
+      {slug === "contact" && sent ? (
+        <p className="mt-6 rounded-2xl border border-line bg-card p-4 text-sm">We received your message. We will reply to the email you entered.</p>
+      ) : null}
       {slug === "contact" ? (
         <form action="/api/support" method="post" className="mt-10 grid gap-3 rounded-2xl border border-line bg-card p-5">
           <input name="email" type="email" required placeholder="Email" className="h-11 rounded-xl border border-line px-3 text-sm" />

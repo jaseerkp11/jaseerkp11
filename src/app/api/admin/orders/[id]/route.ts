@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/auth";
 import { jsonError } from "@/lib/validation";
 import { writeAudit } from "@/lib/audit";
-import { getBrand } from "@/config/brand";
+import { redirectTo } from "@/lib/http";
 import type { OrderStatus } from "@prisma/client";
 import { adjustInventory } from "@/lib/services/inventory";
 
@@ -97,5 +97,5 @@ export async function POST(
     entityId: id,
     metadata: { status },
   });
-  return Response.redirect(new URL(`/admin/orders/${id}`, getBrand().siteUrl), 303);
+  return redirectTo(request, `/admin/orders/${id}`);
 }

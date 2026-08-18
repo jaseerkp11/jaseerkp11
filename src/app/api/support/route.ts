@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
 import { emailSchema, jsonError } from "@/lib/validation";
-import { getBrand } from "@/config/brand";
+import { redirectTo } from "@/lib/http";
 
 export async function POST(request: NextRequest) {
   const user = await getSessionUser();
@@ -22,5 +22,5 @@ export async function POST(request: NextRequest) {
       orderId: String(form.get("orderId") ?? "") || undefined,
     },
   });
-  return Response.redirect(new URL("/pages/contact", getBrand().siteUrl), 303);
+  return redirectTo(request, "/pages/contact?sent=1");
 }

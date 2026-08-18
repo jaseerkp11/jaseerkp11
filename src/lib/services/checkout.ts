@@ -6,6 +6,8 @@ import { paymentProviders } from "@/lib/payments/provider";
 import { shippingProvider } from "@/lib/shipping/provider";
 import { trackEvent } from "@/lib/analytics/track";
 import { writeAudit } from "@/lib/audit";
+import { emailProvider, notificationTemplates } from "@/lib/notifications/email";
+import { formatMoney } from "@/lib/money";
 import type { addressSchema } from "@/lib/validation";
 import type { z } from "zod";
 
@@ -137,6 +139,14 @@ export async function placeOrder(input: {
     return created;
   });
 
+  await emailProvider.send({
+    to: order.email,
+    ...notificationTemplates.orderConfirmed(
+      order.orderNumber,
+      formatMoney(order.totalPaise),
+      input.paymentMethod === "cod" ? "Cash on delivery" : "Online payment pending",
+    ),
+  });
   await trackEvent({ name: "purchase", metadata: { orderId: order.id } });
   await writeAudit({
     actorId: user?.id,
