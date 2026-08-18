@@ -76,12 +76,16 @@ export default async function CartPage() {
               <dt>Discount</dt>
               <dd>-{formatMoney(totals.discountPaise)}</dd>
             </div>
+            <div className="flex justify-between">
+              <dt>Delivery</dt>
+              <dd>{formatMoney(totals.shippingPaise)}</dd>
+            </div>
             <div className="flex justify-between font-semibold">
               <dt>Total</dt>
               <dd>{formatMoney(totals.totalPaise)}</dd>
             </div>
           </dl>
-          <p className="mt-2 text-xs text-muted">Prices include tax. Shipping is added after you enter a pincode at checkout.</p>
+          <p className="mt-2 text-xs text-muted">Prices include tax. Delivery is ₹80 on every order.</p>
           <form action="/api/cart/coupon" method="post" className="mt-4 space-y-2">
             <input
               name="code"

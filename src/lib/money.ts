@@ -1,5 +1,8 @@
 export type MoneyMinor = number;
 
+/** Flat delivery fee charged on every order, in paise. */
+export const DELIVERY_PAISE = 8000;
+
 export function paise(amount: number): MoneyMinor {
   if (!Number.isFinite(amount)) return 0;
   return Math.round(amount);

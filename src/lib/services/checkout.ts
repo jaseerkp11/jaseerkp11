@@ -3,7 +3,6 @@ import { getSessionUser } from "@/lib/auth";
 import { quoteCart } from "@/lib/services/cart";
 import { adjustInventory } from "@/lib/services/inventory";
 import { paymentProviders } from "@/lib/payments/provider";
-import { shippingProvider } from "@/lib/shipping/provider";
 import { trackEvent } from "@/lib/analytics/track";
 import { writeAudit } from "@/lib/audit";
 import { emailProvider, notificationTemplates } from "@/lib/notifications/email";
@@ -33,12 +32,6 @@ export async function placeOrder(input: {
   const quote = await quoteCart(input.address.pincode, input.shippingMethod);
   if (quote.activeItems.length === 0 || !quote.cart.id) {
     throw new CheckoutError("empty", "Your cart is empty.");
-  }
-
-  const quotes = await shippingProvider.quote(input.address.pincode);
-  const shipping = quotes.find((q) => q.method === input.shippingMethod && q.available);
-  if (!shipping) {
-    throw new CheckoutError("pincode", "Enter a valid 6-digit pincode so we can deliver.");
   }
 
   const provider = paymentProviders[input.paymentMethod];
@@ -98,7 +91,7 @@ export async function placeOrder(input: {
         shippingState: input.address.state,
         shippingPincode: input.address.pincode,
         shippingCountry: "IN",
-        shippingMethod: shipping.label,
+        shippingMethod: quote.shippingLabel,
         items: {
           create: quote.activeItems.map((item) => ({
             productId: item.productId,
@@ -192,6 +185,7 @@ export async function placeOrder(input: {
       }
     }
     if (error instanceof CheckoutError) throw error;
+    console.error("checkout.save", error);
     throw new CheckoutError("save", "The order could not be saved. Please try again.");
   }
 }

@@ -97,14 +97,35 @@ export const productInputSchema = z.object({
   seoDescription: z.string().max(180).optional(),
 });
 
-export const checkoutSchema = z.object({
+export const checkoutFormSchema = z.object({
   email: emailSchema,
   phone: phoneSchema,
-  address: addressSchema,
-  shippingMethod: z.enum(["standard", "express"]),
-  paymentMethod: z.enum(["cod", "razorpay"]),
-  couponCode: z.string().optional(),
+  fullName: z.string().trim().min(2, "Enter your full name").max(80),
+  addrPhone: phoneSchema,
+  line1: z.string().trim().min(2, "Enter your address").max(120),
+  line2: z.string().trim().max(120).optional().or(z.literal("")),
+  city: z.string().trim().min(2, "Enter your city").max(60),
+  state: z.string().trim().min(2, "Enter your state").max(60),
+  pincode: pincodeSchema,
 });
+
+export const checkoutSchema = checkoutFormSchema.transform((value) => ({
+  email: value.email,
+  phone: value.phone,
+  shippingMethod: "standard" as const,
+  paymentMethod: "cod" as const,
+  address: {
+    label: "Checkout",
+    fullName: value.fullName,
+    phone: value.addrPhone,
+    line1: value.line1,
+    line2: value.line2 || undefined,
+    city: value.city,
+    state: value.state,
+    pincode: value.pincode,
+    country: "IN",
+  },
+}));
 
 export type ApiErrorBody = {
   error: string;

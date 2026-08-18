@@ -1,9 +1,8 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
-import { computeOrderTotals } from "@/lib/money";
+import { computeOrderTotals, DELIVERY_PAISE } from "@/lib/money";
 import { evaluateCoupon } from "@/lib/services/coupons";
-import { shippingProvider } from "@/lib/shipping/provider";
 
 const CART_COOKIE = "store_cart";
 
@@ -185,22 +184,10 @@ export async function quoteCart(pincode?: string, shippingMethod = "standard") {
     else couponMessage = evaluation.message;
   }
 
-  let shippingPaise = 0;
-  let shippingLabel = "Calculated at checkout";
-  if (pincode) {
-    const quotes = await shippingProvider.quote(pincode);
-    const selected = quotes.find((q) => q.method === shippingMethod && q.available) ?? quotes[0];
-    if (selected?.available) {
-      shippingPaise = selected.amountPaise;
-      shippingLabel = selected.label;
-      const { getStoreSettings, shippingFeesPaise } = await import("@/lib/services/store-settings");
-      const fees = shippingFeesPaise(await getStoreSettings());
-      if (shippingMethod === "standard" && fees.freeOverPaise > 0 && subtotalPaise - discountPaise >= fees.freeOverPaise) {
-        shippingPaise = 0;
-        shippingLabel = `${selected.label} (free over threshold)`;
-      }
-    }
-  }
+  void pincode;
+  void shippingMethod;
+  const shippingPaise = DELIVERY_PAISE;
+  const shippingLabel = "Delivery";
 
 
   return {
