@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { marginPercent, rupeesToPaise } from "@/lib/money";
+import { splitProductImages } from "@/lib/services/product-images";
 
 type Option = { id: string; name: string };
 
@@ -10,6 +11,7 @@ type ProductImage = {
   url: string;
   alt: string;
   type: string;
+  position: number;
 };
 
 type ProductValues = {
@@ -37,6 +39,45 @@ type ProductValues = {
   images?: ProductImage[];
 };
 
+function ImageSlot({
+  label,
+  name,
+  deleteName,
+  url,
+  onUrlChange,
+}: {
+  label: string;
+  name: string;
+  deleteName: string;
+  url: string;
+  onUrlChange: (value: string) => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-line bg-card p-3">
+      <p className="text-sm font-medium">{label}</p>
+      {url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={url} alt="" className="mt-2 aspect-square w-full rounded-xl object-cover bg-[#ece6dc]" />
+      ) : (
+        <div className="mt-2 flex aspect-square items-center justify-center rounded-xl bg-[#ece6dc] text-xs text-muted">
+          Empty
+        </div>
+      )}
+      <input
+        name={name}
+        value={url}
+        onChange={(e) => onUrlChange(e.target.value)}
+        placeholder="https://… or /images/…"
+        className="mt-2 h-10 w-full rounded-xl border border-line px-3 text-xs"
+      />
+      <label className="mt-2 flex items-center gap-2 text-xs text-[#9b2c2c]">
+        <input type="checkbox" name={deleteName} />
+        Delete this image
+      </label>
+    </div>
+  );
+}
+
 export function ProductForm({
   categories,
   suppliers,
@@ -48,18 +89,18 @@ export function ProductForm({
 }) {
   const [cost, setCost] = useState(((product?.costPaise ?? 0) / 100).toString());
   const [sell, setSell] = useState(((product?.sellingPaise ?? 0) / 100).toString());
-  const mainImage = product?.images?.find((img) => img.type === "MAIN") ?? product?.images?.[0];
-  const [imageUrl, setImageUrl] = useState(mainImage?.url ?? "");
+  const split = splitProductImages(product?.images ?? []);
+  const [mainUrl, setMainUrl] = useState(split.main?.url ?? "");
+  const [extras, setExtras] = useState(["", "", "", ""].map((empty, i) => split.extras[i]?.url ?? empty));
   const margin = useMemo(() => {
     const c = rupeesToPaise(Number(cost) || 0);
     const s = rupeesToPaise(Number(sell) || 0);
     return marginPercent(s, c);
   }, [cost, sell]);
   const action = product?.id ? `/api/admin/products/${product.id}` : "/api/admin/products";
-  const gallery = product?.images ?? [];
 
   return (
-    <form action={action} method="post" className="mt-6 grid max-w-3xl gap-4">
+    <form action={action} method="post" className="mt-6 grid max-w-4xl gap-4">
       <input name="sku" required defaultValue={product?.sku} placeholder="SKU" className="h-11 rounded-xl border border-line px-3 text-sm" />
       <input name="name" required defaultValue={product?.name} placeholder="Name" className="h-11 rounded-xl border border-line px-3 text-sm" />
       <input name="slug" required defaultValue={product?.slug} placeholder="slug" className="h-11 rounded-xl border border-line px-3 text-sm" />
@@ -101,39 +142,26 @@ export function ProductForm({
         <input name="stock" type="number" min={0} defaultValue={product?.stock ?? 0} className="h-11 rounded-xl border border-line px-3 text-sm" />
         <input name="lowStockThreshold" type="number" min={0} defaultValue={product?.lowStockThreshold ?? 5} className="h-11 rounded-xl border border-line px-3 text-sm" />
       </div>
-      <div className="rounded-2xl border border-line bg-card p-4">
-        <p className="text-sm font-medium">Main image</p>
+      <div>
+        <p className="text-sm font-medium">Product photos</p>
         <p className="mt-1 text-xs text-muted">
-          Paste a full https:// link, or a site path such as /images/products/linen-overshirt.svg
+          Main image is the large photo. The four extra photos appear as small boxes on the product page. Hovering an extra photo shows it large. Tick Delete and Save to remove one.
         </p>
-        {gallery.length > 0 ? (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {gallery.map((image) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={image.id}
-                src={image.url}
-                alt={image.alt || "Product"}
-                className="h-24 w-24 rounded-xl object-cover bg-[#ece6dc]"
-              />
-            ))}
-          </div>
-        ) : null}
-        {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt="Preview" className="mt-3 h-40 w-40 rounded-xl object-cover bg-[#ece6dc]" />
-        ) : (
-          <div className="mt-3 flex h-40 w-40 items-center justify-center rounded-xl bg-[#ece6dc] text-xs text-muted">
-            No image yet
-          </div>
-        )}
-        <input
-          name="imageUrl"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="https://… or /images/products/your-file.svg"
-          className="mt-3 h-11 w-full rounded-xl border border-line px-3 text-sm"
-        />
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <ImageSlot label="Main image" name="imageUrl" deleteName="deleteMain" url={mainUrl} onUrlChange={setMainUrl} />
+          {extras.map((url, index) => (
+            <ImageSlot
+              key={index}
+              label={`Extra ${index + 1}`}
+              name={`extraImage${index + 1}`}
+              deleteName={`deleteExtra${index + 1}`}
+              url={url}
+              onUrlChange={(value) =>
+                setExtras((current) => current.map((item, i) => (i === index ? value : item)))
+              }
+            />
+          ))}
+        </div>
       </div>
       <select name="status" defaultValue={product?.status ?? "ACTIVE"} className="h-11 rounded-xl border border-line px-3 text-sm">
         <option>DRAFT</option>

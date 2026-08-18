@@ -4,6 +4,7 @@ import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/a
 import { rupeesToPaise } from "@/lib/money";
 import { writeAudit } from "@/lib/audit";
 import { jsonError } from "@/lib/validation";
+import { syncProductImages } from "@/lib/services/product-images";
 
 export async function POST(
   request: NextRequest,
@@ -44,23 +45,7 @@ export async function POST(
       seoDescription: String(form.get("seoDescription") ?? "") || null,
     },
   });
-  const imageUrl = String(form.get("imageUrl") ?? "").trim();
-  if (imageUrl) {
-    const existingMain = await prisma.productImage.findFirst({
-      where: { productId: product.id, type: "MAIN" },
-      orderBy: { position: "asc" },
-    });
-    if (existingMain) {
-      await prisma.productImage.update({
-        where: { id: existingMain.id },
-        data: { url: imageUrl, alt: product.name },
-      });
-    } else {
-      await prisma.productImage.create({
-        data: { productId: product.id, url: imageUrl, alt: product.name, position: 0, type: "MAIN" },
-      });
-    }
-  }
+  await syncProductImages(product.id, product.name, form);
   await writeAudit({
     actorId: session!.id,
     action: "product.update",

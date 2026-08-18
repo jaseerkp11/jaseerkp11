@@ -10,6 +10,8 @@ import { ProductCard } from "@/components/store/product-card";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { PincodeChecker } from "@/components/store/pincode-checker";
+import { ProductGallery } from "@/components/store/product-gallery";
+import { splitProductImages } from "@/lib/services/product-images";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -100,27 +102,7 @@ export default async function ProductPage({
         ]}
       />
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
-        <div className="space-y-3">
-          {product.images[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.images[0].url}
-              alt={product.images[0].alt}
-              className="w-full rounded-[1.5rem] bg-[#ece6dc] object-cover"
-            />
-          ) : null}
-          <div className="grid grid-cols-4 gap-2">
-            {product.images.map((image) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={image.id}
-                src={image.url}
-                alt={image.alt}
-                className="aspect-square rounded-xl object-cover"
-              />
-            ))}
-          </div>
-        </div>
+        <ProductGallery {...splitProductImages(product.images)} />
         <div>
           <p className="text-sm text-muted">{product.brand}</p>
           <h1 className="mt-1 font-display text-4xl">{product.name}</h1>

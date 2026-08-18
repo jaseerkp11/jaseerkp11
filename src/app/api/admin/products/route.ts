@@ -5,6 +5,7 @@ import { rupeesToPaise } from "@/lib/money";
 import { writeAudit } from "@/lib/audit";
 import { jsonError } from "@/lib/validation";
 import { adjustInventory } from "@/lib/services/inventory";
+import { syncProductImages } from "@/lib/services/product-images";
 
 function parseProduct(form: FormData) {
   return {
@@ -52,12 +53,7 @@ export async function POST(request: NextRequest) {
       stock: 0,
     },
   });
-  const imageUrl = String(form.get("imageUrl") ?? "").trim();
-  if (imageUrl) {
-    await prisma.productImage.create({
-      data: { productId: product.id, url: imageUrl, alt: data.name, position: 0, type: "MAIN" },
-    });
-  }
+  await syncProductImages(product.id, data.name, form);
   if (data.stock > 0) {
     await adjustInventory({
       productId: product.id,

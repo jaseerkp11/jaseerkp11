@@ -13,7 +13,7 @@ export default async function EditProductPage({
   const { id } = await params;
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { images: true, variants: true },
+    include: { images: { orderBy: { position: "asc" } }, variants: true },
   });
   if (!product) notFound();
   const [categories, suppliers] = await Promise.all([
