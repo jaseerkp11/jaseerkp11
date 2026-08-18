@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { marginPercent, rupeesToPaise } from "@/lib/money";
-import { splitProductImages } from "@/lib/services/product-images";
+import { splitProductImages } from "@/lib/services/product-image-slots";
 
 type Option = { id: string; name: string };
 
@@ -41,26 +41,29 @@ type ProductValues = {
 
 function ImageSlot({
   label,
+  hint,
   name,
   deleteName,
   url,
   onUrlChange,
 }: {
   label: string;
+  hint: string;
   name: string;
   deleteName: string;
   url: string;
   onUrlChange: (value: string) => void;
 }) {
   return (
-    <div className="rounded-2xl border border-line bg-card p-3">
-      <p className="text-sm font-medium">{label}</p>
+    <div className="rounded-2xl border-2 border-line bg-card p-4">
+      <p className="text-base font-medium">{label}</p>
+      <p className="mt-1 text-xs text-muted">{hint}</p>
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt="" className="mt-2 aspect-square w-full rounded-xl object-cover bg-[#ece6dc]" />
+        <img src={url} alt="" className="mt-3 aspect-square w-full rounded-xl object-cover bg-[#ece6dc]" />
       ) : (
-        <div className="mt-2 flex aspect-square items-center justify-center rounded-xl bg-[#ece6dc] text-xs text-muted">
-          Empty
+        <div className="mt-3 flex aspect-square items-center justify-center rounded-xl border border-dashed border-line bg-[#ece6dc] text-sm text-muted">
+          Paste a photo URL below
         </div>
       )}
       <input
@@ -68,11 +71,18 @@ function ImageSlot({
         value={url}
         onChange={(e) => onUrlChange(e.target.value)}
         placeholder="https://… or /images/…"
-        className="mt-2 h-10 w-full rounded-xl border border-line px-3 text-xs"
+        className="mt-3 h-11 w-full rounded-xl border border-line px-3 text-sm"
       />
+      <button
+        type="button"
+        className="mt-2 h-10 w-full rounded-xl border border-[#9b2c2c] text-sm text-[#9b2c2c]"
+        onClick={() => onUrlChange("")}
+      >
+        Remove this photo
+      </button>
       <label className="mt-2 flex items-center gap-2 text-xs text-[#9b2c2c]">
         <input type="checkbox" name={deleteName} />
-        Delete this image
+        Delete on save
       </label>
     </div>
   );
@@ -100,7 +110,36 @@ export function ProductForm({
   const action = product?.id ? `/api/admin/products/${product.id}` : "/api/admin/products";
 
   return (
-    <form action={action} method="post" className="mt-6 grid max-w-4xl gap-4">
+    <form action={action} method="post" className="mt-6 grid max-w-5xl gap-4">
+      <section className="rounded-3xl border-2 border-primary/40 bg-[#f6f1ea] p-4 sm:p-5">
+        <h2 className="font-display text-2xl">Product photos</h2>
+        <p className="mt-1 text-sm text-muted">
+          Add the main photo first, then up to four more photos. These extra photos become the four small boxes on the shop product page. Hovering a small box shows that photo large.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <ImageSlot
+            label="Main image"
+            hint="Large photo on the product page and in the dashboard list"
+            name="imageUrl"
+            deleteName="deleteMain"
+            url={mainUrl}
+            onUrlChange={setMainUrl}
+          />
+          {extras.map((url, index) => (
+            <ImageSlot
+              key={index}
+              label={`Extra photo ${index + 1}`}
+              hint={`Small box ${index + 1} on the product page`}
+              name={`extraImage${index + 1}`}
+              deleteName={`deleteExtra${index + 1}`}
+              url={url}
+              onUrlChange={(value) =>
+                setExtras((current) => current.map((item, i) => (i === index ? value : item)))
+              }
+            />
+          ))}
+        </div>
+      </section>
       <input name="sku" required defaultValue={product?.sku} placeholder="SKU" className="h-11 rounded-xl border border-line px-3 text-sm" />
       <input name="name" required defaultValue={product?.name} placeholder="Name" className="h-11 rounded-xl border border-line px-3 text-sm" />
       <input name="slug" required defaultValue={product?.slug} placeholder="slug" className="h-11 rounded-xl border border-line px-3 text-sm" />
@@ -142,27 +181,6 @@ export function ProductForm({
         <input name="stock" type="number" min={0} defaultValue={product?.stock ?? 0} className="h-11 rounded-xl border border-line px-3 text-sm" />
         <input name="lowStockThreshold" type="number" min={0} defaultValue={product?.lowStockThreshold ?? 5} className="h-11 rounded-xl border border-line px-3 text-sm" />
       </div>
-      <div>
-        <p className="text-sm font-medium">Product photos</p>
-        <p className="mt-1 text-xs text-muted">
-          Main image is the large photo. The four extra photos appear as small boxes on the product page. Hovering an extra photo shows it large. Tick Delete and Save to remove one.
-        </p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <ImageSlot label="Main image" name="imageUrl" deleteName="deleteMain" url={mainUrl} onUrlChange={setMainUrl} />
-          {extras.map((url, index) => (
-            <ImageSlot
-              key={index}
-              label={`Extra ${index + 1}`}
-              name={`extraImage${index + 1}`}
-              deleteName={`deleteExtra${index + 1}`}
-              url={url}
-              onUrlChange={(value) =>
-                setExtras((current) => current.map((item, i) => (i === index ? value : item)))
-              }
-            />
-          ))}
-        </div>
-      </div>
       <select name="status" defaultValue={product?.status ?? "ACTIVE"} className="h-11 rounded-xl border border-line px-3 text-sm">
         <option>DRAFT</option>
         <option>ACTIVE</option>
@@ -185,7 +203,7 @@ export function ProductForm({
       </div>
       <input name="seoTitle" defaultValue={product?.seoTitle ?? ""} placeholder="SEO title" className="h-11 rounded-xl border border-line px-3 text-sm" />
       <input name="seoDescription" defaultValue={product?.seoDescription ?? ""} placeholder="SEO description" className="h-11 rounded-xl border border-line px-3 text-sm" />
-      <button className="h-11 rounded-full bg-primary text-sm text-[#f6f1ea]">{product?.id ? "Save" : "Create"}</button>
+      <button className="h-11 rounded-full bg-primary text-sm text-[#f6f1ea]">{product?.id ? "Save photos and product" : "Create"}</button>
     </form>
   );
 }

@@ -11,7 +11,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { PincodeChecker } from "@/components/store/pincode-checker";
 import { ProductGallery } from "@/components/store/product-gallery";
-import { splitProductImages } from "@/lib/services/product-images";
+import { splitProductImages } from "@/lib/services/product-image-slots";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";

@@ -24,7 +24,8 @@ export default async function EditProductPage({
     <div>
       <h1 className="font-display text-3xl">Edit product</h1>
       <p className="mt-2 text-sm text-muted">
-        Profit {formatMoney(profitPaise(product.sellingPaise, product.costPaise))} · margin{" "}
+        Photo boxes are at the top of this page (main + 4 extra). Profit{" "}
+        {formatMoney(profitPaise(product.sellingPaise, product.costPaise))} · margin{" "}
         {marginPercent(product.sellingPaise, product.costPaise)}%. Customers never see cost.
       </p>
       <ProductForm categories={categories} suppliers={suppliers} product={product} />
