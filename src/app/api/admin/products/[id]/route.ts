@@ -4,7 +4,6 @@ import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/a
 import { rupeesToPaise } from "@/lib/money";
 import { writeAudit } from "@/lib/audit";
 import { jsonError } from "@/lib/validation";
-import { getBrand } from "@/config/brand";
 
 export async function POST(
   request: NextRequest,
@@ -47,9 +46,20 @@ export async function POST(
   });
   const imageUrl = String(form.get("imageUrl") ?? "").trim();
   if (imageUrl) {
-    await prisma.productImage.create({
-      data: { productId: product.id, url: imageUrl, alt: product.name, type: "GALLERY" },
+    const existingMain = await prisma.productImage.findFirst({
+      where: { productId: product.id, type: "MAIN" },
+      orderBy: { position: "asc" },
     });
+    if (existingMain) {
+      await prisma.productImage.update({
+        where: { id: existingMain.id },
+        data: { url: imageUrl, alt: product.name },
+      });
+    } else {
+      await prisma.productImage.create({
+        data: { productId: product.id, url: imageUrl, alt: product.name, position: 0, type: "MAIN" },
+      });
+    }
   }
   await writeAudit({
     actorId: session!.id,
@@ -57,5 +67,5 @@ export async function POST(
     entity: "Product",
     entityId: product.id,
   });
-  return Response.redirect(new URL(`/admin/products/${product.id}`, getBrand().siteUrl), 303);
+  return Response.redirect(new URL(`/admin/products/${product.id}`, request.url), 303);
 }

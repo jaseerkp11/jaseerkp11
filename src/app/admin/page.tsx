@@ -11,6 +11,7 @@ export default async function AdminDashboard() {
     prisma.user.count({ where: { role: "CUSTOMER" } }),
     prisma.product.findMany({
       where: { status: "ACTIVE" },
+      include: { images: { orderBy: { position: "asc" }, take: 1 } },
       take: 40,
     }),
   ]);
@@ -65,8 +66,14 @@ export default async function AdminDashboard() {
           ) : (
             <ul className="mt-3 divide-y divide-line rounded-2xl border border-line bg-card">
               {low.slice(0, 8).map((p) => (
-                <li key={p.id} className="flex justify-between px-4 py-3 text-sm">
-                  <Link href={`/admin/products/${p.id}`}>{p.name}</Link>
+                <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                  <Link href={`/admin/products/${p.id}`} className="flex items-center gap-3">
+                    {p.images[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.images[0].url} alt="" className="h-10 w-10 rounded-lg object-cover bg-[#ece6dc]" />
+                    ) : null}
+                    {p.name}
+                  </Link>
                   <span>{p.stock - p.reservedStock} available</span>
                 </li>
               ))}

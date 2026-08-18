@@ -4,7 +4,6 @@ import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/a
 import { rupeesToPaise } from "@/lib/money";
 import { writeAudit } from "@/lib/audit";
 import { jsonError } from "@/lib/validation";
-import { getBrand } from "@/config/brand";
 import { adjustInventory } from "@/lib/services/inventory";
 
 function parseProduct(form: FormData) {
@@ -74,5 +73,5 @@ export async function POST(request: NextRequest) {
     entity: "Product",
     entityId: product.id,
   });
-  return Response.redirect(new URL(`/admin/products/${product.id}`, getBrand().siteUrl), 303);
+  return Response.redirect(new URL(`/admin/products/${product.id}`, request.url), 303);
 }

@@ -16,7 +16,11 @@ export default async function AdminProductsPage({
           OR: [{ name: { contains: q } }, { sku: { contains: q } }],
         }
       : undefined,
-    include: { category: true, supplier: true },
+    include: {
+      category: true,
+      supplier: true,
+      images: { orderBy: { position: "asc" }, take: 1 },
+    },
     orderBy: { updatedAt: "desc" },
     take: 100,
   });
@@ -48,10 +52,24 @@ export default async function AdminProductsPage({
             {products.map((p) => (
               <tr key={p.id} className="border-b border-line last:border-0">
                 <td className="px-4 py-3">
-                  <Link href={`/admin/products/${p.id}`} className="font-medium underline">
-                    {p.name}
+                  <Link href={`/admin/products/${p.id}`} className="flex items-center gap-3">
+                    {p.images[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={p.images[0].url}
+                        alt=""
+                        className="h-12 w-12 shrink-0 rounded-lg object-cover bg-[#ece6dc]"
+                      />
+                    ) : (
+                      <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#ece6dc] text-[10px] text-muted">
+                        No img
+                      </span>
+                    )}
+                    <span>
+                      <span className="block font-medium underline">{p.name}</span>
+                      <span className="block text-xs text-muted no-underline">{p.category.name}</span>
+                    </span>
                   </Link>
-                  <p className="text-xs text-muted">{p.category.name}</p>
                 </td>
                 <td>{p.sku}</td>
                 <td>{formatMoney(p.sellingPaise)}</td>

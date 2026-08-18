@@ -5,6 +5,13 @@ import { marginPercent, rupeesToPaise } from "@/lib/money";
 
 type Option = { id: string; name: string };
 
+type ProductImage = {
+  id: string;
+  url: string;
+  alt: string;
+  type: string;
+};
+
 type ProductValues = {
   id?: string;
   sku?: string;
@@ -27,6 +34,7 @@ type ProductValues = {
   newArrival?: boolean;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  images?: ProductImage[];
 };
 
 export function ProductForm({
@@ -40,12 +48,15 @@ export function ProductForm({
 }) {
   const [cost, setCost] = useState(((product?.costPaise ?? 0) / 100).toString());
   const [sell, setSell] = useState(((product?.sellingPaise ?? 0) / 100).toString());
+  const mainImage = product?.images?.find((img) => img.type === "MAIN") ?? product?.images?.[0];
+  const [imageUrl, setImageUrl] = useState(mainImage?.url ?? "");
   const margin = useMemo(() => {
     const c = rupeesToPaise(Number(cost) || 0);
     const s = rupeesToPaise(Number(sell) || 0);
     return marginPercent(s, c);
   }, [cost, sell]);
   const action = product?.id ? `/api/admin/products/${product.id}` : "/api/admin/products";
+  const gallery = product?.images ?? [];
 
   return (
     <form action={action} method="post" className="mt-6 grid max-w-3xl gap-4">
@@ -90,7 +101,40 @@ export function ProductForm({
         <input name="stock" type="number" min={0} defaultValue={product?.stock ?? 0} className="h-11 rounded-xl border border-line px-3 text-sm" />
         <input name="lowStockThreshold" type="number" min={0} defaultValue={product?.lowStockThreshold ?? 5} className="h-11 rounded-xl border border-line px-3 text-sm" />
       </div>
-      <input name="imageUrl" placeholder="Main image URL (optional)" className="h-11 rounded-xl border border-line px-3 text-sm" />
+      <div className="rounded-2xl border border-line bg-card p-4">
+        <p className="text-sm font-medium">Main image</p>
+        <p className="mt-1 text-xs text-muted">
+          Paste a full https:// link, or a site path such as /images/products/linen-overshirt.svg
+        </p>
+        {gallery.length > 0 ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {gallery.map((image) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={image.id}
+                src={image.url}
+                alt={image.alt || "Product"}
+                className="h-24 w-24 rounded-xl object-cover bg-[#ece6dc]"
+              />
+            ))}
+          </div>
+        ) : null}
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imageUrl} alt="Preview" className="mt-3 h-40 w-40 rounded-xl object-cover bg-[#ece6dc]" />
+        ) : (
+          <div className="mt-3 flex h-40 w-40 items-center justify-center rounded-xl bg-[#ece6dc] text-xs text-muted">
+            No image yet
+          </div>
+        )}
+        <input
+          name="imageUrl"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+          placeholder="https://… or /images/products/your-file.svg"
+          className="mt-3 h-11 w-full rounded-xl border border-line px-3 text-sm"
+        />
+      </div>
       <select name="status" defaultValue={product?.status ?? "ACTIVE"} className="h-11 rounded-xl border border-line px-3 text-sm">
         <option>DRAFT</option>
         <option>ACTIVE</option>
