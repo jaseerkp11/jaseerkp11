@@ -1,11 +1,37 @@
 import { z } from "zod";
 
+export function indiaMobile(value: unknown): string | null {
+  const digits = String(value ?? "").replace(/\D/g, "");
+  let ten = digits;
+  if (digits.length === 12 && digits.startsWith("91")) ten = digits.slice(2);
+  if (digits.length === 11 && digits.startsWith("0")) ten = digits.slice(1);
+  if (!/^\d{10}$/.test(ten)) return null;
+  return ten;
+}
+
 export const emailSchema = z.string().trim().email().max(255);
 export const phoneSchema = z
   .string()
   .trim()
-  .regex(/^[0-9+\-() ]{8,20}$/, "Enter a valid phone number");
-export const pincodeSchema = z.string().trim().regex(/^[1-9][0-9]{5}$/, "Enter a valid 6-digit pincode");
+  .transform((value, ctx) => {
+    const mobile = indiaMobile(value);
+    if (!mobile) {
+      ctx.addIssue({ code: "custom", message: "Enter a 10-digit mobile number" });
+      return z.NEVER;
+    }
+    return mobile;
+  });
+export const pincodeSchema = z
+  .string()
+  .trim()
+  .transform((value, ctx) => {
+    const pin = value.replace(/\D/g, "");
+    if (!/^[1-9][0-9]{5}$/.test(pin)) {
+      ctx.addIssue({ code: "custom", message: "Enter a valid 6-digit pincode" });
+      return z.NEVER;
+    }
+    return pin;
+  });
 export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters")

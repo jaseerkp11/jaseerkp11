@@ -11,6 +11,12 @@ import { formatMoney } from "@/lib/money";
 import type { addressSchema } from "@/lib/validation";
 import type { z } from "zod";
 
+export class CheckoutError extends Error {
+  constructor(public code: string, message: string) {
+    super(message);
+  }
+}
+
 function orderNumber(): string {
   const n = Math.floor(Math.random() * 900000) + 100000;
   return `AT${Date.now().toString().slice(-8)}${n.toString().slice(0, 2)}`;
@@ -25,38 +31,48 @@ export async function placeOrder(input: {
 }) {
   const user = await getSessionUser();
   const quote = await quoteCart(input.address.pincode, input.shippingMethod);
-  if (quote.activeItems.length === 0) {
-    throw new Error("Your cart is empty.");
+  if (quote.activeItems.length === 0 || !quote.cart.id) {
+    throw new CheckoutError("empty", "Your cart is empty.");
   }
 
   const quotes = await shippingProvider.quote(input.address.pincode);
   const shipping = quotes.find((q) => q.method === input.shippingMethod && q.available);
-  if (!shipping) throw new Error("Shipping is not available for this pincode.");
-
-  const provider = paymentProviders[input.paymentMethod];
-  const intent = await provider.createIntent(quote.totals.totalPaise, "INR");
-  if (!intent.configured) {
-    throw new Error(intent.message);
+  if (!shipping) {
+    throw new CheckoutError("pincode", "Enter a valid 6-digit pincode so we can deliver.");
   }
 
-  const order = await prisma.$transaction(async (tx) => {
+  const provider = paymentProviders[input.paymentMethod];
+  if (!provider) {
+    throw new CheckoutError("payment", "Please choose cash on delivery.");
+  }
+  const intent = await provider.createIntent(quote.totals.totalPaise, "INR");
+  if (!intent.configured) {
+    throw new CheckoutError("payment", "Please choose cash on delivery.");
+  }
+
+  const reserved: Array<{ productId: string; variantId: string | null; quantity: number }> = [];
+  try {
     for (const item of quote.activeItems) {
-      const product = await tx.product.findUnique({ where: { id: item.productId } });
-      if (!product) throw new Error("A product in your cart is no longer available.");
+      const product = await prisma.product.findUnique({ where: { id: item.productId } });
+      if (!product) throw new CheckoutError("stock", "A product in your cart is no longer available.");
       const available = product.stock - product.reservedStock;
       if (available < item.quantity) {
-        throw new Error(`${product.name} does not have enough stock.`);
+        throw new CheckoutError("stock", `${product.name} does not have enough stock.`);
       }
       await adjustInventory({
         productId: item.productId,
         variantId: item.variantId,
         delta: item.quantity,
         reason: "RESERVE",
-        tx,
+      });
+      reserved.push({
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: item.quantity,
       });
     }
 
-    const created = await tx.order.create({
+    const order = await prisma.order.create({
       data: {
         orderNumber: orderNumber(),
         customerId: user?.id,
@@ -65,7 +81,7 @@ export async function placeOrder(input: {
         subtotalPaise: quote.totals.subtotalPaise,
         discountPaise: quote.totals.discountPaise,
         shippingPaise: quote.totals.shippingPaise,
-        taxPaise: quote.totals.taxPaise,
+        taxPaise: 0,
         totalPaise: quote.totals.totalPaise,
         costPaise: quote.activeItems.reduce((sum, item) => {
           const cost = item.variant?.costPaise ?? item.product.costPaise;
@@ -77,11 +93,11 @@ export async function placeOrder(input: {
         shippingName: input.address.fullName,
         shippingPhone: input.address.phone,
         shippingLine1: input.address.line1,
-        shippingLine2: input.address.line2,
+        shippingLine2: input.address.line2 || null,
         shippingCity: input.address.city,
         shippingState: input.address.state,
         shippingPincode: input.address.pincode,
-        shippingCountry: input.address.country ?? "IN",
+        shippingCountry: "IN",
         shippingMethod: shipping.label,
         items: {
           create: quote.activeItems.map((item) => ({
@@ -111,50 +127,71 @@ export async function placeOrder(input: {
             status: "PENDING",
             note:
               input.paymentMethod === "cod"
-                ? "Order placed with cash on delivery. Payment will be collected on delivery."
+                ? "Order placed. Pay cash when the parcel arrives."
                 : "Order placed. Waiting for payment confirmation.",
-            actorId: user?.id,
           },
         },
       },
     });
 
     if (quote.cart.couponCode) {
-      const coupon = await tx.coupon.findUnique({ where: { code: quote.cart.couponCode } });
+      const coupon = await prisma.coupon.findUnique({ where: { code: quote.cart.couponCode } });
       if (coupon) {
-        await tx.couponRedemption.create({
-          data: { couponId: coupon.id, userId: user?.id, orderId: created.id },
+        await prisma.couponRedemption.create({
+          data: { couponId: coupon.id, userId: user?.id, orderId: order.id },
         });
       }
     }
 
-    await tx.cartItem.deleteMany({
+    await prisma.cartItem.deleteMany({
       where: { cartId: quote.cart.id, savedForLater: false },
     });
-    await tx.cart.update({
+    await prisma.cart.update({
       where: { id: quote.cart.id },
       data: { couponCode: null },
     });
 
-    return created;
-  });
+    try {
+      await emailProvider.send({
+        to: order.email,
+        ...notificationTemplates.orderConfirmed(
+          order.orderNumber,
+          formatMoney(order.totalPaise),
+          "Cash on delivery",
+        ),
+      });
+    } catch {
+      /* order is already saved */
+    }
+    try {
+      await trackEvent({ name: "purchase", metadata: { orderId: order.id } });
+      await writeAudit({
+        actorId: user?.id,
+        action: "order.create",
+        entity: "Order",
+        entityId: order.id,
+        metadata: { paymentMethod: input.paymentMethod, totalPaise: order.totalPaise },
+      });
+    } catch {
+      /* order is already saved */
+    }
 
-  await emailProvider.send({
-    to: order.email,
-    ...notificationTemplates.orderConfirmed(
-      order.orderNumber,
-      formatMoney(order.totalPaise),
-      input.paymentMethod === "cod" ? "Cash on delivery" : "Online payment pending",
-    ),
-  });
-  await trackEvent({ name: "purchase", metadata: { orderId: order.id } });
-  await writeAudit({
-    actorId: user?.id,
-    action: "order.create",
-    entity: "Order",
-    entityId: order.id,
-    metadata: { paymentMethod: input.paymentMethod, totalPaise: order.totalPaise },
-  });
-
-  return order;
+    return order;
+  } catch (error) {
+    for (const item of reserved) {
+      try {
+        await adjustInventory({
+          productId: item.productId,
+          variantId: item.variantId,
+          delta: item.quantity,
+          reason: "RELEASE",
+          note: "Checkout rolled back",
+        });
+      } catch {
+        /* keep trying remaining lines */
+      }
+    }
+    if (error instanceof CheckoutError) throw error;
+    throw new CheckoutError("save", "The order could not be saved. Please try again.");
+  }
 }

@@ -202,14 +202,6 @@ export async function quoteCart(pincode?: string, shippingMethod = "standard") {
     }
   }
 
-  const taxable = Math.max(0, subtotalPaise - discountPaise);
-  const taxPaise = Math.round(
-    activeItems.reduce((sum, item) => {
-      const price = item.variant?.sellingPaise ?? item.product.sellingPaise;
-      const share = subtotalPaise === 0 ? 0 : (price * item.quantity) / subtotalPaise;
-      return sum + Math.round(taxable * share * (item.product.taxBps / 10000));
-    }, 0),
-  );
 
   return {
     cart,
@@ -218,7 +210,7 @@ export async function quoteCart(pincode?: string, shippingMethod = "standard") {
       subtotalPaise,
       discountPaise,
       shippingPaise,
-      taxPaise,
+      taxPaise: 0,
     }),
     shippingLabel,
     couponMessage,
