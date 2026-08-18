@@ -32,6 +32,9 @@ export default async function AdminProductsPage({
           Add product
         </Link>
       </div>
+      <p className="mt-2 text-sm text-muted">
+        Click a product name to edit. Photo slots (main + 4 extra) are at the top of the edit page.
+      </p>
       <form className="mt-4">
         <input name="q" defaultValue={q} placeholder="Search name or SKU" className="h-11 w-full max-w-md rounded-xl border border-line bg-card px-3 text-sm" />
       </form>
