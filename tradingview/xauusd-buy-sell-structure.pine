@@ -104,7 +104,7 @@ float bearGap = low[2] - high
 bool validBullFvg = showFvg and barstate.isconfirmed and atr15 > 0 and low > high[2] and bullGap >= minFvgAtr * atr15 and midBull and (not fvgWith4h or bias4h == 1)
 bool validBearFvg = showFvg and barstate.isconfirmed and atr15 > 0 and high < low[2] and bearGap >= minFvgAtr * atr15 and midBear and (not fvgWith4h or bias4h == -1)
 
-bool fvgDuplicate(int dir, float top, float bot) =>
+fvgDuplicate(int dir, float top, float bot) =>
     bool dup = false
     if array.size(fvgs) > 0
         for i = 0 to array.size(fvgs) - 1
@@ -134,7 +134,7 @@ if array.size(fvgs) > 0
         FvgBox old = array.shift(fvgs)
         box.delete(old.bx)
 
-bool overlapsFvg(int dir) =>
+overlapsFvg(int dir) =>
     bool hit = false
     float pad = atr15 * 0.12
     if array.size(fvgs) > 0
@@ -145,7 +145,7 @@ bool overlapsFvg(int dir) =>
                 break
     hit
 
-float nearestFvgMid(int dir) =>
+nearestFvgMid(int dir) =>
     float best = float(na)
     float bestDist = 1e10
     if array.size(fvgs) > 0
@@ -186,6 +186,7 @@ dropOldestTf(int tf) =>
                 box.delete(z.bx)
                 array.remove(zones, i)
                 break
+    0
 
 addZone(int tf, int kind, float lvl, float halfH, color border, color bg, string tag, int leftBars) =>
     if not na(lvl) and atr15 > 0 and not zoneExists(tf, lvl, math.max(halfH * 0.9, 1.0))
@@ -195,6 +196,7 @@ addZone(int tf, int kind, float lvl, float halfH, color border, color bg, string
         float bot = kind == 1 ? lvl - halfH * 0.35 : lvl - halfH
         box zb = box.new(math.max(bar_index - leftBars, 0), top, bar_index + 6, bot, border_color = border, bgcolor = bg, border_width = 1, text = tag, text_color = border, text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_center)
         array.push(zones, SrZone.new(zb, tf, kind, top, bot, lvl))
+    0
 
 float h4Half = math.max(nz(h4atr, atr15) * 0.14, 3.0)
 float h1Half = math.max(nz(h1atr, atr15) * 0.16, 2.0)
@@ -240,7 +242,7 @@ nearKind(int kind) =>
                     break
     hit
 
-float nearestZoneMid(int kind) =>
+nearestZoneMid(int kind) =>
     float best = float(na)
     float bestDist = 1e10
     if array.size(zones) > 0
@@ -253,7 +255,7 @@ float nearestZoneMid(int kind) =>
                     best := z.mid
     best
 
-string nearestZoneTag(int kind) =>
+nearestZoneTag(int kind) =>
     string tag = "none"
     float bestDist = 1e10
     int bestTf = 0
