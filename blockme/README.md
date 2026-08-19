@@ -1,6 +1,12 @@
 # BlockMe line-clear helper (phone browser)
 
-Open `helper.html` on your phone (Files / any browser). It does **not** log into or click `app.blockme.games`.
+**iPhone:** A downloaded `.html` file only shows code. iOS will not run it from Files. Open this **https** link in **Safari** instead (that is the real app):
+
+https://cdn.jsdelivr.net/gh/jaseerkp11/jaseerkp11@cursor/blockme-line-helper-9059/blockme/helper.html
+
+Then Share → **Add to Home Screen** if you want an icon.
+
+It does **not** log into or click `app.blockme.games`.
 
 1. Tap the 8×8 grid to copy **your current board** (`#` = filled).
 2. Tap every piece you can use this turn (center random **and** left/right catalog).
