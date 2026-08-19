@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>BlockMe 8-line helper</title>
+  <style>
+    :root { --bg: #128a3a; --cell: #0d4a22; --on: #f0c040; --hit: #3ee0d0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: #fff; padding: 12px; padding-bottom: 88px; }
+    h1 { font-size: 1.15rem; margin: 0 0 6px; }
+    p, .hint { font-size: 0.85rem; line-height: 1.35; margin: 0 0 10px; opacity: 0.95; }
+    .grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; max-width: 360px; margin: 0 auto 8px; }
+    .cell { aspect-ratio: 1; background: var(--cell); border-radius: 6px; border: 1px solid #0a3a1a; }
+    .cell.on { background: var(--on); }
+    .cell.preview { background: var(--hit); }
+    .nums { display: grid; grid-template-columns: repeat(8, 1fr); max-width: 360px; margin: 0 auto 12px; font-size: 0.7rem; text-align: center; opacity: 0.8; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    button { font: inherit; padding: 10px 12px; border: 0; border-radius: 10px; background: #0b3d1c; color: #fff; }
+    button.primary { background: #ffcc33; color: #123; font-weight: 700; width: 100%; font-size: 1.05rem; }
+    .pieces { display: flex; flex-wrap: wrap; gap: 6px; }
+    .piece { padding: 8px 10px; border-radius: 8px; background: #0b3d1c; font-size: 0.8rem; }
+    .piece.sel { outline: 3px solid #ffcc33; }
+    #out { background: #0b3d1c; border-radius: 12px; padding: 12px; white-space: pre-wrap; font-size: 0.92rem; min-height: 72px; }
+    .sticky { position: sticky; bottom: 0; background: var(--bg); padding: 8px 0 16px; }
+  </style>
+</head>
+<body>
+  <h1>8-line helper (you tap, it advises)</h1>
+  <p class="hint">This is a planner, not a bot inside the game. Copy your board by tapping cells. Select pieces you have (center random + left/right). It tells you which piece and which start row/column. Row 1 is the top of the screen.</p>
+  <div class="nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+  <div class="grid" id="grid"></div>
+  <div class="row">
+    <button type="button" id="clearBoard">Clear board</button>
+    <button type="button" id="fillSetup">Load L-7 8-line setup</button>
+  </div>
+  <p>Tap every piece you can use now:</p>
+  <div class="pieces" id="pieces"></div>
+  <div class="sticky">
+    <button type="button" class="primary" id="solve">Find 8-line / best clear</button>
+  </div>
+  <div id="out">Tap the board and pieces, then Find.</div>
+  <script>
+    const N = 8;
+    const board = Array.from({ length: N }, () => Array(N).fill(false));
+    const gridEl = document.getElementById("grid");
+    const outEl = document.getElementById("out");
+    const selected = new Set(["L-7"]);
+
+    const CATALOG = {
+      "I-5": [[0,0],[1,0],[2,0],[3,0],[4,0]],
+      "L-5": [[0,0],[1,0],[2,0],[3,0],[3,1]],
+      "L-6": [[0,0],[1,0],[2,0],[3,0],[4,0],[4,1]],
+      "L-7": [[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[5,1]],
+      "T-7": [[0,0],[0,1],[0,2],[1,1],[2,1],[3,1],[4,1]],
+      "V-7": [[0,0],[1,0],[2,0],[3,0],[4,0],[4,1],[4,2]],
+      "O-4": [[0,0],[0,1],[1,0],[1,1]],
+      "O-8": [[0,0],[0,1],[1,0],[1,1],[2,0],[2,1],[3,0],[3,1]],
+      "O-9": [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]],
+      "I-4": [[0,0],[1,0],[2,0],[3,0]],
+      "U-5": [[0,0],[0,2],[1,0],[1,1],[1,2]],
+      "Y-7": [[0,0],[1,0],[2,0],[3,0],[4,0],[3,1],[4,1]]
+    };
+
+    function rot(cells) {
+      return cells.map(([r, c]) => [c, -r]);
+    }
+    function norm(cells) {
+      const mr = Math.min(...cells.map((x) => x[0]));
+      const mc = Math.min(...cells.map((x) => x[1]));
+      return cells.map(([r, c]) => [r - mr, c - mc]);
+    }
+    function orients(name) {
+      let cells = CATALOG[name].map((x) => x.slice());
+      const seen = new Set();
+      const out = [];
+      for (let i = 0; i < 4; i++) {
+        cells = norm(cells);
+        const key = cells.map((p) => p.join(",")).sort().join("|");
+        if (!seen.has(key)) {
+          seen.add(key);
+          out.push(cells.map((p) => p.slice()));
+        }
+        cells = rot(cells);
+      }
+      return out;
+    }
+
+    function render(preview) {
+      [...gridEl.children].forEach((el, i) => {
+        const r = Math.floor(i / N);
+        const c = i % N;
+        el.className = "cell" + (board[r][c] ? " on" : "") + (preview && preview[r][c] ? " preview" : "");
+      });
+    }
+
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        const el = document.createElement("button");
+        el.type = "button";
+        el.className = "cell";
+        el.addEventListener("click", () => {
+          board[r][c] = !board[r][c];
+          render();
+        });
+        gridEl.appendChild(el);
+      }
+    }
+
+    const piecesEl = document.getElementById("pieces");
+    Object.keys(CATALOG).forEach((name) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "piece" + (selected.has(name) ? " sel" : "");
+      b.textContent = name;
+      b.addEventListener("click", () => {
+        if (selected.has(name)) selected.delete(name);
+        else selected.add(name);
+        b.classList.toggle("sel");
+      });
+      piecesEl.appendChild(b);
+    });
+
+    function canPlace(b, cells, r0, c0) {
+      for (const [dr, dc] of cells) {
+        const r = r0 + dr, c = c0 + dc;
+        if (r < 0 || c < 0 || r >= N || c >= N) return false;
+        if (b[r][c]) return false;
+      }
+      return true;
+    }
+
+    function afterPlace(b, cells, r0, c0) {
+      const next = b.map((row) => row.slice());
+      for (const [dr, dc] of cells) next[r0 + dr][c0 + dc] = true;
+      return next;
+    }
+
+    function lines(b) {
+      let rows = 0, cols = 0;
+      const rowIds = [], colIds = [];
+      for (let r = 0; r < N; r++) {
+        if (b[r].every(Boolean)) { rows++; rowIds.push(r + 1); }
+      }
+      for (let c = 0; c < N; c++) {
+        if (b.every((row) => row[c])) { cols++; colIds.push(c + 1); }
+      }
+      return { total: rows + cols, rows, cols, rowIds, colIds };
+    }
+
+    function solve() {
+      let best = null;
+      const hits8 = [];
+      for (const name of selected) {
+        orients(name).forEach((cells, rotI) => {
+          for (let r = 0; r < N; r++) {
+            for (let c = 0; c < N; c++) {
+              if (!canPlace(board, cells, r, c)) continue;
+              const next = afterPlace(board, cells, r, c);
+              const L = lines(next);
+              const rec = { name, rotI, r: r + 1, c: c + 1, L, cells, r0: r, c0: c };
+              if (!best || L.total > best.L.total) best = rec;
+              if (L.total >= 8) hits8.push(rec);
+            }
+          }
+        });
+      }
+      const pick = hits8[0] || best;
+      if (!pick || pick.L.total === 0) {
+        outEl.textContent = "No clearing move with the selected pieces. Build holes first, or add L-7 / T-7 / V-7.";
+        render();
+        return;
+      }
+      const preview = Array.from({ length: N }, () => Array(N).fill(false));
+      for (const [dr, dc] of pick.cells) preview[pick.r0 + dr][pick.c0 + dc] = true;
+      render(preview);
+      const kind = pick.L.total >= 8 ? "8+ LINES" : "best this board (not 8 yet)";
+      outEl.textContent =
+        kind + "\nUse piece: " + pick.name +
+        "\nRotation: " + pick.rotI + " (0 = catalog upright, then 90° clockwise each step)" +
+        "\nStart cell (top-left of piece box): row " + pick.r + ", column " + pick.c +
+        "\nClears rows: " + (pick.L.rowIds.join(", ") || "none") +
+        "\nClears columns: " + (pick.L.colIds.join(", ") || "none") +
+        "\nTotal lines: " + pick.L.total +
+        (pick.L.total < 8 ? "\n\nFor 8: tap Load L-7 8-line setup, keep L-7 selected, Find again." : "");
+    }
+
+    document.getElementById("solve").addEventListener("click", solve);
+    document.getElementById("clearBoard").addEventListener("click", () => {
+      for (let r = 0; r < N; r++) board[r].fill(false);
+      render();
+    });
+    document.getElementById("fillSetup").addEventListener("click", () => {
+      for (let r = 0; r < N; r++) board[r].fill(false);
+      for (let r = 2; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          if (c === 3) continue;
+          if (r === 7 && c === 4) continue;
+          board[r][c] = true;
+        }
+      }
+      board[0][3] = board[1][3] = true;
+      for (let r = 0; r < 7; r++) board[r][4] = true;
+      render();
+      outEl.textContent = "L-7 setup loaded. Keep L-7 selected and tap Find. Place stem in column 4 from row 3 down; extra square at row 8 column 5.";
+    });
+    render();
+  </script>
+</body>
+</html>
