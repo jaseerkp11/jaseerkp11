@@ -1,18 +1,29 @@
-# XAUUSD Buy Sell Structure (TradingView)
+# XAUUSD High Probability Structure (TradingView)
 
-Pine Script **v6** overlay for the **15-minute** chart. Copy `xauusd-buy-sell-structure.pine` into TradingView → Pine Editor → Add to chart.
+Pine Script **v6** for the **15-minute** XAUUSD chart. Paste into Pine Editor → Add to chart.
 
-## What changed vs the previous script
+## What makes an arrow “high probability”
 
-- **15m FVG boxes (both directions):** bullish and bearish 3-candle imbalances are drawn on 15m. The 4H-only FVG filter is **off** by default so you see both sides. Boxes stay until filled, then delete.
-- **Auto S/R zones:** confirmed swing pools on **4H**, **1H**, and **15m** are drawn as shaded boxes and extend forward. Broken zones are removed.
-- **Arrows only when aligned:** BUY/SELL arrows need 4H+1H bias, London/NY session, a real sweep + displacement, overlapping 15m FVG, and a nearby S/R zone (each extra filter can be turned off in settings).
-- **Entry table:** top-right panel now shows **Enter** (price / wait instruction), **Stop** (sweep invalidation), and current **FVG / S/R** touches.
+An arrow only prints on a **confirmed 15m close** when all of this is true:
 
-## Use
+1. **Daily not against** the trade, and **4H + 1H** same bias  
+2. **London 07–10 or New York 12–16 UTC** (killzone; can turn off)  
+3. **Real sweep** (wick through a 15m swing, close back, not a runaway break)  
+4. **Displacement** (strong body, close through prior bar, close in the right third of the candle)  
+5. **Confluence score ≥ 7 / 12** (default): HTF, daily, killzone, equal swings, FVG, demand/supply, premium/discount, Asia sweep, ADX, not stretched  
+6. **15m FVG** in trade direction and a nearby **demand** (buy) or **supply** (sell) zone  
+7. Buys only in the **discount** half of the last 8 hours; sells only in **premium**
 
-1. Open **XAUUSD** (or XAU) on **15m**.
-2. Paste the indicator and keep the chart timeframe at 15m (HTF data is pulled internally).
-3. Tune groups: Price action, Filters, Display, Fair value gaps, Support / resistance.
+Fake sweeps (close back through the level before confirmation) are cancelled.
 
-This is a confluence tool, not a guaranteed entry.
+## Table
+
+Score, Daily, 4H/1H, killzone, PD array, pending, **Enter**, **Stop / TP1**, FVG/SD, ADX, Asia range.
+
+On a signal the chart gets **SL / TP1 / TP2** lines (defaults 1.5R and 2.5R) and a label with prices.
+
+## If you get no arrows
+
+That is intended. Loosen **Min confluence score**, turn off killzone, FVG, or Asia in **Filters / probability**.
+
+This is a confluence tool, not a guaranteed trade.
