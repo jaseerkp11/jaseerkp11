@@ -18,10 +18,13 @@ npm install
 npm run dev
 ```
 
-If you already cloned the repo, do not run `cd claimradar` from `C:\Users\DELL`. Go into the clone, then the app folder:
+If `jaseerkp11` **already exists** (this is your case), do not clone again. Switch that folder to the ClaimRadar branch:
 
 ```bat
-cd %USERPROFILE%\jaseerkp11\claimradar
+cd %USERPROFILE%\jaseerkp11
+git fetch origin cursor/claimradar-tracker-9059
+git checkout cursor/claimradar-tracker-9059
+cd claimradar
 npm install
 npm run dev
 ```
