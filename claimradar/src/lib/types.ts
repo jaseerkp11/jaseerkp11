@@ -7,6 +7,9 @@ export type Campaign = {
   status: string;
   kind?: string;
   extra?: string;
+  chain?: string;
+  reward?: string;
+  action?: string;
 };
 
 export type SourceReport = {
@@ -16,9 +19,15 @@ export type SourceReport = {
   error?: string;
 };
 
+export type ChainCoverage = {
+  name: string;
+  live: number;
+};
+
 export type CampaignPayload = {
   fetchedAt: string;
   nextRefreshSec: number;
   items: Campaign[];
   sources: SourceReport[];
+  chains: ChainCoverage[];
 };

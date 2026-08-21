@@ -1,6 +1,6 @@
 export const metadata = {
   title: "ClaimRadar",
-  description: "Public crypto quest and airdrop campaign index. You sign up yourself.",
+  description: "Public index of crypto signup/in-app rewards and on-chain token earn programs. You sign up yourself.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
