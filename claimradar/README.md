@@ -6,8 +6,22 @@ Rows are ranked so **claim / signup** links sit above quest hubs, articles, Galx
 
 ## Run
 
-```bash
-cd claimradar
+`claimradar` is a folder **inside this GitHub repo**, not a folder in your Windows user directory. From `C:\Users\DELL` you must clone the repo first (install [Node.js LTS](https://nodejs.org/) if `npm` is missing).
+
+Command Prompt:
+
+```bat
+cd %USERPROFILE%
+git clone -b cursor/claimradar-tracker-9059 https://github.com/jaseerkp11/jaseerkp11.git
+cd jaseerkp11\claimradar
+npm install
+npm run dev
+```
+
+If you already cloned the repo, do not run `cd claimradar` from `C:\Users\DELL`. Go into the clone, then the app folder:
+
+```bat
+cd %USERPROFILE%\jaseerkp11\claimradar
 npm install
 npm run dev
 ```
