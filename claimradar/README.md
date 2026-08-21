@@ -1,8 +1,6 @@
 # ClaimRadar
 
-Standalone Next.js app (not the Atria store). It **indexes public campaign pages** (name + official-looking URL). You sign up and do tasks yourself.
-
-It does **not** auto-signup, complete quests, bet, or withdraw.
+Public campaign scanner. It lists **names + links** from Telegram previews, airdrop sites, Galxe, DefiLlama, and optional X. You sign up yourself.
 
 ## Run
 
@@ -14,26 +12,23 @@ npm run dev
 
 Open http://localhost:3100
 
-The list re-fetches from sources about every **15 minutes** (API `revalidate = 900`, browser interval 15 min). Tap **Refresh** anytime.
+Default filters hide Galxe **points** and DexScreener **listings**. Uncheck those boxes if you want them.
 
-## Sources
+Refresh is ~15 minutes.
 
-| Source | What you get |
-|---|---|
-| Quest hubs | Galxe, Layer3, Zealy, Intract, TaskOn, DefiLlama airdrops, Airdrops.io |
-| Galxe GraphQL | Trending + newest public quests + `app.galxe.com` links |
-| DefiLlama airdrop-checker | Active projects from their public GitHub config |
-| Airdrops.io | Latest WordPress posts |
-| DexScreener | Latest token profiles (listings, **not** faucets — high scam risk) |
+## Extra sources (optional)
 
-A source failing (timeout, 4xx) is shown as a red chip; others still load.
+Create `claimradar/.env.local`:
 
-## Safety
+```
+TELEGRAM_CHANNELS=airdropalert,SomeOtherPublicChannel
+X_BEARER_TOKEN=your_x_api_bearer
+```
 
-- “Instant USDC from signup” posts are often fake or shut down quickly.
-- Never enter a seed phrase. Open only the linked domain.
-- Points / soulbound tokens usually cannot be swapped.
+Telegram uses public `t.me/s/channel` pages (no bot required). X search only works if you add a bearer token.
 
-## Deploy
+Add more public channel usernames in `TELEGRAM_CHANNELS` (comma-separated, no @).
 
-Create a **separate** Vercel project with root directory `claimradar` (do not use the storefront root).
+## What it cannot do
+
+It cannot see **private** Telegram groups or posts that were never published on a public `t.me/s/` page. There is no complete internet-wide “every free $1 app” feed.

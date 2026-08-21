@@ -5,6 +5,7 @@ export type Campaign = {
   source: string;
   summary: string;
   status: string;
+  kind?: string;
   extra?: string;
 };
 
