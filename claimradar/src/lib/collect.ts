@@ -1,7 +1,7 @@
 import type { Campaign, ChainCoverage, SourceReport } from "./types";
 
 const UA = "ClaimRadar/0.4 (earn-index; no signup automation)";
-const TIMEOUT_MS = 18000;
+const TIMEOUT_MS = 25000;
 
 function absUrl(href: string): string | null {
   try {
