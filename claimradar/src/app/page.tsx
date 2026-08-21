@@ -62,8 +62,8 @@ export default function HomePage() {
       <p style={{ color: "#8b9bb4", letterSpacing: "0.14em", fontSize: 12, margin: 0 }}>PUBLIC SCANNER</p>
       <h1 style={{ fontSize: 32, margin: "6px 0 8px" }}>ClaimRadar</h1>
       <p style={{ color: "#b7c3d6", lineHeight: 1.5, maxWidth: 740 }}>
-        Pulls public Telegram channel previews, AirdropAlert, Airdrops.io, Galxe, DefiLlama, quest hubs, and optional X search.
-        Each row is a <strong>name + link</strong>. You open it and do signup/tasks yourself. No auto-accounts.
+        Pulls CryptoRank claim pages, public Telegram channel previews, AirdropAlert, Airdrops.io, Galxe, DefiLlama, quest hubs, and optional X search.
+        Claim / signup rows sort to the top. Each row is a <strong>name + link</strong>. You open it and do signup/tasks yourself. No auto-accounts.
       </p>
       <p style={{ color: "#9aa8bd", fontSize: 13 }}>
         Default view hides Galxe-style <em>points</em> and DexScreener <em>listings</em>. Turn those boxes off if you want them. Verify every site yourself.
@@ -130,12 +130,21 @@ export default function HomePage() {
 
       <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
         {rows.map((c) => (
-          <li key={c.id} style={{ background: "#101624", border: "1px solid #1c2740", borderRadius: 14, padding: 14 }}>
+          <li
+            key={c.id}
+            style={{
+              background: "#101624",
+              border: `1px solid ${c.kind === "claim" ? "#2d6a45" : "#1c2740"}`,
+              borderRadius: 14,
+              padding: 14,
+            }}
+          >
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
               <strong>{c.name}</strong>
               <span style={{ color: "#8b9bb4", fontSize: 12 }}>
                 {c.source}
                 {c.kind ? ` · ${c.kind}` : ""}
+                {c.extra ? ` · ${c.extra}` : ""}
               </span>
             </div>
             <p style={{ margin: "8px 0", color: "#c5d0e0", fontSize: 14 }}>{c.summary}</p>

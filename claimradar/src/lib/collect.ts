@@ -1,6 +1,6 @@
 import type { Campaign, SourceReport } from "./types";
 
-const UA = "ClaimRadar/0.2 (public campaign index; no signup automation)";
+const UA = "ClaimRadar/0.3 (public campaign index; no signup automation)";
 const TIMEOUT_MS = 12000;
 
 function absUrl(href: string): string | null {
@@ -52,6 +52,24 @@ function stripHtml(html: string): string {
 
 function looksLikePoints(text: string): boolean {
   return /\b(xp|points?|loyalty|cubs?|soulbound|sbt)\b/i.test(text);
+}
+
+function looksLikeClaim(text: string): boolean {
+  return /\b(claim|signup|sign up|register|faucet|bonus|free token|welcome bonus)\b/i.test(text);
+}
+
+function priority(c: Campaign): number {
+  const blob = `${c.name} ${c.summary} ${c.kind} ${c.status} ${c.extra ?? ""}`;
+  let n = 0;
+  if (c.kind === "claim") n += 80;
+  else if (c.kind === "signup") n += 40;
+  else if (c.kind === "quest") n += 25;
+  else if (c.kind === "article") n += 10;
+  else if (c.kind === "hub") n += 5;
+  else if (c.kind === "listing" || c.kind === "points") n -= 20;
+  if (looksLikeClaim(blob)) n += 15;
+  if (looksLikePoints(blob) && c.kind !== "claim") n -= 10;
+  return n;
 }
 
 export const HUBS: Campaign[] = [
@@ -133,6 +151,15 @@ export const HUBS: Campaign[] = [
     url: "https://airdropalert.com/latest-airdrops",
     source: "Quest hubs",
     summary: "Large public airdrop catalog. Open each project page and verify the claim site.",
+    status: "hub",
+    kind: "hub",
+  },
+  {
+    id: "hub-cryptorank",
+    name: "CryptoRank Drop Hunting",
+    url: "https://cryptorank.io/drophunting",
+    source: "Quest hubs",
+    summary: "Public airdrop board with claim links when a distribution is live.",
     status: "hub",
     kind: "hub",
   },
@@ -257,16 +284,101 @@ async function fetchDexProfiles(): Promise<Campaign[]> {
   });
 }
 
+type RankCoin = { key?: string; name?: string; symbol?: string | null };
+type RankRow = {
+  key?: string;
+  status?: string;
+  rewardType?: string;
+  linkToClaim?: string | null;
+  checkLink?: string | null;
+  isAuthProtected?: boolean;
+  activityTypes?: string[];
+  coin?: RankCoin;
+};
+type RankReward = {
+  key?: string;
+  linkToClaim?: string | null;
+  coin?: { name?: string };
+};
+type RankHot = { key?: string; name?: string; firstType?: string };
+
+async function fetchCryptoRank(): Promise<Campaign[]> {
+  const html = await getHtml("https://cryptorank.io/drophunting");
+  const m = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+  if (!m) throw new Error("CryptoRank page had no public data blob");
+  const next = JSON.parse(m[1]) as {
+    props?: {
+      pageProps?: {
+        fallbackTableData?: { data?: RankRow[] };
+        widgetsData?: { nextRewards?: RankReward[]; hotEvents?: RankHot[] };
+      };
+    };
+  };
+  const pp = next.props?.pageProps;
+  const out: Campaign[] = [];
+
+  for (const r of pp?.widgetsData?.nextRewards ?? []) {
+    const url = absUrl(r.linkToClaim || "");
+    if (!url || !r.key) continue;
+    out.push({
+      id: `cr-claim-${r.key}`,
+      name: `${r.coin?.name || r.key} claim`,
+      url,
+      source: "CryptoRank claims",
+      summary: "Distribution / claim page listed on CryptoRank Drop Hunting.",
+      status: "claim",
+      kind: "claim",
+      extra: r.key,
+    });
+  }
+
+  for (const h of pp?.widgetsData?.hotEvents ?? []) {
+    const url = absUrl(h.key ? `https://cryptorank.io/drophunting/${encodeURIComponent(h.key)}` : "");
+    if (!url || !h.key) continue;
+    out.push({
+      id: `cr-hot-${h.key}`,
+      name: h.name || h.key,
+      url,
+      source: "CryptoRank hot",
+      summary: h.firstType ? `Hot Drop Hunting activity · ${h.firstType}` : "Hot Drop Hunting activity.",
+      status: "listed",
+      kind: "quest",
+    });
+  }
+
+  for (const row of pp?.fallbackTableData?.data ?? []) {
+    if (!row.key || row.isAuthProtected) continue;
+    const claim = absUrl(row.linkToClaim || row.checkLink || "");
+    const url = claim || absUrl(`https://cryptorank.io/drophunting/${encodeURIComponent(row.key)}`);
+    if (!url) continue;
+    const name = row.coin?.name || row.key;
+    const types = (row.activityTypes || []).join(", ");
+    const reward = row.rewardType || "activity";
+    const kind = claim ? "claim" : looksLikePoints(reward) ? "points" : "quest";
+    out.push({
+      id: `cr-row-${row.key}`,
+      name,
+      url,
+      source: "CryptoRank board",
+      summary: [row.status, reward, types].filter(Boolean).join(" · ") || "Drop Hunting listing.",
+      status: row.status || "listed",
+      kind,
+      extra: row.coin?.symbol || undefined,
+    });
+  }
+
+  if (out.length === 0) throw new Error("CryptoRank public page returned no campaigns");
+  return out;
+}
+
 const DEFAULT_TG = [
   "airdropalert",
   "AirdropInspector",
   "airdrops_io",
   "CryptoAirdrop",
-  "AirdropStagram",
-  "airdroped",
   "freeairdrop",
-  "AirdropHeroes",
-  "DailyAirdrop",
+  "CryptoAirdropsInc",
+  "FreeAirdrops",
 ];
 
 function telegramChannels(): string[] {
@@ -289,18 +401,17 @@ function parseTelegramPreview(html: string, channel: string): Campaign[] {
       .map((h) => absUrl(h))
       .filter((u): u is string => Boolean(u))
       .filter((u) => !/t\.me\/|telegram\.org/i.test(u));
-    const url = ext[0] || absUrl(`https://t.me/${channel}`);
-    if (!url || !text) continue;
+    if (!ext[0] || !text) continue;
     n += 1;
-    const name = text.slice(0, 80) || `t.me/${channel} post`;
+    const name = text.split(/[.!|\n]/)[0]?.slice(0, 80) || text.slice(0, 80);
     out.push({
-      id: `tg-${channel}-${n}-${url.slice(-24)}`,
+      id: `tg-${channel}-${n}-${ext[0].slice(-24)}`,
       name,
-      url,
+      url: ext[0],
       source: `Telegram @${channel}`,
       summary: text,
       status: "telegram",
-      kind: "signup",
+      kind: looksLikeClaim(text) ? "claim" : "signup",
     });
   }
   return out;
@@ -350,7 +461,7 @@ async function fetchXSearch(): Promise<Campaign[]> {
         source: "X recent search",
         summary: tw.text.slice(0, 220),
         status: "tweet",
-        kind: "signup",
+        kind: looksLikeClaim(tw.text) ? "claim" : "signup",
       } satisfies Campaign,
     ];
   });
@@ -359,6 +470,7 @@ async function fetchXSearch(): Promise<Campaign[]> {
 export async function collectCampaigns(): Promise<{ items: Campaign[]; sources: SourceReport[] }> {
   const jobs: { source: string; run: () => Promise<Campaign[]> }[] = [
     { source: "Quest hubs", run: async () => HUBS },
+    { source: "CryptoRank Drop Hunting", run: fetchCryptoRank },
     { source: "Galxe Trending", run: () => fetchGalxe("Trending") },
     { source: "Galxe Newest", run: () => fetchGalxe("Newest") },
     { source: "DefiLlama airdrop-checker", run: fetchLlamaAirdropConfig },
@@ -368,7 +480,7 @@ export async function collectCampaigns(): Promise<{ items: Campaign[]; sources: 
       run: () =>
         fetchWpPosts(
           "AirdropAlert",
-          "https://airdropalert.com/wp-json/wp/v2/posts?per_page=25&categories=5&_fields=id,date,link,title,excerpt",
+          "https://airdropalert.com/wp-json/wp/v2/posts?per_page=40&categories=5&_fields=id,date,link,title,excerpt",
           "signup",
         ),
     },
@@ -403,5 +515,6 @@ export async function collectCampaigns(): Promise<{ items: Campaign[]; sources: 
     seen.add(key);
     items.push(c);
   }
+  items.sort((a, b) => priority(b) - priority(a));
   return { items, sources };
 }
