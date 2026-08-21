@@ -33,27 +33,24 @@ export default function HomePage() {
     return () => clearInterval(id);
   }, [load]);
 
-  const sources = useMemo(() => {
-    const s = new Set(data?.items.map((i) => i.source) ?? []);
-    return ["all", ...Array.from(s)];
-  }, [data]);
-
-  const kinds = useMemo(() => {
-    const s = new Set((data?.items.map((i) => i.kind).filter(Boolean) as string[]) ?? []);
-    return ["all", ...Array.from(s)];
-  }, [data]);
-
+  const sources = useMemo(() => ["all", ...Array.from(new Set(data?.items.map((i) => i.source) ?? []))], [data]);
+  const kinds = useMemo(
+    () => ["all", ...Array.from(new Set((data?.items.map((i) => i.kind).filter(Boolean) as string[]) ?? []))],
+    [data],
+  );
   const chains = useMemo(() => {
-    const s = new Set((data?.items.map((i) => i.chain).filter(Boolean) as string[]) ?? []);
+    const s = new Set<string>();
+    for (const i of data?.items ?? []) {
+      if (i.chain) s.add(i.chain.split(",")[0].trim());
+    }
     return ["all", ...Array.from(s).sort()];
   }, [data]);
 
   const rows = useMemo(() => {
-    const items = data?.items ?? [];
-    return items.filter((i) => {
+    return (data?.items ?? []).filter((i) => {
       if (source !== "all" && i.source !== source) return false;
       if (kind !== "all" && i.kind !== kind) return false;
-      if (chain !== "all" && i.chain !== chain) return false;
+      if (chain !== "all" && !(i.chain || "").startsWith(chain) && i.chain !== chain) return false;
       if (!q.trim()) return true;
       const hay = `${i.name} ${i.summary} ${i.url} ${i.chain ?? ""} ${i.reward ?? ""}`.toLowerCase();
       return hay.includes(q.trim().toLowerCase());
@@ -62,22 +59,23 @@ export default function HomePage() {
 
   return (
     <main style={{ maxWidth: 960, margin: "0 auto", padding: "28px 16px 80px" }}>
-      <p style={{ color: "#8b9bb4", letterSpacing: "0.14em", fontSize: 12, margin: 0 }}>EARN INDEX</p>
+      <p style={{ color: "#8b9bb4", letterSpacing: "0.14em", fontSize: 12, margin: 0 }}>FRESH SCAN</p>
       <h1 style={{ fontSize: 32, margin: "6px 0 8px" }}>ClaimRadar</h1>
-      <p style={{ color: "#b7c3d6", lineHeight: 1.5, maxWidth: 760 }}>
-        This is <strong>not</strong> an airdrop blog scraper. It lists official exchange/wallet reward pages, in-app token
-        apps (learn / play / tap / move), live <strong>on-chain reward programs</strong> (Merkl, 60+ chains), and DEX/lending
-        farms that pay extra tokens (DefiLlama). You open the link and check the live offer yourself. No auto-signup.
+      <p style={{ color: "#b7c3d6", lineHeight: 1.5, maxWidth: 780 }}>
+        Built for the <strong>Ares-style</strong> case: a new-user welcome / instant reward that dies once it goes viral.
+        This scan does <strong>not</strong> use airdrop blogs or a frozen list of Coinbase/Binance pages.
       </p>
-      <p style={{ color: "#9aa8bd", fontSize: 13 }}>
-        Signup bonuses change by country and disappear. DEX rows usually need a deposit. Verify every site.
+      <p style={{ color: "#9aa8bd", fontSize: 13, lineHeight: 1.5, maxWidth: 780 }}>
+        What it can see: contracts <em>just verified</em> on Polygon, Ethereum, Arbitrum, Optimism, Scroll, Celo, Unichain,
+        Gnosis (names like faucet / claim / airdrop / bonus / merkle / chef); Merkl campaigns from the last {14} days;
+        protocols newly listed on DefiLlama (last {21} days) so you can open the live app and check for a signup timer.
+        What it cannot see: a private in-app bonus that never hits a public contract or listing. You still open the app
+        yourself. No auto-claim.
       </p>
 
       {data?.chains && data.chains.length > 0 && (
         <p style={{ color: "#8ee0a8", fontSize: 13 }}>
-          Merkl live campaigns on {data.chains.length} chains
-          {data.chains.slice(0, 8).map((c) => ` · ${c.name} (${c.live})`).join("")}
-          {data.chains.length > 8 ? " …" : ""}
+          Hits: {data.chains.map((c) => `${c.name} (${c.live})`).join(" · ")}
         </p>
       )}
 
@@ -85,7 +83,7 @@ export default function HomePage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search app, chain, token"
+          placeholder="Search contract, app, chain, token"
           style={{ flex: 1, minWidth: 180, padding: "10px 12px", borderRadius: 10, border: "1px solid #243044", background: "#101624", color: "#fff" }}
         />
         <select value={kind} onChange={(e) => setKind(e.target.value)} style={sel}>
@@ -115,9 +113,9 @@ export default function HomePage() {
       </div>
 
       <p style={{ color: "#8b9bb4", fontSize: 13 }}>
-        {loading ? "Loading…" : `${rows.length} rows`}
-        {data?.fetchedAt ? ` · last fetch ${new Date(data.fetchedAt).toLocaleString()}` : ""}
-        {" · auto-refresh 15 min"}
+        {loading ? "Loading…" : `${rows.length} fresh rows`}
+        {data?.fetchedAt ? ` · ${new Date(data.fetchedAt).toLocaleString()}` : ""}
+        {" · 15 min"}
       </p>
 
       {data?.sources && (
@@ -147,7 +145,7 @@ export default function HomePage() {
             key={c.id}
             style={{
               background: "#101624",
-              border: `1px solid ${c.kind === "signup" ? "#2d6a45" : "#1c2740"}`,
+              border: `1px solid ${c.kind === "instant" || c.kind === "new-app" ? "#2d6a45" : "#1c2740"}`,
               borderRadius: 14,
               padding: 14,
             }}
@@ -155,10 +153,10 @@ export default function HomePage() {
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
               <strong>{c.name}</strong>
               <span style={{ color: "#8b9bb4", fontSize: 12 }}>
-                {c.kind || ""}
+                {c.extra || ""}
+                {c.kind ? ` · ${c.kind}` : ""}
                 {c.chain ? ` · ${c.chain}` : ""}
                 {c.reward ? ` · ${c.reward}` : ""}
-                {c.action ? ` · ${c.action}` : ""}
               </span>
             </div>
             <p style={{ margin: "8px 0", color: "#c5d0e0", fontSize: 14 }}>{c.summary}</p>

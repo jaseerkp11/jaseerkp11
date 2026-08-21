@@ -1,19 +1,18 @@
 # ClaimRadar
 
-Public **earn** index. It does **not** scrape airdrop Telegram channels or quest blogs.
+Fresh scanner for **new** earn paths — the Ares-style case: a welcome / instant reward that exists until it goes viral.
 
-It lists:
+It does **not** scrape old airdrop Telegram channels, Galxe, or a frozen list of Coinbase/Binance pages.
 
-- Official exchange / wallet **reward and signup** pages
-- In-app token apps (learn / play / tap / move) via CoinGecko categories
-- Live **on-chain reward programs** from [Merkl](https://app.merkl.xyz/) (60+ chains)
-- DEX / lending farms that pay extra tokens from DefiLlama yields
+## What it scans
 
-You open the link and check the live offer yourself. No auto-accounts.
+- **Just-verified contracts** on Polygon, Ethereum, Arbitrum, Optimism, Scroll, Celo, Unichain, Gnosis (Blockscout). Names matching faucet / claim / airdrop / bonus / merkle / chef / etc.
+- **Merkl campaigns created in the last 14 days**
+- **Protocols listed on DefiLlama in the last 21 days** (open the live app and look for a signup timer)
 
-Signup bonuses are regional and disappear. DEX/Merkl rows usually need a deposit or using the protocol.
+Ares $1 pUSD was an **in-app** timer. That does not appear as a Polygon contract until/unless they put it on-chain. This tool gets you to **new apps and new claim contracts** quickly; you still open them yourself.
 
-## Run (Windows, existing clone)
+## Run (Windows)
 
 ```bat
 cd C:\Users\DELL\jaseerkp11
@@ -25,6 +24,4 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3100
-
-Refresh is ~15 minutes.
+http://localhost:3100

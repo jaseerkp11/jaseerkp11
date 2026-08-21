@@ -10,6 +10,7 @@ export type Campaign = {
   chain?: string;
   reward?: string;
   action?: string;
+  seenAt?: string;
 };
 
 export type SourceReport = {

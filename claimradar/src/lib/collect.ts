@@ -1,7 +1,9 @@
 import type { Campaign, ChainCoverage, SourceReport } from "./types";
 
-const UA = "ClaimRadar/0.4 (earn-index; no signup automation)";
-const TIMEOUT_MS = 25000;
+const UA = "ClaimRadar/0.5 (fresh on-chain earn scan; no signup automation)";
+const TIMEOUT_MS = 22000;
+const MERKL_DAYS = 14;
+const LLAMA_DAYS = 21;
 
 function absUrl(href: string): string | null {
   try {
@@ -13,14 +15,13 @@ function absUrl(href: string): string | null {
   }
 }
 
-async function getJson(url: string, init?: RequestInit): Promise<unknown> {
+async function getJson(url: string): Promise<unknown> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
   try {
     const res = await fetch(url, {
-      ...init,
       signal: ctrl.signal,
-      headers: { "user-agent": UA, accept: "application/json", ...(init?.headers ?? {}) },
+      headers: { "user-agent": UA, accept: "application/json" },
       next: { revalidate: 900 },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -30,403 +31,195 @@ async function getJson(url: string, init?: RequestInit): Promise<unknown> {
   }
 }
 
+function hoursAgo(iso?: string): string {
+  if (!iso) return "";
+  const ms = Date.now() - new Date(iso).getTime();
+  if (!Number.isFinite(ms) || ms < 0) return iso.slice(0, 16);
+  const h = Math.floor(ms / 3600000);
+  if (h < 1) return `${Math.max(1, Math.floor(ms / 60000))}m ago`;
+  if (h < 48) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
+function classifyContract(name: string): { kind: string; action: string } | null {
+  const n = name.toLowerCase();
+  if (/(safeproxy|gnosissafe|identityproxy|beaconproxy|eip1967|uniswapv2pair|multicall|create2)/i.test(n)) {
+    return null;
+  }
+  if (/(faucet|airdrop|air.?drop|merkle|distributor|claim|bonus|welcome|referral|giveaway|dropper|quest)/i.test(n)) {
+    return { kind: "instant", action: "claim" };
+  }
+  if (/(reward|incentive|voucher|coupon|minter)/i.test(n)) {
+    return { kind: "instant", action: "reward" };
+  }
+  if (/(masterchef|gauge|farm)/i.test(n)) {
+    return { kind: "farm", action: "farm" };
+  }
+  return null;
+}
+
 function priority(c: Campaign): number {
   const kindScore: Record<string, number> = {
-    signup: 100,
-    "in-app": 70,
-    onchain: 50,
-    dex: 30,
+    instant: 100,
+    "new-app": 80,
+    merkl: 55,
+    farm: 25,
   };
-  return (kindScore[c.kind || ""] || 0) + (c.action === "signup" ? 10 : 0);
+  let n = kindScore[c.kind || ""] || 0;
+  if (c.seenAt) {
+    const ageH = (Date.now() - new Date(c.seenAt).getTime()) / 3600000;
+    if (ageH < 6) n += 20;
+    else if (ageH < 24) n += 10;
+  }
+  return n;
 }
 
-/** Official product reward / earn pages. Offers change; user opens the app and checks. */
-const APP_EARN: Campaign[] = [
-  {
-    id: "app-coinbase-rewards",
-    name: "Coinbase Rewards",
-    url: "https://www.coinbase.com/rewards",
-    source: "Official apps",
-    summary: "In-app rewards. Sometimes includes learn/tasks. KYC. Check the live offer in the app.",
-    status: "app",
-    kind: "signup",
-    action: "signup",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-coinbase-learn",
-    name: "Coinbase Learn",
-    url: "https://www.coinbase.com/learn",
-    source: "Official apps",
-    summary: "Learn modules that have historically paid crypto. Availability is region-locked.",
-    status: "app",
-    kind: "in-app",
-    action: "learn",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-binance-rewards",
-    name: "Binance Rewards Hub",
-    url: "https://www.binance.com/en/activity/rewards-hub",
-    source: "Official apps",
-    summary: "Exchange missions and bonuses. Not the same as old airdrop blogs. Check current tasks in the app.",
-    status: "app",
-    kind: "in-app",
-    action: "task",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-binance-earn",
-    name: "Binance Earn",
-    url: "https://www.binance.com/en/earn",
-    source: "Official apps",
-    summary: "Earn listed coins (simple earn / locked). Usually needs a deposit, not a free mint.",
-    status: "app",
-    kind: "dex",
-    action: "earn",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-okx-rewards",
-    name: "OKX Rewards",
-    url: "https://www.okx.com/rewards",
-    source: "Official apps",
-    summary: "Exchange rewards center. Signup/task bonuses change by region.",
-    status: "app",
-    kind: "signup",
-    action: "signup",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-bybit-rewards",
-    name: "Bybit Rewards",
-    url: "https://www.bybit.com/en/rewards",
-    source: "Official apps",
-    summary: "In-app rewards and missions on Bybit.",
-    status: "app",
-    kind: "in-app",
-    action: "task",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-bitget",
-    name: "Bitget events",
-    url: "https://www.bitget.com/events",
-    source: "Official apps",
-    summary: "Exchange event/bonus center.",
-    status: "app",
-    kind: "in-app",
-    action: "task",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-gate",
-    name: "Gate.io rewards",
-    url: "https://www.gate.io/reward",
-    source: "Official apps",
-    summary: "Gate rewards / bonus center.",
-    status: "app",
-    kind: "in-app",
-    action: "task",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-kucoin",
-    name: "KuCoin rewards",
-    url: "https://www.kucoin.com/rewards",
-    source: "Official apps",
-    summary: "KuCoin rewards center.",
-    status: "app",
-    kind: "in-app",
-    action: "task",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-crypto-com",
-    name: "Crypto.com rewards",
-    url: "https://crypto.com/rewards",
-    source: "Official apps",
-    summary: "Card/app rewards. Check current signup or task offers in the app.",
-    status: "app",
-    kind: "signup",
-    action: "signup",
-    chain: "Cronos / Multi-chain",
-  },
-  {
-    id: "app-kraken-learn",
-    name: "Kraken Learn",
-    url: "https://www.kraken.com/learn",
-    source: "Official apps",
-    summary: "Education hub. Earn campaigns appear and disappear.",
-    status: "app",
-    kind: "in-app",
-    action: "learn",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-polymarket",
-    name: "Polymarket",
-    url: "https://polymarket.com/",
-    source: "Official apps",
-    summary: "Prediction app. Past programs have paid a small signup/credit amount. Verify the live offer yourself.",
-    status: "app",
-    kind: "signup",
-    action: "signup",
-    chain: "Polygon",
-  },
-  {
-    id: "app-phantom",
-    name: "Phantom",
-    url: "https://phantom.com/",
-    source: "Official apps",
-    summary: "Wallet. Open Rewards / Discover in the app for any current token tasks.",
-    status: "app",
-    kind: "in-app",
-    action: "task",
-    chain: "Solana / Multi-chain",
-  },
-  {
-    id: "app-rainbow",
-    name: "Rainbow wallet",
-    url: "https://rainbow.me/",
-    source: "Official apps",
-    summary: "Wallet points/rewards live in the app, not on airdrop blogs.",
-    status: "app",
-    kind: "in-app",
-    action: "task",
-    chain: "Ethereum / L2",
-  },
-  {
-    id: "app-trust",
-    name: "Trust Wallet rewards",
-    url: "https://trustwallet.com/rewards",
-    source: "Official apps",
-    summary: "Wallet rewards page. Check in-app campaigns.",
-    status: "app",
-    kind: "in-app",
-    action: "task",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-backpack",
-    name: "Backpack",
-    url: "https://backpack.app/",
-    source: "Official apps",
-    summary: "Wallet + exchange. Open the app for any earn/points program.",
-    status: "app",
-    kind: "in-app",
-    action: "task",
-    chain: "Solana",
-  },
-  {
-    id: "app-jupiter",
-    name: "Jupiter",
-    url: "https://jup.ag/",
-    source: "Official apps",
-    summary: "Solana DEX/aggregator. Earn is via using the product (swap, LFG, etc.), not an airdrop newsletter.",
-    status: "app",
-    kind: "dex",
-    action: "use",
-    chain: "Solana",
-  },
-  {
-    id: "app-hyperliquid",
-    name: "Hyperliquid",
-    url: "https://app.hyperliquid.xyz/",
-    source: "Official apps",
-    summary: "Perp DEX. Any token/points earn is inside the app.",
-    status: "app",
-    kind: "dex",
-    action: "use",
-    chain: "Hyperliquid",
-  },
-  {
-    id: "app-dydx",
-    name: "dYdX",
-    url: "https://dydx.trade/",
-    source: "Official apps",
-    summary: "Perp DEX. Trading rewards (if live) are in-product.",
-    status: "app",
-    kind: "dex",
-    action: "use",
-    chain: "dYdX",
-  },
-  {
-    id: "app-uniswap",
-    name: "Uniswap",
-    url: "https://app.uniswap.org/",
-    source: "Official apps",
-    summary: "DEX. LP / incentive seasons show in the app when a chain is running rewards.",
-    status: "app",
-    kind: "dex",
-    action: "pool",
-    chain: "Multi-chain",
-  },
-  {
-    id: "app-merkl",
-    name: "Merkl app",
-    url: "https://app.merkl.xyz/",
-    source: "Official apps",
-    summary: "Dashboard of live on-chain token distributions across 60+ chains. Filter by chain yourself.",
-    status: "app",
-    kind: "onchain",
-    action: "claim",
-    chain: "60+ chains",
-  },
+const BLOCKSCOUT: { host: string; chain: string }[] = [
+  { host: "polygon.blockscout.com", chain: "Polygon" },
+  { host: "eth.blockscout.com", chain: "Ethereum" },
+  { host: "arbitrum.blockscout.com", chain: "Arbitrum" },
+  { host: "optimism.blockscout.com", chain: "Optimism" },
+  { host: "scroll.blockscout.com", chain: "Scroll" },
+  { host: "celo.blockscout.com", chain: "Celo" },
+  { host: "unichain.blockscout.com", chain: "Unichain" },
+  { host: "gnosis.blockscout.com", chain: "Gnosis" },
 ];
 
-type MerklOpp = {
-  id?: string;
-  name?: string;
-  description?: string;
-  status?: string;
-  action?: string;
-  apr?: number;
-  dailyRewards?: number;
-  depositUrl?: string;
-  chain?: { name?: string; id?: number };
-  protocol?: { name?: string; url?: string };
-  rewardsRecord?: { breakdowns?: { token?: { symbol?: string } }[] };
+type BsItem = {
+  verified_at?: string;
+  address?: { hash?: string; name?: string; is_scam?: boolean };
 };
 
-type MerklChain = { name?: string; liveCampaigns?: number };
-
-async function fetchMerklChains(): Promise<ChainCoverage[]> {
-  const json = (await getJson("https://api.merkl.xyz/v4/chains")) as MerklChain[];
-  if (!Array.isArray(json)) return [];
-  return json
-    .filter((c) => (c.liveCampaigns || 0) > 0 && c.name)
-    .map((c) => ({ name: c.name as string, live: c.liveCampaigns || 0 }))
-    .sort((a, b) => b.live - a.live);
-}
-
-async function fetchMerklOpps(): Promise<Campaign[]> {
-  const pages = await Promise.all(
-    [0, 1, 2, 3].map((page) =>
-      getJson(`https://api.merkl.xyz/v4/opportunities?status=LIVE&items=100&page=${page}`),
-    ),
-  );
-  const rows: MerklOpp[] = pages.flatMap((p) => (Array.isArray(p) ? (p as MerklOpp[]) : []));
-  const scored = rows
-    .filter((o) => o.status === "LIVE" && o.action !== "DROP" && (o.dailyRewards || 0) > 0)
-    .sort((a, b) => (b.dailyRewards || 0) - (a.dailyRewards || 0))
-    .slice(0, 90);
-
-  return scored.flatMap((o) => {
-    const url = absUrl(o.depositUrl || o.protocol?.url || "https://app.merkl.xyz/");
-    if (!url || !o.id) return [];
-    const reward = o.rewardsRecord?.breakdowns?.[0]?.token?.symbol;
-    const chain = o.chain?.name || "Unknown";
-    const apr = typeof o.apr === "number" ? `${o.apr.toFixed(1)}% APR` : "";
-    const daily = o.dailyRewards ? `~$${Math.round(o.dailyRewards)}/day rewards` : "";
-    return [
-      {
-        id: `merkl-${o.id}`,
-        name: o.name || o.protocol?.name || "Merkl opportunity",
-        url,
-        source: "Merkl on-chain rewards",
-        summary: [o.description, apr, daily].filter(Boolean).join(" · ").slice(0, 280),
-        status: "LIVE",
-        kind: "onchain",
-        extra: apr,
-        chain,
-        reward,
-        action: (o.action || "earn").toLowerCase(),
-      } satisfies Campaign,
-    ];
-  });
-}
-
-type LlamaPool = {
-  chain?: string;
-  project?: string;
-  symbol?: string;
-  tvlUsd?: number;
-  apyReward?: number | null;
-  apy?: number | null;
-  rewardTokens?: string[];
-  pool?: string;
-  poolMeta?: string | null;
-};
-
-async function fetchLlamaRewardPools(): Promise<Campaign[]> {
-  const json = (await getJson("https://yields.llama.fi/pools")) as { data?: LlamaPool[] };
-  const pools = json.data ?? [];
-  const withRewards = pools
-    .filter((p) => (p.apyReward || 0) > 1 && (p.tvlUsd || 0) >= 50_000 && (p.rewardTokens?.length || 0) > 0)
-    .sort((a, b) => (b.apyReward || 0) - (a.apyReward || 0))
-    .slice(0, 80);
-
-  return withRewards.flatMap((p) => {
-    const slug = encodeURIComponent(p.project || "");
-    const url = absUrl(`https://defillama.com/yields?project=${slug}`);
-    if (!url || !p.pool) return [];
-    const meta = p.poolMeta ? ` (${p.poolMeta})` : "";
-    return [
-      {
-        id: `llama-${p.pool}`,
-        name: `${p.project} ${p.symbol}${meta}`.slice(0, 90),
-        url,
-        source: "DefiLlama reward farms",
-        summary: `Incentive APY ${Number(p.apyReward).toFixed(1)}% on ${p.chain}. TVL ~$${Math.round(p.tvlUsd || 0).toLocaleString()}. This is DEX/lending yield, usually needs a deposit.`,
-        status: "live",
-        kind: "dex",
-        extra: `${Number(p.apyReward).toFixed(1)}% reward APY`,
-        chain: p.chain,
-        action: "pool",
-      } satisfies Campaign,
-    ];
-  });
-}
-
-type GeckoCoin = {
-  id: string;
-  symbol?: string;
-  name?: string;
-};
-
-async function fetchGeckoCategory(category: string, kind: string, label: string): Promise<Campaign[]> {
-  const json = (await getJson(
-    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=${encodeURIComponent(category)}&per_page=15&order=market_cap_desc`,
-  )) as GeckoCoin[];
-  if (!Array.isArray(json)) return [];
-  return json.flatMap((c) => {
-    const url = absUrl(`https://www.coingecko.com/en/coins/${encodeURIComponent(c.id)}`);
-    if (!url) return [];
-    return [
-      {
-        id: `cg-${category}-${c.id}`,
-        name: c.name || c.id,
-        url,
-        source: label,
-        summary: `${label}: ${c.symbol?.toUpperCase() || ""} token app. Open CoinGecko for the official website, then check in-app earn/tasks.`,
-        status: "listed",
-        kind,
-        extra: c.symbol?.toUpperCase(),
-        reward: c.symbol?.toUpperCase(),
-        action: "use",
-      } satisfies Campaign,
-    ];
-  });
-}
-
-async function fetchGeckoEarnApps(): Promise<Campaign[]> {
-  const cats: { id: string; kind: string; label: string }[] = [
-    { id: "learn-to-earn", kind: "in-app", label: "Learn-to-earn" },
-    { id: "play-to-earn", kind: "in-app", label: "Play-to-earn" },
-    { id: "tap-to-earn", kind: "in-app", label: "Tap-to-earn" },
-    { id: "move-to-earn", kind: "in-app", label: "Move-to-earn" },
-  ];
+async function fetchBlockscoutChain(host: string, chain: string): Promise<Campaign[]> {
   const out: Campaign[] = [];
-  for (const cat of cats) {
-    try {
-      out.push(...(await fetchGeckoCategory(cat.id, cat.kind, cat.label)));
-    } catch {
-      // CoinGecko rate-limits; keep other categories.
+  let url = `https://${host}/api/v2/smart-contracts`;
+  for (let page = 0; page < 2; page++) {
+    const json = (await getJson(url)) as { items?: BsItem[]; next_page_params?: Record<string, string | number> };
+    for (const row of json.items ?? []) {
+      const name = row.address?.name || "";
+      const hash = row.address?.hash;
+      if (!hash || row.address?.is_scam) continue;
+      const cls = classifyContract(name);
+      if (!cls) continue;
+      const explorer = absUrl(`https://${host}/address/${hash}`);
+      if (!explorer) continue;
+      out.push({
+        id: `bs-${chain}-${hash}`,
+        name: `${name} (${chain})`,
+        url: explorer,
+        source: "Fresh verified contracts",
+        summary: `Newly verified ${cls.action} contract on ${chain}. Open the explorer, read the contract, then the project site. This is not an old airdrop blog. Most will be junk; Ares-style bonuses are usually in-app, not on-chain.`,
+        status: "verified",
+        kind: cls.kind,
+        extra: hoursAgo(row.verified_at),
+        chain,
+        action: cls.action,
+        seenAt: row.verified_at,
+      });
+    }
+    const next = json.next_page_params;
+    if (!next) break;
+    const qs = new URLSearchParams(Object.entries(next).map(([k, v]) => [k, String(v)]));
+    url = `https://${host}/api/v2/smart-contracts?${qs.toString()}`;
+  }
+  return out;
+}
+
+async function fetchAllBlockscout(): Promise<Campaign[]> {
+  const settled = await Promise.allSettled(BLOCKSCOUT.map((c) => fetchBlockscoutChain(c.host, c.chain)));
+  const items: Campaign[] = [];
+  let ok = 0;
+  for (const res of settled) {
+    if (res.status === "fulfilled") {
+      ok += 1;
+      items.push(...res.value);
     }
   }
-  if (out.length === 0) throw new Error("CoinGecko earn categories empty or rate-limited");
-  return out;
+  if (ok === 0) throw new Error("all block explorers failed");
+  return items;
+}
+
+type MerklCampaign = {
+  id?: string;
+  opportunityId?: string;
+  createdAt?: string;
+  dailyRewards?: number;
+  type?: string;
+  chain?: { name?: string };
+  rewardToken?: { symbol?: string };
+  campaignStatus?: { status?: string } | string;
+};
+
+async function fetchNewMerkl(): Promise<Campaign[]> {
+  const since = new Date(Date.now() - MERKL_DAYS * 86400000).toISOString().slice(0, 10);
+  const json = (await getJson(
+    `https://api.merkl.xyz/v4/campaigns?items=80&createdAfter=${since}`,
+  )) as MerklCampaign[];
+  if (!Array.isArray(json) || json.length === 0) throw new Error("no new Merkl campaigns");
+  return json.flatMap((c) => {
+    const id = c.opportunityId || c.id;
+    const url = absUrl(id ? `https://app.merkl.xyz/opportunities/${id}` : "https://app.merkl.xyz/");
+    if (!url || !id) return [];
+    const created = typeof c.createdAt === "string" ? c.createdAt : undefined;
+    const chain = c.chain?.name || "Unknown";
+    const reward = c.rewardToken?.symbol;
+    const daily = c.dailyRewards ? `~$${Number(c.dailyRewards).toFixed(2)}/day` : "";
+    return [
+      {
+        id: `merkl-new-${id}-${c.id || ""}`,
+        name: `${reward || "token"} reward · ${chain}`,
+        url,
+        source: "New Merkl campaigns",
+        summary: `On-chain distribution created ${hoursAgo(created)}. ${c.type || "campaign"} ${daily}. Usually needs using the protocol, not a $0 signup. Check the opportunity page.`,
+        status: typeof c.campaignStatus === "string" ? c.campaignStatus : c.campaignStatus?.status || "new",
+        kind: "merkl",
+        extra: hoursAgo(created),
+        chain,
+        reward,
+        action: "earn",
+        seenAt: created,
+      } satisfies Campaign,
+    ];
+  });
+}
+
+type LlamaProto = {
+  name?: string;
+  symbol?: string;
+  url?: string;
+  category?: string;
+  listedAt?: number;
+  chains?: string[];
+};
+
+async function fetchNewLlamaApps(): Promise<Campaign[]> {
+  const json = (await getJson("https://api.llama.fi/lite/protocols2")) as { protocols?: LlamaProto[] };
+  const cut = Date.now() / 1000 - LLAMA_DAYS * 86400;
+  const recent = (json.protocols ?? [])
+    .filter((p) => (p.listedAt || 0) >= cut && p.url && p.name)
+    .sort((a, b) => (b.listedAt || 0) - (a.listedAt || 0));
+  return recent.flatMap((p) => {
+    const url = absUrl(p.url || "");
+    if (!url) return [];
+    const seenAt = p.listedAt ? new Date(p.listedAt * 1000).toISOString() : undefined;
+    const chains = (p.chains || []).slice(0, 4).join(", ") || "Unknown";
+    return [
+      {
+        id: `llama-new-${p.name}-${p.listedAt}`,
+        name: p.name || "New protocol",
+        url,
+        source: "Newly listed apps",
+        summary: `Listed on DefiLlama ${hoursAgo(seenAt)}. Category: ${p.category || "n/a"}. Open the live app and look for a welcome / signup / quest timer like Ares — those are in the product, not on old blogs.`,
+        status: "new",
+        kind: "new-app",
+        extra: hoursAgo(seenAt),
+        chain: chains,
+        reward: p.symbol || undefined,
+        action: "signup",
+        seenAt,
+      } satisfies Campaign,
+    ];
+  });
 }
 
 export async function collectCampaigns(): Promise<{
@@ -435,10 +228,9 @@ export async function collectCampaigns(): Promise<{
   chains: ChainCoverage[];
 }> {
   const jobs: { source: string; run: () => Promise<Campaign[]> }[] = [
-    { source: "Official apps", run: async () => APP_EARN },
-    { source: "Merkl on-chain rewards", run: fetchMerklOpps },
-    { source: "DefiLlama reward farms", run: fetchLlamaRewardPools },
-    { source: "In-app token apps", run: fetchGeckoEarnApps },
+    { source: "Fresh verified contracts", run: fetchAllBlockscout },
+    { source: "New Merkl campaigns", run: fetchNewMerkl },
+    { source: "Newly listed apps", run: fetchNewLlamaApps },
   ];
 
   const sources: SourceReport[] = [];
@@ -454,14 +246,6 @@ export async function collectCampaigns(): Promise<{
     }
   });
 
-  let chains: ChainCoverage[] = [];
-  try {
-    chains = await fetchMerklChains();
-    sources.push({ source: "Merkl chain coverage", ok: true, count: chains.length });
-  } catch (e) {
-    sources.push({ source: "Merkl chain coverage", ok: false, count: 0, error: String(e).slice(0, 180) });
-  }
-
   const seen = new Set<string>();
   const items: Campaign[] = [];
   for (const c of chunks.flat()) {
@@ -471,5 +255,15 @@ export async function collectCampaigns(): Promise<{
     items.push(c);
   }
   items.sort((a, b) => priority(b) - priority(a));
+
+  const chainCount = new Map<string, number>();
+  for (const c of items) {
+    const name = (c.chain || "Unknown").split(",")[0].trim();
+    chainCount.set(name, (chainCount.get(name) || 0) + 1);
+  }
+  const chains: ChainCoverage[] = [...chainCount.entries()]
+    .map(([name, live]) => ({ name, live }))
+    .sort((a, b) => b.live - a.live);
+
   return { items, sources, chains };
 }
