@@ -72,8 +72,19 @@ export function scoreJob(input: {
     why.push("Industry overlap (fit-out / hotel / ops)");
   }
 
+  const senior = /\b(senior|head of|director|vp|vice president|principal|staff |lead)\b/i.test(title);
+  const icAccounting = /\b(accountant|accounts (assistant|officer|executive|payable|receivable)|bookkeep|procurement officer|buyer|purchasing officer)\b/i.test(title);
+  if (senior && !icAccounting) {
+    score -= 22;
+    why.push("Senior/lead title — stretch vs current IC+supervisor level");
+  }
+
+  if (/united states|usa\b|united kingdom|\buk\b|dublin|poland|romania|netherlands/i.test(loc) && !/uae|dubai|abu dhabi|india|remote/i.test(loc)) {
+    score -= 12;
+  }
+
   score = Math.max(0, Math.min(99, score));
-  if (score < 32) return null;
+  if (score < 38) return null;
 
   const fit: Job["fit"] = score >= 62 ? "strong" : score >= 45 ? "possible" : "stretch";
   if (why.length === 0) why.push("Keyword match on title");
