@@ -51,3 +51,11 @@ Still no `FOUND.txt`. Prize unspent.
 ## Rejected 2026-08-23: unique 4-letter prefix + IMDb votes < 250k
 
 See `REJECT_PREFIX_RATINGS.md`. Unique BIP-39 prefixes do **not** send Goonies→`good`, Léon→`legal`/`lesson`, Sharknado→`shark`, Shining→`shiver`. Live IMDb votes `< 250k` mark **16** films, not 10. No oracle, no seed.
+
+## ChatGPT AKA pass (rejected) + 3-as-intruders (already empty)
+
+Do **not** use `treasure` / `perfect` / `storm`. `treasure` and `storm` are **not** BIP39 English words. Localized AKAs are unbounded (any language can mint a word). ChatGPT’s own follow-up was right to unlock those.
+
+The useful branch was: community 3 wordless titles (**Goonies, Léon, Sharknado**) are 3 of the 10 intruders; Shining → `shine`; longest substring elsewhere. That search (`words34_3drop.txt`) is **no match** (2,629,575 / 19.6s). Flo also reports timothy-barus already emptied ~1.23e9 checksum-valid seeds on metadata rules with two wildcards.
+
+**Honest stop on Movie Enigma:** stills are locked, AKA is a dead rule, 3-as-intruders is empty, unique prefix is empty. Next hunt is FTPK Season 2, not more Movie Enigma CPU.
