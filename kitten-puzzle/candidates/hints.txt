@@ -1,0 +1,59 @@
+# Curated first-pass candidates from public puzzle text only.
+# Corey said a strong passphrase is not meant to be brute-forced.
+# This list is small on purpose. Add your own guesses, one per line.
+
+kitten
+kittens
+cat
+cats
+bitimage
+Bitimage
+BitImage
+passphrase
+mnemonic
+bip39
+BIP39
+aantonop
+andreas
+Andreas
+antonopoulos
+bitcoin
+Bitcoin
+satoshi
+Satoshi
+corey
+Corey
+phillips
+Phillips
+coreyphillips
+picture
+photo
+photos
+image
+jpg
+jpeg
+base64
+sha256
+1808d35318ac7cb98b69ff9779b699d6a631f15e0b353ac89b7c4020774832ed
+bc1q57euh23y3qs2f9d5mtwpax5lqecfvrdkqce82a
+bc1qcyrndzgy036f6ax370g8zyvlw86ulawgt0246r
+a picture is worth a thousand satoshis
+A picture is worth a thousand satoshis
+thousand satoshis
+not meant to be solved
+correct horse battery staple
+password
+Password
+123456
+letmein
+secret
+Secret
+kittenphoto
+kitten.jpg
+kittenphoto.jpg
+cats_2
+cats_2.jpeg
+steganography
+stego
+white rabbit
+follow the white rabbit
