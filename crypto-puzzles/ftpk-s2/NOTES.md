@@ -17,7 +17,7 @@ From `analysis/tested.md` in floflo777/open-crypto-puzzles (2026-07-26).
 | 2 | | Rebus. Leaning `seven` / `second`. `GAMES_2_11.md` |
 | 3 | | Kakuro solved; **SW 1881** → `twelve` (1-based) unconfirmed |
 | 4 | | Motto page. Leaning `simple` |
-| 5 | | Page1 `5509589357423` OK. Page2 barcode/diag family 404’d. Next: first column+C `1490306003093` |
+| 5 | | Page1 `5509589357423` OK. Page2 all digit+C glues 404. Next: motto slug `SimplicityMustBeRewardedC` |
 | 6 | | Évènementia. `party` / `festival` / `host` (`event` not BIP39) |
 | 7 | | Riddle. Brute last |
 | 8 | | Fall Guys. Leaning `fall` / `bean` |

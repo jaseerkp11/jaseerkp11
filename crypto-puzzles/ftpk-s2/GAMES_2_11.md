@@ -89,20 +89,22 @@ Grid (from the still):
 978030456783
 ```
 
-**404 family (do not retry):** EAN-on-diagonal `1500251762232`, ISBN `9780304567836`, NE–SW+EAN `3467565413497`, sum `4048777668667`, keep-reading `1234567890134`, sequential `1234567890123`, diag+C `1500251762233`, 12-digit diag `150025176223`, column C `330402620368`, `150025176223C.html`, UPC→EAN `0084002017891` / `0606015100003`.
+**404 family (do not retry):** EAN-on-diagonal `1500251762232`, ISBN `9780304567836`, NE–SW+EAN `3467565413497`, sum `4048777668667`, keep-reading `1234567890134`, sequential `1234567890123`, diag+C `1500251762233`, 12-digit diag `150025176223`, column C `330402620368`, `150025176223C.html`, UPC→EAN `0084002017891` / `0606015100003`, first-col+C `1490306003093`, first-line EAN `1234567890135`, C+anti `3943141747843`, anti+C `3487471413493`, page1-stack diag `5150025176223`, 3-pad diag `3150025176223`.
 
-Page 1’s **z** sat under the **middle** of a 13×25 block (center-column candidate). Page 2’s **C** sits **bottom-left**, so the same grammar is “left column + C=3”, not “barcode the diagonal”.
+Page 1 ignored the footer **z** and used a **visual** diagonal of a **13×25** rectangle. Page 2 is **12×12**, so that same diagonal cannot make 13 digits; every way of forcing a 13th digit from C has 404’d. Treat **C** like Game 6’s **I**: a motto-page stamp, not a digit to glue on.
 
-Only two of the twelve lines are valid UPC-A (`084002017891`, `606015100003`); treating those as the answer already 404’d.
+The 13-digit instruction is likely leftover template from page 1. Game 6’s logo already hops to a **non-hash** slug `Simplicity Must Be Rewarded I`. Page 2 prints the same motto with **C**.
 
 Try in this order (Chrome). Skip anything already 404:
 
-1. **`1490306003093`** — first column `149030600309` + footer **C=3** (z-under-grid analogue)
-2. **`1234567890135`** — first line + EAN-13 check (“simplicity”)
-3. **`3943141747843`** — **C** then NE from bottom-left along the anti-diagonal
-4. **`3487471413493`** — anti-diagonal `348747141349` + **C=3**
-5. **`5150025176223`** — stack page-1 slug `5509589357423` as an extra 13th row (left-pad the 12-digit lines) and take the visual diagonal
-6. **`3150025176223`** — pad a 13×13 of **3**s at top/left, visual diagonal
+1. **`SimplicityMustBeRewardedC`** — same slug style as Game 6, letter **C**
+2. **`simplicitymustberewardedC`** — lowercase + C
+3. **`simplicity-must-be-rewarded-C`** — hyphenated
+4. **`3123456789013`** — GS1 prefix **3** (C / France) in front of the first line, old check kept
+5. **`123456789013`** — first line as a 12-digit filename (instruction leftover)
+6. **`3084002017891`** — prefix **3** on the first valid UPC-A line
+
+If these 404 too: on the laptop, Select All on page 2 and paste the twelve lines as text. One wrong digit would make every derived number 404.
 
 Still not the seed word until a page 200s.
 
