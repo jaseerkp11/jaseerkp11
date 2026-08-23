@@ -36,6 +36,18 @@ No `FOUND.txt`. Prize still unspent.
 
 The missing piece is **how Léon and Goonies become BIP39 words** (or one wrong remaining title). That is insight, not more CPU. No further still glance is required.
 
+## Extra searches 2026-08-23 (still no seed)
+
+Unique 4-letter prefix, first token hit (`prefix_first.txt`): Goonies / Godzilla / Raiders = DROP. Then drop 7 more: **no match** (2,629,575).
+
+Same with last token (`prefix_last.txt`): **no match**.
+
+Prefix + substring fallback (`ill` / `soft`, Goonies still DROP): **no match** (38,567,100, 4.9 min).
+
+Wikidata: **year ≥ 2000** is exactly 10 films. Those 10 keepers still include Goonies (1985) with no word, so that split cannot be checked.
+
+Still no `FOUND.txt`. Prize unspent.
+
 ## Rejected 2026-08-23: unique 4-letter prefix + IMDb votes < 250k
 
 See `REJECT_PREFIX_RATINGS.md`. Unique BIP-39 prefixes do **not** send Goonies→`good`, Léon→`legal`/`lesson`, Sharknado→`shark`, Shining→`shiver`. Live IMDb votes `< 250k` mark **16** films, not 10. No oracle, no seed.
