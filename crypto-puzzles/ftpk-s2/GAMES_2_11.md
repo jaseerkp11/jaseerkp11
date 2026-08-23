@@ -53,19 +53,22 @@ Text is exactly the author’s motto. BIP39: **`simple`** (from *simplicity*) or
 
 Instruction: visit `https://findtheprivatekeys2.vercel.app/<13 digits>.html`.
 
-Thirteen rows, twelve of length 25, row 7 length **26**, then **Z**. Flo: a *visual* diagonal of the rendered block is the reading that 200’s (a matrix-diagonal 404’d).
+User confirmed the first batch of URLs **all 404**. Those used a **matrix** diagonal `(row i, column i)`, which Flo already knew 404s, plus a **26-digit row 7** that was a misread.
 
-From the screenshot transcription (digits may be off — **retype if the URL 404s**):
+Correct grid: **13 rows × 25 digits**, then a centered **z**. Row 7 is `9544540031089899912206147` (25 digits).
 
-| Reading | 13 digits |
-| --- | --- |
-| NW–SE of left 13×13 | `5578704735424` |
-| NE–SW from top-right (southwest-going) | `2930361455644` |
-| Last column of the 25-wide block (letter Z) | `2203744686583` |
-| First digits of each row | `5532639166513` |
-| Row 7 split 13+13 | `9544454003108` / `9899912206147` |
+Flo: the reading that 200s is a **visual** diagonal of the rendered block (corner to corner of the 13×25 rectangle = every **other** column), not the matrix diagonal.
 
-This agent cannot fetch Vercel to see which 200s. After a hit, that *next* page is what holds the seed word.
+Try in this order (Chrome, on your laptop):
+
+1. **`5509589357423`** — visual NW→SE (top-left to bottom-right)
+2. **`2456049338213`** — visual NE→SW (top-right to bottom-left; matches the **z** / southwest hint)
+3. **`5922019519604`** — center column (z sits under the middle)
+4. **`2203747686583`** — last column (z = last letter)
+
+Do **not** retry `5578704735424` / `2930361455644` / `2203744686583` / the 26-digit splits — those 404’d.
+
+This agent gets Vercel 403/429, not a real 404. After a hit, screenshot the next page.
 
 ## Game 6 — Évènementia
 
