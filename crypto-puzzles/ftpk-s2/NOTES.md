@@ -17,7 +17,7 @@ From `analysis/tested.md` in floflo777/open-crypto-puzzles (2026-07-26).
 | 2 | | Rebus. Leaning `seven` / `second`. `GAMES_2_11.md` |
 | 3 | | Kakuro solved; **SW 1881** → `twelve` (1-based) unconfirmed |
 | 4 | | Motto page. Leaning `simple` |
-| 5 | | `5509589357423` hit. EAN-diag 404. Next try sum `4048777668667` |
+| 5 | | Page1 `5509589357423` OK. Page2 still open: try 12-digit `150025176223` and UPC `0084002017891` / `0606015100003` |
 | 6 | | Évènementia. `party` / `festival` / `host` (`event` not BIP39) |
 | 7 | | Riddle. Brute last |
 | 8 | | Fall Guys. Leaning `fall` / `bean` |

@@ -37,7 +37,7 @@ Prize is ~$300 USDT. Gas will take a slice.
 2. Solve games that are text/cipher/audio using Flo’s notes (Game 1 Vigenère + Cicada-style key; Game 12 notes-as-digits like Season 1).
 3. Hold 2048-word brute **only** for game 7 after the other 11 exist.
 
-Stills for 1–11: `GAMES_1_7_12.md` + `GAMES_2_11.md`. Game 5 page 1 confirmed: `5509589357423`. EAN-diag follow-ups 404’d. Next try sum `4048777668667`.
+Stills for 1–11: `GAMES_1_7_12.md` + `GAMES_2_11.md`. Game 5 page 1: `5509589357423`. Page 2 (12×12 + C) still 404s; next try `150025176223` (12-digit) and UPC forms `0084002017891` / `0606015100003`.
 
 Still missing: that next Game 5 screenshot, **Game 12 audio**, Game 1 cipher retype if letters are fuzzy.
 

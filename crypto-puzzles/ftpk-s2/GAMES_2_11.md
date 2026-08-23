@@ -89,18 +89,20 @@ Grid (from the still):
 978030456783
 ```
 
-User confirmed those three **404**. Digits above are exact; the EAN-on-diagonal rule was wrong.
+User confirmed EAN-diag, sum `4048777668667`, `1234567890134`, `1234567890123`, and `1500251762233` **all 404**.
 
-Next reading of **C** / “simplicity”: the twelve 12-digit lines **sum to a 13-digit number**.
+Untried, simpler readings of **C** on a **12×12** block (the “13-digit” line may be leftover copy from the previous page):
 
-Try in order:
+1. **12-digit diagonal** (no extra digit): `150025176223`
+2. **Column C** (3rd letter = 3rd column): `330402620368`
+3. **Letter C in the filename**: `150025176223C`
+4. Two rows are valid **UPC-A**; EAN-13 adds a leading `0`:
+   - `0084002017891` (from `084002017891`)
+   - `0606015100003` (from `606015100003`)
+5. Luhn on the diagonal: `1500251762231`
+6. 13 samples along the diagonal: `1500251176223`
 
-1. **`4048777668667`** — sum of all 12 numbers (simplest 13-digit from the whole block)
-2. **`1234567890134`** — keep reading: first row + first digit of row 2
-3. **`1234567890123`** — consecutive 1–13
-4. **`1500251762233`** — NW–SE diagonal + `C` as 3rd letter → digit `3`
-
-Screenshot whichever is not 404.
+Try 1–4 first. Still not the seed word until a page 200s.
 
 ## Game 6 — Évènementia
 
