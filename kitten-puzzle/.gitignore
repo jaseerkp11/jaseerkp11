@@ -1,0 +1,8 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+found.txt
+found.json
+*.wif
+progress.txt
