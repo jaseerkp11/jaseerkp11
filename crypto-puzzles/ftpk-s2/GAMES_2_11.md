@@ -89,20 +89,22 @@ Grid (from the still):
 978030456783
 ```
 
-User confirmed EAN-diag, sum `4048777668667`, `1234567890134`, `1234567890123`, and `1500251762233` **all 404**.
+**404 family (do not retry):** EAN-on-diagonal `1500251762232`, ISBN `9780304567836`, NE–SW+EAN `3467565413497`, sum `4048777668667`, keep-reading `1234567890134`, sequential `1234567890123`, diag+C `1500251762233`, 12-digit diag `150025176223`, column C `330402620368`, `150025176223C.html`, UPC→EAN `0084002017891` / `0606015100003`.
 
-Untried, simpler readings of **C** on a **12×12** block (the “13-digit” line may be leftover copy from the previous page):
+Page 1’s **z** sat under the **middle** of a 13×25 block (center-column candidate). Page 2’s **C** sits **bottom-left**, so the same grammar is “left column + C=3”, not “barcode the diagonal”.
 
-1. **12-digit diagonal** (no extra digit): `150025176223`
-2. **Column C** (3rd letter = 3rd column): `330402620368`
-3. **Letter C in the filename**: `150025176223C`
-4. Two rows are valid **UPC-A**; EAN-13 adds a leading `0`:
-   - `0084002017891` (from `084002017891`)
-   - `0606015100003` (from `606015100003`)
-5. Luhn on the diagonal: `1500251762231`
-6. 13 samples along the diagonal: `1500251176223`
+Only two of the twelve lines are valid UPC-A (`084002017891`, `606015100003`); treating those as the answer already 404’d.
 
-Try 1–4 first. Still not the seed word until a page 200s.
+Try in this order (Chrome). Skip anything already 404:
+
+1. **`1490306003093`** — first column `149030600309` + footer **C=3** (z-under-grid analogue)
+2. **`1234567890135`** — first line + EAN-13 check (“simplicity”)
+3. **`3943141747843`** — **C** then NE from bottom-left along the anti-diagonal
+4. **`3487471413493`** — anti-diagonal `348747141349` + **C=3**
+5. **`5150025176223`** — stack page-1 slug `5509589357423` as an extra 13th row (left-pad the 12-digit lines) and take the visual diagonal
+6. **`3150025176223`** — pad a 13×13 of **3**s at top/left, visual diagonal
+
+Still not the seed word until a page 200s.
 
 ## Game 6 — Évènementia
 
