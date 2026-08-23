@@ -35,3 +35,7 @@ Year &lt; 1980 is again exactly 10 films on this list (Léon is 1994, so it does
 No `FOUND.txt`. Prize still unspent.
 
 The missing piece is **how Léon and Goonies become BIP39 words** (or one wrong remaining title). That is insight, not more CPU. No further still glance is required.
+
+## Rejected 2026-08-23: unique 4-letter prefix + IMDb votes < 250k
+
+See `REJECT_PREFIX_RATINGS.md`. Unique BIP-39 prefixes do **not** send Goonies→`good`, Léon→`legal`/`lesson`, Sharknado→`shark`, Shining→`shiver`. Live IMDb votes `< 250k` mark **16** films, not 10. No oracle, no seed.
