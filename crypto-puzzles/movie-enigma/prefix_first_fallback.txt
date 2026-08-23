@@ -1,0 +1,36 @@
+# prefix_first, then longest substring if prefix missed.
+# Goonies still DROP. Godzilla -> ill. Raiders glued -> soft.
+hard
+path
+alien
+mad
+alien
+now
+escape
+DROP
+spare
+miss
+ill
+life
+profit
+man
+crime
+visit
+clock
+start
+gravity
+first
+solar
+blade
+guard
+close
+barrel
+share
+term
+screen
+matrix
+toy
+ghost
+soft
+shine
+human
