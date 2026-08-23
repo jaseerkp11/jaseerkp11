@@ -70,7 +70,7 @@ Do **not** retry `5578704735424` / `2930361455644` / `2203744686583` / the 26-di
 
 **Hit (user, 2026-08-23):** `https://findtheprivatekeys2.vercel.app/5509589357423.html` is a real page. Next step is another 13-digit URL.
 
-That page: 12 lines × **12 digits**, motto **simplicity must be rewarded C**. `C` = check digit (EAN-13 / ISBN, same GS1 weights as `123456789012` → `8`).
+That page: 12 lines × **12 digits**, motto **simplicity must be rewarded C**. EAN-on-diagonal URLs **404’d**. `C` may mean calculate/sum, letter 3, or just the next motto stamp.
 
 Grid (from the still):
 
@@ -89,13 +89,18 @@ Grid (from the still):
 978030456783
 ```
 
-On a square, visual NW→SE **is** the matrix diagonal (12 digits), then append EAN-13 `C`:
+User confirmed those three **404**. Digits above are exact; the EAN-on-diagonal rule was wrong.
 
-1. **`1500251762232`** — NW–SE `150025176223` + check `2` (same method as the previous hit)
-2. **`9780304567836`** — last row looks like an ISBN-13 stem `978…` + check `6` (motto = pick the simple barcode)
-3. **`3467565413497`** — NE–SW diagonal + check `7`
+Next reading of **C** / “simplicity”: the twelve 12-digit lines **sum to a 13-digit number**.
 
-Try (1) first. Screenshot whatever 200s.
+Try in order:
+
+1. **`4048777668667`** — sum of all 12 numbers (simplest 13-digit from the whole block)
+2. **`1234567890134`** — keep reading: first row + first digit of row 2
+3. **`1234567890123`** — consecutive 1–13
+4. **`1500251762233`** — NW–SE diagonal + `C` as 3rd letter → digit `3`
+
+Screenshot whichever is not 404.
 
 ## Game 6 — Évènementia
 
