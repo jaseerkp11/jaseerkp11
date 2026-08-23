@@ -1,0 +1,38 @@
+# One token per panel, panel 1 on line 1.
+# Use a BIP39 English word, or DROP if this panel has no word / is a known gap.
+# Lines starting with # are ignored.
+
+hard
+glory
+alien
+mad
+alien
+now
+escape
+DROP
+art
+miss
+ill
+life
+DROP
+iron
+river
+visit
+clock
+hope
+gravity
+first
+solar
+blade
+galaxy
+close
+bar
+DROP
+day
+cream
+matrix
+story
+ghost
+soft
+shine
+human
