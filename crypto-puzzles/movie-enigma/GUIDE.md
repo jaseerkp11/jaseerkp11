@@ -58,8 +58,9 @@ Known exceptions:
 | --- | --- | --- |
 | The Goonies | none | leave as `DROP` (likely an intruder) |
 | Sharknado | none | `DROP` |
-| Léon: The Professional | none | `DROP` |
-| The Shining | `shine` is a stem, not a substring | `shine` |
+| The Long Goodbye (working #13) | `long` `good` | `long` |
+| Léon: The Professional (issue #9 #13) | none | `DROP` |
+| The Shining | `shine` is a stem, not a substring | `DROP` (not `shine`) |
 | Raiders of the Lost Ark | `soft` only if you delete spaces | `soft` or `DROP` |
 | Barry Lyndon | `bar` | `bar` |
 
@@ -119,4 +120,4 @@ So “open Cursor and extract the seed” is not possible until the **stills are
 
 ## Honest end state
 
-We will solve it **if and only if** the 34 stills and the title→word rule are right; then `search_drop10.py` finishes it. I cannot honestly print a 24-word seed today. Next message: send your `words34.txt` (or a screenshot of a panel you cannot name) and I will run the search again.
+We will solve it **if and only if** the 34 stills and the title→word rule are right; then `search_drop10.py` finishes it. I cannot honestly print a 24-word seed today. Next human step is `NEXT.md` (panel 13 only), not more drop-10 on mixed IDs.

@@ -62,9 +62,13 @@ curl https://mempool.space/api/address/bc1q94ecsn0qk8lap2gefrycnms3ruepy889z969a
 
 ### What you actually do
 
+Human glance left: **panel 13 only**. See `crypto-puzzles/movie-enigma/NEXT.md`.
+
+Working 34 titles: `crypto-puzzles/movie-enigma/titles34.txt` (not Flo’s CSV).
+
 1. Open [the stills](https://bitcoinmovieenigma.com/) (author site; do not copy film frames into git).
-2. Open `data\films.csv` in the cloned repo. That is Flo’s ID list. Community list in `data\films_community_issue9.csv` **disagrees on ~9 panels**. Reconcile those first.
-3. For each agreed title, pick the BIP39 word (often a literal substring: Die Hard → `hard`). Four titles have **no** BIP39 substring: The Goonies, Barry Lyndon, Sharknado, Raiders of the Lost Ark. Either they are intruders, or the word rule is not “substring.”
+2. Open `data\films.csv` in the cloned repo only as background. Community list in `data\films_community_issue9.csv` **disagrees on ~9 panels**. Most of those nine are now settled from stills; **13** is the leftover.
+3. For each agreed title, pick the BIP39 word (often a literal substring: Die Hard → `hard`). Official-substring holes on the working list: The Goonies, Sharknado, The Shining. Either they are intruders, or the word rule is not “substring.”
 4. On IMDb, find **one field** that marks exactly **10** films as out. MPAA R, Oscars, “based on a novel,” etc. are already refuted in `analysis\tested.md`. Do not re-run those.
 5. Keep panel order. Drop the 10. You now have 24 words.
 6. Test:

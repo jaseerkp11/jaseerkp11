@@ -4,6 +4,21 @@ Inspected the published research folder
 `3-small-prizes/bitcoin-movie-enigma-100ksats/`  
 (from [floflo777/open-crypto-puzzles](https://github.com/floflo777/open-crypto-puzzles)).
 
+On-disk files (README names in parentheses when they differ):
+
+| Path | Role |
+| --- | --- |
+| `README.md` | Narrative; some lead text is stale vs CSV |
+| `puzzle.json` | Machine index; leads slightly stale |
+| `data/films.csv` | Canonical 34 IDs + BIP39 substring guesses |
+| `data/films_community_issue9.csv` | Alternate 34 IDs (issue #9) |
+| `analysis/tested.md` | Negatives ledger |
+| `analysis/leads.md` | Ranked leads + community reconciliation |
+| `clues/author-posts.md` | Author quotes |
+| `tools/oracle.py` | 24-word verifier (`--selftest`) |
+| `tools/fig_panel_grid.py` | Grid SVG generator |
+| `images/02-panel-grid-identification.svg` | Confidence grid |
+
 No drop-10 search, no private-key search, no broadcast. Oracle **self-test only**.
 
 **Status: OPEN.** Escrow `bc1q94ecsn0qk8lap2gefrycnms3ruepy889z969a6` was recorded funded and unspent (100,000 sats) on 2026-08-16. There is **no solved 24-word seed** in this folder.
@@ -243,9 +258,11 @@ No other oracle calls. No C(34,10). No keys generated. No transaction.
 
 Do **not** brute-force drop-10 yet. The 34-word line is not locked.
 
-1. Open the stills on [bitcoinmovieenigma.com](https://bitcoinmovieenigma.com/) and settle panels **3, 5, 9, 13, 14, 16, 23, 24, 27** (canonical vs community). Write the winner into `data/films.csv`.
-2. For each of the 34 titles, pick **one** BIP39 word with a rule you can apply to all 34 (literal longest substring, or a documented exception list).
-3. Build an IMDb table (year, MPAA, runtime, country, Oscars, …) **after** the titles are stable; look for a field that marks **exactly 10** films.
-4. Only then: 24 words in panel order → a **single** `tools/oracle.py "…"` check. If you must search drop-10, that is a later, bounded step, and only after (1)–(2).
+Working files in this repo (not Flo’s CSV): `titles34.txt`, `words34.txt`, `extract_bip39.py`, `NEXT.md`.
+
+1. Human: glance at [panel 13](https://www.bitcoinmovieenigma.com/blog/13) and say *The Long Goodbye* vs *Léon* (`NEXT.md`).
+2. Title → word is still the hole: Goonies, Sharknado, and The Shining have **no** official BIP39 substring. `shine` is not inside `shining`.
+3. Do **not** treat year&lt;1980 or year≥2000 as solved. Those counts move if panel 13 is 1973, and they cannot fill 24 words while three titles are wordless.
+4. Only after 34 words exist: one oracle check, or a bounded drop-10. Not before.
 
 Highest-value work right now, in the folder’s own words: **ideas on the wordless titles beat more compute.**

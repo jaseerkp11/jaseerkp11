@@ -1,6 +1,6 @@
 # One token per panel, panel 1 on line 1.
-# Use a BIP39 English word, or DROP if this panel has no word / is a known gap.
-# Lines starting with # are ignored.
+# Longest official BIP39 substring of the working title (spaces deleted).
+# DROP = no official substring. Not a claim that the panel is an IMDb intruder.
 
 hard
 glory
@@ -11,15 +11,15 @@ now
 escape
 DROP
 art
-miss
+possible
 ill
 life
-DROP
+long
 iron
 river
 visit
-clock
-hope
+orange
+episode
 gravity
 first
 solar
@@ -28,11 +28,11 @@ galaxy
 close
 bar
 DROP
-day
+term
 cream
 matrix
 story
 ghost
 soft
-shine
+DROP
 human

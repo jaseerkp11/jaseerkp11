@@ -1,0 +1,37 @@
+# Working 34 titles in panel order. One title per numbered line.
+# Not Flo's films.csv (do not overwrite that). Visual IDs from author stills.
+# Confidence tags: CONFIRMED / PROBABLE.
+1	Die Hard	CONFIRMED
+2	Paths of Glory	CONFIRMED
+3	Aliens	CONFIRMED
+4	Mad Max	CONFIRMED
+5	Alien	CONFIRMED
+6	Apocalypse Now	CONFIRMED
+7	Escape from Alcatraz	CONFIRMED
+8	The Goonies	PROBABLE
+9	Spartacus	CONFIRMED
+10	Mission: Impossible	CONFIRMED
+11	Godzilla	CONFIRMED
+12	Life of Pi	CONFIRMED
+13	The Long Goodbye	PROBABLE
+14	The Man in the Iron Mask	CONFIRMED
+15	The Crimson Rivers	CONFIRMED
+16	The Visitors	CONFIRMED
+17	A Clockwork Orange	CONFIRMED
+18	Star Wars: Episode IV - A New Hope	CONFIRMED
+19	Gravity	CONFIRMED
+20	First Man	CONFIRMED
+21	Solaris	CONFIRMED
+22	Blade Runner 2049	CONFIRMED
+23	Guardians of the Galaxy	CONFIRMED
+24	Close Encounters of the Third Kind	CONFIRMED
+25	Barry Lyndon	CONFIRMED
+26	Sharknado	CONFIRMED
+27	Terminator 2: Judgment Day	CONFIRMED
+28	Scream 2	CONFIRMED
+29	The Matrix Reloaded	CONFIRMED
+30	Toy Story 2	CONFIRMED
+31	Ghostbusters II	CONFIRMED
+32	Raiders of the Lost Ark	CONFIRMED
+33	The Shining	CONFIRMED
+34	The Human Centipede (First Sequence)	CONFIRMED

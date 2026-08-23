@@ -1,5 +1,7 @@
 # Disputed panels 3, 5, 9, 13, 14, 16, 23, 24, 27
 
+**Later pass:** author-site stills were viewed. Working titles live in `titles34.txt` and `STILLS_ID.md`. This page is the older CSV-vs-issue-#9 ledger and is **not** the working list.
+
 Puzzle data files were **not** changed. No C(34,10) search. No keys. Oracle not re-run.
 
 **Visuals:** this folder’s `images/` contains only `02-panel-grid-identification.svg` (confidence colours). The 34 stills are **not** stored here (third-party frames). Identifications below use `data/films.csv`, `data/films_community_issue9.csv`, `analysis/leads.md`, and [GitHub issue #9](https://github.com/floflo777/open-crypto-puzzles/issues/9) (garrou, deviceio121, SmallCakekoo frame-match links). This agent did **not** see the puzzle JPEGs.
