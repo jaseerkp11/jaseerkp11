@@ -37,7 +37,9 @@ Prize is ~$300 USDT. Gas will take a slice.
 2. Solve games that are text/cipher/audio using Flo’s notes (Game 1 Vigenère + Cicada-style key; Game 12 notes-as-digits like Season 1).
 3. Hold 2048-word brute **only** for game 7 after the other 11 exist.
 
-Your optional help: open https://findtheprivatekeys2.vercel.app/ on the laptop if a still/image game needs a human pair of eyes, and send a screenshot.
+Screenshots for games 1 / 7 / 12: see `GAMES_1_7_12.md`. Cipher and riddle are **not** seed words yet. Third shot is the order page, not the audio game.
+
+Your optional help: remaining game pages (2–6, 8–11), a **re-typed** Game 1 cipher if any letter looks uncertain, and the **Game 12 audio**.
 
 Flo write-up: https://github.com/floflo777/open-crypto-puzzles/tree/main/2-mid-prizes/ftpk-season-2-300usdt
 Hub: https://findtheprivatekeys.vercel.app/

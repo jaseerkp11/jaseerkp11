@@ -13,6 +13,9 @@ From `analysis/tested.md` in floflo777/open-crypto-puzzles (2026-07-26).
 
 | Game | Word | Status |
 | ---: | --- | --- |
-| 1–12 | | unsolved here |
+| 1 | | Cipher transcribed from screenshot. Cicada-class Vigenère keys tried; **no English**. Likely OCR. See `GAMES_1_7_12.md`. |
+| 7 | | Riddle transcribed. Candidates (`wish`, `copy`, `model`, …) **not locked**. Brute last. |
+| 12 | | **No audio in the stills** (third shot is `wordorder.html`). |
+| 2–6, 8–11 | | No pages yet. |
 
 Do not brute game 7 until the other 11 exist.
