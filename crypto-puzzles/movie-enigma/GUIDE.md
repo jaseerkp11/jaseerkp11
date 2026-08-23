@@ -118,4 +118,4 @@ So “open Cursor and extract the seed” still needs the **title→word rule**.
 
 ## Honest end state
 
-We will solve it **if and only if** the 34 stills and the title→word rule are right. Panel 13 is locked as *Léon*. Strict substring + drop-10 already missed. The remaining work is how Goonies / Léon (and maybe Sharknado / Shining) become BIP39 words.
+We will solve it **if and only if** the 34 stills and the title→word rule are right. Panels 8 and 13 are locked as *The Goonies* and *Léon*. Strict substring + drop-10 already missed. The remaining work is how Goonies / Léon (and maybe Sharknado / Shining) become BIP39 words.

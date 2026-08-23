@@ -8,7 +8,7 @@
 5	Alien	CONFIRMED
 6	Apocalypse Now	CONFIRMED
 7	Escape from Alcatraz	CONFIRMED
-8	The Goonies	PROBABLE
+8	The Goonies	CONFIRMED
 9	Spartacus	CONFIRMED
 10	Mission: Impossible	CONFIRMED
 11	Godzilla	CONFIRMED

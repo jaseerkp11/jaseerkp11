@@ -6,7 +6,7 @@ There is **no seed yet**. Do not grind unbounded C(34,10).
 
 ## No human still-work left
 
-Unless you disagree with *Spartacus* (#9) or *Close Encounters* (#24), titles are frozen in `titles34.txt`.
+Titles are frozen in `titles34.txt`. Panel **8 is *The Goonies*** (your confirm: Perkins/Troy, rain, Walsh house). Panel **13 is *Léon***.
 
 ## Remaining hole (this is the puzzle)
 
@@ -34,6 +34,4 @@ Year &lt; 1980 is again exactly 10 films on this list (Léon is 1994, so it does
 
 No `FOUND.txt`. Prize still unspent.
 
-If you want a tiny optional look: panel **8** is still only PROBABLE *The Goonies*. A different title there could supply a real BIP39 word. Not required.
-
-The missing piece is **how Léon and Goonies become BIP39 words** (or one wrong non-disputed title). That is insight, not more CPU.
+The missing piece is **how Léon and Goonies become BIP39 words** (or one wrong remaining title). That is insight, not more CPU. No further still glance is required.

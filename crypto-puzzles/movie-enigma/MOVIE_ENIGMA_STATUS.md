@@ -42,7 +42,7 @@ Internal inconsistency in the write-up: `README.md` / `puzzle.json` still say pa
 | 5 | Star Trek: The Motion Picture | probable | Community: *Alien* (1979) |
 | 6 | Apocalypse Now | confirmed | |
 | 7 | Escape from Alcatraz | confirmed | |
-| 8 | The Goonies | probable | |
+| 8 | The Goonies | confirmed | Human: Perkins/Troy rain scene at Walsh house |
 | 9 | Duel in the Sun | confirmed | Community: *Spartacus* |
 | 10 | Mission: Impossible | confirmed | |
 | 11 | Godzilla | confirmed-community | README lead #1 is stale (still describes buried tuna boxes) |
@@ -256,11 +256,11 @@ No other oracle calls. No C(34,10). No keys generated. No transaction.
 
 # Recommended Next Step
 
-Do **not** brute-force drop-10 yet. The 34-word line is not locked.
+Do **not** run unbounded C(34,10). Bounded drop-10 on the frozen list already missed.
 
 Working files in this repo (not Flo’s CSV): `titles34.txt`, `words34.txt`, `extract_bip39.py`, `NEXT.md`.
 
-1. Panel 13 is **Léon: The Professional** (human confirm). Titles are frozen unless a non-disputed still is wrong.
+1. Panels 8 and 13 are human-confirmed (**The Goonies**, **Léon: The Professional**). Titles are frozen unless a remaining still is wrong.
 2. Title → word is still the hole: Goonies, Léon, Sharknado, and The Shining have **no** official BIP39 substring. `shine` is not inside `shining`.
 3. Year&lt;1980 and year≥2000 are each 10 films again (Léon is 1994). They still cannot fill 24 words while four titles are wordless.
 4. Bounded drop-10 on `words34.txt` (4 forced DROPs, C(30,6)): **no match**. Loose list with `tornado`/`shine`: **no match**. Not a full C(34,10).

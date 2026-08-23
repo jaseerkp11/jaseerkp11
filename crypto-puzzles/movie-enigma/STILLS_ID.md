@@ -19,6 +19,7 @@ No C(34,10). Puzzle CSVs not edited.
 | Panel | Canonical CSV | Issue #9 | What the still shows | Best title | Confidence | Literal BIP39 substrings |
 | ---: | --- | --- | --- | --- | --- | --- |
 | 3 | Alien | Aliens | M41A pulse rifle on a teal ops desk, block **70**, colony/lab set | **Aliens** (1986) | **CONFIRMED** | `alien` |
+| 8 | The Goonies | The Goonies | Rain, umbrellas, Mr. Perkins + Troy outside the Walsh house | **The Goonies** (1985) | **CONFIRMED** (human) | *(none)* |
 | 5 | Star Trek: The Motion Picture | Alien | White quilted Nostromo suit; locker tag **RIPLEY**; Narcissus finale | **Alien** (1979) | **CONFIRMED** | `alien` |
 | 9 | Duel in the Sun | Spartacus | Couple kissing on a **green** hillside at dusk, trees, not desert rock | **Spartacus** (1960) | **CONFIRMED** | `art` |
 | 13 | Goodfellas | Léon: The Professional | Tight CU of a mustached man by blinds, checking a chronograph | **Léon: The Professional** (1994) | **CONFIRMED** (human) | *(none)* |
@@ -33,6 +34,8 @@ No C(34,10). Puzzle CSVs not edited.
 **3.** Pulse rifle + underslung launcher is *Aliens*, not 1979 *Alien*. Issue #9 is right.
 
 **5.** “RIPLEY” on the locker and the quilted suit are the *Narcissus* ending of *Alien* (1979), not TMP.
+
+**8.** Human ID: **The Goonies** (1985), Perkins/Troy foreclosure visit in the rain. Title still has **no** official BIP39 substring.
 
 **9.** Green grass, trees, terracotta dress, rustic tunic: the Spartacus / Varinia hillside scene, not *Duel in the Sun*’s desert climax. Treated as **CONFIRMED** unless a human names a better match.
 
@@ -54,6 +57,6 @@ None of the nine disputed IDs remain. Word mapping is the remaining hole (see `N
 
 ## Accept vs inspect
 
-**Accept:** 3 *Aliens*, 5 *Alien*, 9 *Spartacus*, 13 *Léon: The Professional* (human), 14 *The Man in the Iron Mask*, 16 *The Visitors*, 23 *Guardians of the Galaxy*, 24 *Close Encounters of the Third Kind*, 27 *Terminator 2: Judgment Day*.
+**Accept:** 3 *Aliens*, 5 *Alien*, 8 *The Goonies* (human), 9 *Spartacus*, 13 *Léon: The Professional* (human), 14 *The Man in the Iron Mask*, 16 *The Visitors*, 23 *Guardians of the Galaxy*, 24 *Close Encounters of the Third Kind*, 27 *Terminator 2: Judgment Day*.
 
 **No further still glance required.**

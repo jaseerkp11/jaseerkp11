@@ -62,7 +62,7 @@ curl https://mempool.space/api/address/bc1q94ecsn0qk8lap2gefrycnms3ruepy889z969a
 
 ### What you actually do
 
-Human glance left: **none** (panel 13 = *Léon*). See `crypto-puzzles/movie-enigma/NEXT.md`.
+Human glance left: **none** (panel 8 = *Goonies*, panel 13 = *Léon*). See `crypto-puzzles/movie-enigma/NEXT.md`.
 
 Working 34 titles: `crypto-puzzles/movie-enigma/titles34.txt` (not Flo’s CSV).
 
