@@ -25,10 +25,15 @@ That is **4** wordless titles. The author drops **10** IMDb “intruders”. If 
 
 Year &lt; 1980 is again exactly 10 films on this list (Léon is 1994, so it does not join that set). Year ≥ 2000 is also 10. **Neither** can produce 24 words while Goonies / Léon / Sharknado / Shining stay wordless, because those four are not all inside one year bucket.
 
-## What I do next (no extra task for you)
+## Search results (already ran)
 
-1. Bounded drop-10 on `words34.txt` (4 forced `DROP`s → C(30,6) checksums).
-2. Optional second list: `tornado` for Sharknado, `shine` for The Shining, still `DROP` Goonies + Léon.
-3. Only if a MATCH appears: write `FOUND.txt` and stop.
+| List | Forced DROP | Result |
+| --- | --- | --- |
+| `words34.txt` longest substring | 8, 13, 26, 33 | no match (593,775 / 4.4s) |
+| `words34_loose.txt` + tornado/shine | 8, 13 | no match (10,518,300 / 78s) |
 
-If both searches miss, the missing piece is still **how Léon and Goonies become BIP39 words** (or a different title on a non-disputed panel). That is insight, not more CPU.
+No `FOUND.txt`. Prize still unspent.
+
+If you want a tiny optional look: panel **8** is still only PROBABLE *The Goonies*. A different title there could supply a real BIP39 word. Not required.
+
+The missing piece is **how Léon and Goonies become BIP39 words** (or one wrong non-disputed title). That is insight, not more CPU.

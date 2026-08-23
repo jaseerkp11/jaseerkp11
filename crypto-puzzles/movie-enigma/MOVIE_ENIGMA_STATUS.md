@@ -263,6 +263,6 @@ Working files in this repo (not Flo’s CSV): `titles34.txt`, `words34.txt`, `ex
 1. Panel 13 is **Léon: The Professional** (human confirm). Titles are frozen unless a non-disputed still is wrong.
 2. Title → word is still the hole: Goonies, Léon, Sharknado, and The Shining have **no** official BIP39 substring. `shine` is not inside `shining`.
 3. Year&lt;1980 and year≥2000 are each 10 films again (Léon is 1994). They still cannot fill 24 words while four titles are wordless.
-4. Next compute: bounded drop-10 on `words34.txt` (4 forced DROPs). Not a full C(34,10).
+4. Bounded drop-10 on `words34.txt` (4 forced DROPs, C(30,6)): **no match**. Loose list with `tornado`/`shine`: **no match**. Not a full C(34,10).
 
 Highest-value leftover: **how Léon and The Goonies become BIP39 words**, not more CPU.

@@ -111,12 +111,11 @@ Miner fee will eat a visible slice of 100k sats. That is expected.
 
 | Word list | Forced DROP | Result |
 | --- | --- | --- |
-| Community issue #9 first words | Goonies, Léon, Sharknado | no match (2.6M combos) |
-| Flo titles, longest substring + `soft` + `shine` | Goonies, Sharknado | no match (10.5M combos) |
-| Flo titles, first substring + `soft` + `shine` | Goonies, Sharknado | no match (10.5M combos) |
+| Strict still-list, longest substring | Goonies, Léon, Sharknado, Shining | no match (593,775 combos, 4.4s) |
+| Same + `tornado` + `shine` | Goonies, Léon | no match (10,518,300 combos, 78s) |
 
-So “open Cursor and extract the seed” still needs the **title→word rule**. The nine disputed stills are settled; four titles still have no official substring.
+So “open Cursor and extract the seed” still needs the **title→word rule**. The nine disputed stills are settled; four titles still have no official substring. Bounded drop-10 on the frozen list already missed.
 
 ## Honest end state
 
-We will solve it **if and only if** the 34 stills and the title→word rule are right; then `search_drop10.py` finishes it. Panel 13 is locked as *Léon*. I cannot honestly print a 24-word seed until Goonies / Léon / Sharknado / Shining map to words (or sit among the 10 drops). Next: bounded drop-10 on `words34.txt`.
+We will solve it **if and only if** the 34 stills and the title→word rule are right. Panel 13 is locked as *Léon*. Strict substring + drop-10 already missed. The remaining work is how Goonies / Léon (and maybe Sharknado / Shining) become BIP39 words.
