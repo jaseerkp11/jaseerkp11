@@ -1,0 +1,38 @@
+# Same as words34.txt except portmanteau/stem guesses:
+# 26 Sharknado -> tornado, 33 The Shining -> shine
+# Goonies and Léon stay DROP.
+
+hard
+glory
+alien
+mad
+alien
+now
+escape
+DROP
+art
+possible
+ill
+life
+DROP
+iron
+river
+visit
+orange
+episode
+gravity
+first
+solar
+blade
+galaxy
+close
+bar
+tornado
+term
+cream
+matrix
+story
+ghost
+soft
+shine
+human
