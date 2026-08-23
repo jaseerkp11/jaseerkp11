@@ -13,9 +13,17 @@ From `analysis/tested.md` in floflo777/open-crypto-puzzles (2026-07-26).
 
 | Game | Word | Status |
 | ---: | --- | --- |
-| 1 | | Cipher transcribed from screenshot. Cicada-class Vigenère keys tried; **no English**. Likely OCR. See `GAMES_1_7_12.md`. |
-| 7 | | Riddle transcribed. Candidates (`wish`, `copy`, `model`, …) **not locked**. Brute last. |
-| 12 | | **No audio in the stills** (third shot is `wordorder.html`). |
-| 2–6, 8–11 | | No pages yet. |
+| 1 | | Cipher; Vigenère not English yet. `GAMES_1_7_12.md` |
+| 2 | | Rebus. Leaning `seven` / `second`. `GAMES_2_11.md` |
+| 3 | | Kakuro solved; **SW 1881** → `twelve` (1-based) unconfirmed |
+| 4 | | Motto page. Leaning `simple` |
+| 5 | | Need a 13-digit URL that 200s, then the word |
+| 6 | | Évènementia. `party` / `festival` / `host` (`event` not BIP39) |
+| 7 | | Riddle. Brute last |
+| 8 | | Fall Guys. Leaning `fall` / `bean` |
+| 9 | | **3114** = A1Z26 `3,1,14` → `can` |
+| 10 | | Four texts. Leaning `silent` / `whisper` / `mirror` |
+| 11 | | Example address only. Leaning `example` / `address` |
+| 12 | | No audio yet |
 
 Do not brute game 7 until the other 11 exist.
