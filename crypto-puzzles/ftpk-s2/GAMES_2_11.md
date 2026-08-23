@@ -68,7 +68,34 @@ Try in this order (Chrome, on your laptop):
 
 Do **not** retry `5578704735424` / `2930361455644` / `2203744686583` / the 26-digit splits — those 404’d.
 
-This agent gets Vercel 403/429, not a real 404. After a hit, screenshot the next page.
+**Hit (user, 2026-08-23):** `https://findtheprivatekeys2.vercel.app/5509589357423.html` is a real page. Next step is another 13-digit URL.
+
+That page: 12 lines × **12 digits**, motto **simplicity must be rewarded C**. `C` = check digit (EAN-13 / ISBN, same GS1 weights as `123456789012` → `8`).
+
+Grid (from the still):
+
+```
+123456789013
+453219876540
+950110148630
+084002017891
+370123456789
+002345678912
+606015100003
+072345678907
+060123456781
+303005007292
+046000001126
+978030456783
+```
+
+On a square, visual NW→SE **is** the matrix diagonal (12 digits), then append EAN-13 `C`:
+
+1. **`1500251762232`** — NW–SE `150025176223` + check `2` (same method as the previous hit)
+2. **`9780304567836`** — last row looks like an ISBN-13 stem `978…` + check `6` (motto = pick the simple barcode)
+3. **`3467565413497`** — NE–SW diagonal + check `7`
+
+Try (1) first. Screenshot whatever 200s.
 
 ## Game 6 — Évènementia
 
