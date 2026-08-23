@@ -1,46 +1,34 @@
-# What you do next (one small look)
+# Status after panel 13
 
-I already: locked a working 34-title file from the stills, extracted every official BIP39 substring, proved year-splits cannot fill 24 words under a substring rule, and checked the prize is still **100,000 sats unspent**.
+Panel **13 is locked** as **Léon: The Professional** (1994) from your ID. Issue #9 was right. *The Long Goodbye* is out.
 
-There is **no seed yet**. Do not grind C(34,10).
+There is **no seed yet**. Do not grind unbounded C(34,10).
 
-## Your only job (2 minutes)
+## No human still-work left
 
-Open panel **13** and say which movie it is:
+Unless you disagree with *Spartacus* (#9) or *Close Encounters* (#24), titles are frozen in `titles34.txt`.
 
-https://www.bitcoinmovieenigma.com/blog/13
-
-Reply with one of:
-
-1. **The Long Goodbye** (1973) — mustache, chronograph, blinds, 1970s grain (current working guess)
-2. **Léon: The Professional** (1994) — issue #9
-3. **something else** (name it)
-
-Panels **9** (*Spartacus* hillside kiss) and **24** (*Close Encounters* 1970s McDonald’s at night) are treated as locked unless you disagree.
-
-## What I will do after that
-
-- Freeze the 34 titles
-- Keep using one word rule (longest official substring, `DROP` if none)
-- Only then look for an IMDb field that marks **exactly 10** films
-- Only then run **one** 24-word oracle check (or a bounded drop-10 if all 34 words exist)
-
-## Files
-
-| File | What it is |
-| --- | --- |
-| `titles34.txt` | Working 34 titles, panel order |
-| `extract_bip39.py` | Lists official BIP39 substrings |
-| `words34.txt` | Longest substring per title (`DROP` = none) |
-
-## Substring holes (this is the remaining insight)
+## Remaining hole (this is the puzzle)
 
 Official English BIP39, spaces deleted, **no** match:
 
-- 8 The Goonies
-- 26 Sharknado
-- 33 The Shining (`shine` is **not** inside `shining`)
+| Panel | Title | Notes |
+| ---: | --- | --- |
+| 8 | The Goonies | no substring |
+| 13 | Léon: The Professional | no substring |
+| 26 | Sharknado | no substring (`tornado` is a portmanteau, not a substring) |
+| 33 | The Shining | `shine` is **not** inside `shining` |
 
-`soft` in *Raiders of the Lost Ark* only appears if you glue words together (`raiders`**oft**`he`). That is a weak word.
+That is **4** wordless titles. The author drops **10** IMDb “intruders”. If the word rule is strict substring, those 4 are likely among the 10, and 6 more must come from IMDb.
 
-Year &lt; 1980 and year ≥ 2000 each look like “exactly 10” on older lists. They **break** if panel 13 is *The Long Goodbye* (1973). They also cannot produce 24 words while Goonies / Sharknado / Shining have no substring. Those year rules are **not** the solve.
+`soft` in *Raiders of the Lost Ark* only appears if you glue words (`raiders`**oft**`he`). Weak.
+
+Year &lt; 1980 is again exactly 10 films on this list (Léon is 1994, so it does not join that set). Year ≥ 2000 is also 10. **Neither** can produce 24 words while Goonies / Léon / Sharknado / Shining stay wordless, because those four are not all inside one year bucket.
+
+## What I do next (no extra task for you)
+
+1. Bounded drop-10 on `words34.txt` (4 forced `DROP`s → C(30,6) checksums).
+2. Optional second list: `tornado` for Sharknado, `shine` for The Shining, still `DROP` Goonies + Léon.
+3. Only if a MATCH appears: write `FOUND.txt` and stop.
+
+If both searches miss, the missing piece is still **how Léon and Goonies become BIP39 words** (or a different title on a non-disputed panel). That is insight, not more CPU.

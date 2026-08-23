@@ -21,7 +21,7 @@ No C(34,10). Puzzle CSVs not edited.
 | 3 | Alien | Aliens | M41A pulse rifle on a teal ops desk, block **70**, colony/lab set | **Aliens** (1986) | **CONFIRMED** | `alien` |
 | 5 | Star Trek: The Motion Picture | Alien | White quilted Nostromo suit; locker tag **RIPLEY**; Narcissus finale | **Alien** (1979) | **CONFIRMED** | `alien` |
 | 9 | Duel in the Sun | Spartacus | Couple kissing on a **green** hillside at dusk, trees, not desert rock | **Spartacus** (1960) | **CONFIRMED** | `art` |
-| 13 | Goodfellas | Léon: The Professional | Tight CU of a mustached man by blinds, checking a chronograph | **The Long Goodbye** (1973) | **PROBABLE** | `long` `good` |
+| 13 | Goodfellas | Léon: The Professional | Tight CU of a mustached man by blinds, checking a chronograph | **Léon: The Professional** (1994) | **CONFIRMED** (human) | *(none)* |
 | 14 | Eyes Wide Shut | The Man in the Iron Mask | Baroque gold stick-masks, huge blond court wig, red-gold coats | **The Man in the Iron Mask** (1998) | **CONFIRMED** | `iron` `mask` `man` `ask` |
 | 16 | The 13th Warrior | The Visitors | Headless knight in armour standing in a flowered meadow (opening gag) | **The Visitors** / *Les Visiteurs* (1993) | **CONFIRMED** | `visit` |
 | 23 | Valerian… | Guardians of the Galaxy | Nova Corps gold 3-point badges, white-haired Nova Prime, Xandar hologram | **Guardians of the Galaxy** (2014) | **CONFIRMED** | `galaxy` `guard` |
@@ -36,7 +36,7 @@ No C(34,10). Puzzle CSVs not edited.
 
 **9.** Green grass, trees, terracotta dress, rustic tunic: the Spartacus / Varinia hillside scene, not *Duel in the Sun*’s desert climax. Treated as **CONFIRMED** unless a human names a better match.
 
-**13.** Not a famous Ray Liotta / Pesci *Goodfellas* composition, and the face is not Jean Reno. Warm 1970s grain, thick mustache, three-register chronograph, bright window/blinds: better fit for **Terry Lennox** in Altman’s *The Long Goodbye* (1973) than *Léon*. Issue #9 still says *Léon* (which has **no** BIP39 substring). Keep **PROBABLE** until a human yes/no.
+**13.** Human ID: **Léon: The Professional** (1994). Matches issue #9. The title has **no** official BIP39 substring. (An earlier Altman/*Long Goodbye* guess is discarded.)
 
 **14.** Court masquerade with handled gold masks and a Louis XIV wig is *The Man in the Iron Mask*, not Kubrick’s *Eyes Wide Shut* mansion.
 
@@ -50,10 +50,10 @@ No C(34,10). Puzzle CSVs not edited.
 
 ## Unresolved
 
-- **13** — PROBABLE *The Long Goodbye* vs issue #9 *Léon*. Human glance: `/blog/13`.
+None of the nine disputed IDs remain. Word mapping is the remaining hole (see `NEXT.md`).
 
 ## Accept vs inspect
 
-**Accept from the still:** 3 *Aliens*, 5 *Alien*, 9 *Spartacus*, 14 *The Man in the Iron Mask*, 16 *The Visitors*, 23 *Guardians of the Galaxy*, 24 *Close Encounters of the Third Kind*, 27 *Terminator 2: Judgment Day*.
+**Accept:** 3 *Aliens*, 5 *Alien*, 9 *Spartacus*, 13 *Léon: The Professional* (human), 14 *The Man in the Iron Mask*, 16 *The Visitors*, 23 *Guardians of the Galaxy*, 24 *Close Encounters of the Third Kind*, 27 *Terminator 2: Judgment Day*.
 
-**Still worth a second look:** 13 only. See `NEXT.md`.
+**No further still glance required.**

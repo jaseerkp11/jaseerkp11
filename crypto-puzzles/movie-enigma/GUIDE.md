@@ -57,10 +57,9 @@ Known exceptions:
 | Panel title | Substring? | What people try |
 | --- | --- | --- |
 | The Goonies | none | leave as `DROP` (likely an intruder) |
-| Sharknado | none | `DROP` |
-| The Long Goodbye (working #13) | `long` `good` | `long` |
-| Léon: The Professional (issue #9 #13) | none | `DROP` |
-| The Shining | `shine` is a stem, not a substring | `DROP` (not `shine`) |
+| Sharknado | none | `DROP` (or try `tornado` as a portmanteau) |
+| Léon: The Professional (locked #13) | none | `DROP` |
+| The Shining | `shine` is a stem, not a substring | `DROP` (or try `shine`) |
 | Raiders of the Lost Ark | `soft` only if you delete spaces | `soft` or `DROP` |
 | Barry Lyndon | `bar` | `bar` |
 
@@ -116,8 +115,8 @@ Miner fee will eat a visible slice of 100k sats. That is expected.
 | Flo titles, longest substring + `soft` + `shine` | Goonies, Sharknado | no match (10.5M combos) |
 | Flo titles, first substring + `soft` + `shine` | Goonies, Sharknado | no match (10.5M combos) |
 
-So “open Cursor and extract the seed” is not possible until the **stills are identified correctly**. The missing work is movie-geek work, not more CPU.
+So “open Cursor and extract the seed” still needs the **title→word rule**. The nine disputed stills are settled; four titles still have no official substring.
 
 ## Honest end state
 
-We will solve it **if and only if** the 34 stills and the title→word rule are right; then `search_drop10.py` finishes it. I cannot honestly print a 24-word seed today. Next human step is `NEXT.md` (panel 13 only), not more drop-10 on mixed IDs.
+We will solve it **if and only if** the 34 stills and the title→word rule are right; then `search_drop10.py` finishes it. Panel 13 is locked as *Léon*. I cannot honestly print a 24-word seed until Goonies / Léon / Sharknado / Shining map to words (or sit among the 10 drops). Next: bounded drop-10 on `words34.txt`.

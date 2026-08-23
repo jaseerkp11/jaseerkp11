@@ -260,9 +260,9 @@ Do **not** brute-force drop-10 yet. The 34-word line is not locked.
 
 Working files in this repo (not Flo’s CSV): `titles34.txt`, `words34.txt`, `extract_bip39.py`, `NEXT.md`.
 
-1. Human: glance at [panel 13](https://www.bitcoinmovieenigma.com/blog/13) and say *The Long Goodbye* vs *Léon* (`NEXT.md`).
-2. Title → word is still the hole: Goonies, Sharknado, and The Shining have **no** official BIP39 substring. `shine` is not inside `shining`.
-3. Do **not** treat year&lt;1980 or year≥2000 as solved. Those counts move if panel 13 is 1973, and they cannot fill 24 words while three titles are wordless.
-4. Only after 34 words exist: one oracle check, or a bounded drop-10. Not before.
+1. Panel 13 is **Léon: The Professional** (human confirm). Titles are frozen unless a non-disputed still is wrong.
+2. Title → word is still the hole: Goonies, Léon, Sharknado, and The Shining have **no** official BIP39 substring. `shine` is not inside `shining`.
+3. Year&lt;1980 and year≥2000 are each 10 films again (Léon is 1994). They still cannot fill 24 words while four titles are wordless.
+4. Next compute: bounded drop-10 on `words34.txt` (4 forced DROPs). Not a full C(34,10).
 
-Highest-value work right now, in the folder’s own words: **ideas on the wordless titles beat more compute.**
+Highest-value leftover: **how Léon and The Goonies become BIP39 words**, not more CPU.

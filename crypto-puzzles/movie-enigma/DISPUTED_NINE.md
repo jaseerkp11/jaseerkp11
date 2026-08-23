@@ -1,6 +1,6 @@
 # Disputed panels 3, 5, 9, 13, 14, 16, 23, 24, 27
 
-**Later pass:** author-site stills were viewed. Working titles live in `titles34.txt` and `STILLS_ID.md`. This page is the older CSV-vs-issue-#9 ledger and is **not** the working list.
+**Later pass:** author-site stills were viewed; panel 13 is **Léon: The Professional** (human). Working titles live in `titles34.txt` and `STILLS_ID.md`. This page is the older CSV-vs-issue-#9 ledger and is **not** the working list.
 
 Puzzle data files were **not** changed. No C(34,10) search. No keys. Oracle not re-run.
 
