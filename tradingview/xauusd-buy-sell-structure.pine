@@ -1,0 +1,604 @@
+//@version=6
+indicator("XAUUSD High Probability Structure", overlay = true, max_labels_count = 50, max_lines_count = 40, max_boxes_count = 200)
+
+// 15m execution. Daily + 4H + 1H bias. Signal only after a REAL liquidity sweep
+// (wick through, close back, then displacement). Fake sweeps cancel.
+// Score-based confluence: killzone, Asia sweep, premium/discount, FVG, demand/supply.
+// Not a guaranteed win.
+
+string grpPA  = "Price action / liquidity"
+string grpFil = "Filters / probability"
+string grpVis = "Display"
+string grpFvg = "Fair value gaps (15m)"
+string grpSR  = "Demand / supply zones"
+string grpEx  = "Exits"
+
+int swingLen = input.int(5, "15m swing length", minval = 3, maxval = 12, group = grpPA)
+float eqTol  = input.float(2.5, "Equal high/low tolerance ($)", minval = 0.5, group = grpPA)
+int confirmBars = input.int(2, "Bars allowed to confirm displacement", minval = 1, maxval = 4, group = grpPA)
+float minBodyAtr = input.float(0.50, "Min confirm body (ATR)", minval = 0.2, maxval = 1.5, step = 0.05, group = grpPA)
+float maxPierceAtr = input.float(1.6, "Max sweep pierce (ATR)", minval = 0.6, maxval = 4.0, group = grpPA)
+
+bool useSession = input.bool(true, "Block Asia dead hours (only UTC 07:00–21:00)", group = grpFil)
+bool useKillzone = input.bool(true, "Only London 07–10 or NY 12–16 UTC", group = grpFil)
+int cooldownBars = input.int(20, "Min bars between signals", minval = 4, maxval = 48, group = grpFil)
+bool needConfluence = input.bool(true, "Extra: equal swings / round / 1H level", group = grpFil)
+bool needFvgAlign = input.bool(true, "Require overlapping 15m FVG", group = grpFil)
+bool needSrAlign = input.bool(true, "Require nearby demand/supply zone", group = grpFil)
+bool needPd = input.bool(true, "Buys in discount / sells in premium (4H window)", group = grpFil)
+bool needAsia = input.bool(true, "Prefer / score Asia high-low sweep", group = grpFil)
+bool needAdx = input.bool(true, "Require ADX trend (skip chop)", group = grpFil)
+int minAdx = input.int(16, "Min ADX", minval = 10, maxval = 40, group = grpFil)
+int minScore = input.int(7, "Min confluence score (0–12)", minval = 4, maxval = 12, group = grpFil)
+bool needDaily = input.bool(true, "Daily bias must match 4H", group = grpFil)
+bool skipStretch = input.bool(true, "Skip if price is stretched vs 4H EMA50", group = grpFil)
+
+bool showSrLines = input.bool(false, "Show 1H pivot lines", group = grpVis)
+bool showTable = input.bool(true, "Show probability table", group = grpVis)
+bool showTps = input.bool(true, "Draw last SL / TP lines", group = grpVis)
+
+bool showFvg = input.bool(true, "Draw 15m FVG (both directions)", group = grpFvg)
+bool fvgWith4h = input.bool(false, "Only FVGs in 4H trend", group = grpFvg)
+float minFvgAtr = input.float(0.22, "Min FVG size (ATR)", minval = 0.08, maxval = 1.5, step = 0.02, group = grpFvg)
+int maxFvg = input.int(12, "Max unfilled FVG boxes", minval = 2, maxval = 30, group = grpFvg)
+int fvgExtend = input.int(8, "FVG box right extend", minval = 2, maxval = 40, group = grpFvg)
+
+bool showSr4h = input.bool(true, "Draw 4H demand / supply", group = grpSR)
+bool showSr1h = input.bool(true, "Draw 1H demand / supply", group = grpSR)
+bool showSr15 = input.bool(true, "Draw 15m demand / supply", group = grpSR)
+int htfSwing4h = input.int(3, "4H swing length", minval = 2, maxval = 8, group = grpSR)
+int htfSwing1h = input.int(4, "1H swing length", minval = 2, maxval = 8, group = grpSR)
+int maxZonesTf = input.int(6, "Max zones per timeframe", minval = 2, maxval = 12, group = grpSR)
+float srNearAtr = input.float(0.55, "Near-zone distance (ATR)", minval = 0.2, maxval = 2.0, step = 0.05, group = grpSR)
+
+float tp1R = input.float(1.5, "TP1 (R)", minval = 0.8, maxval = 4.0, step = 0.1, group = grpEx)
+float tp2R = input.float(2.5, "TP2 (R)", minval = 1.2, maxval = 6.0, step = 0.1, group = grpEx)
+
+[h4c, h4e20, h4e50, h4atr, h4ph, h4pl] = request.security(syminfo.tickerid, "240", [close, ta.ema(close, 20), ta.ema(close, 50), ta.atr(14), ta.pivothigh(high, htfSwing4h, htfSwing4h), ta.pivotlow(low, htfSwing4h, htfSwing4h)], barmerge.gaps_off, barmerge.lookahead_off)
+[h1c, h1e20, h1e50, h1atr, h1ph, h1pl] = request.security(syminfo.tickerid, "60", [close, ta.ema(close, 20), ta.ema(close, 50), ta.atr(14), ta.pivothigh(high, htfSwing1h, htfSwing1h), ta.pivotlow(low, htfSwing1h, htfSwing1h)], barmerge.gaps_off, barmerge.lookahead_off)
+[dc, de20, de50, datr] = request.security(syminfo.tickerid, "D", [close, ta.ema(close, 20), ta.ema(close, 50), ta.atr(14)], barmerge.gaps_off, barmerge.lookahead_off)
+
+biasFrom(float c, float e20, float e50, float a) =>
+    float band = math.max(nz(a, 1.0) * 0.12, 0.5)
+    int b = 0
+    if math.abs(c - e50) < band
+        b := 0
+    else if c > e50 and e20 >= e50
+        b := 1
+    else if c < e50 and e20 <= e50
+        b := -1
+    else
+        b := 0
+    b
+
+int bias4h = biasFrom(h4c, h4e20, h4e50, h4atr)
+int bias1h = biasFrom(h1c, h1e20, h1e50, h1atr)
+int biasD  = biasFrom(dc, de20, de50, datr)
+bool htfBull = bias4h == 1 and bias1h == 1 and (not needDaily or biasD != -1)
+bool htfBear = bias4h == -1 and bias1h == -1 and (not needDaily or biasD != 1)
+bool htfAligned = htfBull or htfBear
+
+var float h1Res = float(na)
+var float h1Sup = float(na)
+if not na(h1ph)
+    h1Res := h1ph
+if not na(h1pl)
+    h1Sup := h1pl
+
+int hr = hour(time, "UTC")
+bool inSession = not useSession or (hr >= 7 and hr < 21)
+bool inKillzone = (hr >= 7 and hr < 10) or (hr >= 12 and hr < 16)
+bool kzOk = not useKillzone or inKillzone
+
+float atr15 = ta.atr(14)
+[diPlus, diMinus, adxVal] = ta.dmi(14, 14)
+bool adxOk = not needAdx or nz(adxVal, 0) >= minAdx
+
+float pdHi = ta.highest(high, 32)
+float pdLo = ta.lowest(low, 32)
+float pdEq = (pdHi + pdLo) * 0.5
+bool inDiscount = close <= pdEq
+bool inPremium  = close >= pdEq
+
+bool stretchedLong  = skipStretch and not na(h4e50) and not na(h4atr) and (close - h4e50) > h4atr * 2.0
+bool stretchedShort = skipStretch and not na(h4e50) and not na(h4atr) and (h4e50 - close) > h4atr * 2.0
+
+// Asia 00:00–07:00 UTC range, locked at London open
+var float asiaHiRun = float(na)
+var float asiaLoRun = float(na)
+var float asiaHi = float(na)
+var float asiaLo = float(na)
+bool inAsia = hr >= 0 and hr < 7
+bool newAsia = inAsia and (na(asiaHiRun) or (hour(time, "UTC") == 0 and hour(time[1], "UTC") != 0))
+if newAsia
+    asiaHiRun := high
+    asiaLoRun := low
+else if inAsia
+    asiaHiRun := math.max(nz(asiaHiRun, high), high)
+    asiaLoRun := math.min(nz(asiaLoRun, low), low)
+if hour(time, "UTC") == 7 and hour(time[1], "UTC") != 7
+    asiaHi := asiaHiRun
+    asiaLo := asiaLoRun
+
+type FvgBox
+    box bx
+    int dir
+    float top
+    float bot
+    int born
+
+type SrZone
+    box bx
+    int tf
+    int kind
+    float top
+    float bot
+    float mid
+
+var array<FvgBox> fvgs = array.new<FvgBox>()
+var array<SrZone> zones = array.new<SrZone>()
+
+bool midImpulse = math.abs(close[1] - open[1]) >= 0.5 * math.max(high[1] - low[1], 0.01) and (high[1] - low[1]) >= 0.50 * atr15
+bool midBull = close[1] > open[1] and midImpulse
+bool midBear = close[1] < open[1] and midImpulse
+float bullGap = low - high[2]
+float bearGap = low[2] - high
+bool validBullFvg = showFvg and barstate.isconfirmed and atr15 > 0 and low > high[2] and bullGap >= minFvgAtr * atr15 and midBull and (not fvgWith4h or bias4h == 1)
+bool validBearFvg = showFvg and barstate.isconfirmed and atr15 > 0 and high < low[2] and bearGap >= minFvgAtr * atr15 and midBear and (not fvgWith4h or bias4h == -1)
+
+fvgDuplicate(int dir, float top, float bot) =>
+    bool dup = false
+    if array.size(fvgs) > 0
+        for i = 0 to array.size(fvgs) - 1
+            FvgBox g = array.get(fvgs, i)
+            if g.dir == dir and math.abs(g.top - top) <= atr15 * 0.08 and math.abs(g.bot - bot) <= atr15 * 0.08
+                dup := true
+                break
+    dup
+
+if validBullFvg and not fvgDuplicate(1, low, high[2])
+    box nb = box.new(bar_index - 2, low, bar_index + fvgExtend, high[2], border_color = color.new(#26a69a, 10), bgcolor = color.new(#26a69a, 78), border_width = 1, text = "15m FVG ▲", text_color = color.new(#26a69a, 0), text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_center)
+    array.push(fvgs, FvgBox.new(nb, 1, low, high[2], bar_index))
+if validBearFvg and not fvgDuplicate(-1, low[2], high)
+    box nb = box.new(bar_index - 2, low[2], bar_index + fvgExtend, high, border_color = color.new(#ef5350, 10), bgcolor = color.new(#ef5350, 78), border_width = 1, text = "15m FVG ▼", text_color = color.new(#ef5350, 0), text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_center)
+    array.push(fvgs, FvgBox.new(nb, -1, low[2], high, bar_index))
+
+if array.size(fvgs) > 0
+    for i = array.size(fvgs) - 1 to 0
+        FvgBox g = array.get(fvgs, i)
+        bool filled = g.dir == 1 ? low <= g.bot : high >= g.top
+        if filled
+            box.delete(g.bx)
+            array.remove(fvgs, i)
+        else
+            box.set_right(g.bx, bar_index + fvgExtend)
+    while array.size(fvgs) > maxFvg
+        FvgBox old = array.shift(fvgs)
+        box.delete(old.bx)
+
+overlapsFvg(int dir) =>
+    bool hit = false
+    float pad = atr15 * 0.12
+    if array.size(fvgs) > 0
+        for i = 0 to array.size(fvgs) - 1
+            FvgBox g = array.get(fvgs, i)
+            if g.dir == dir and low <= g.top + pad and high >= g.bot - pad
+                hit := true
+                break
+    hit
+
+nearestFvgMid(int dir) =>
+    float best = float(na)
+    float bestDist = 1e10
+    if array.size(fvgs) > 0
+        for i = 0 to array.size(fvgs) - 1
+            FvgBox g = array.get(fvgs, i)
+            if g.dir == dir
+                float mid = (g.top + g.bot) * 0.5
+                float dist = math.abs(close - mid)
+                if dist < bestDist
+                    bestDist := dist
+                    best := mid
+    best
+
+zoneExists(int tf, float lvl, float tol) =>
+    bool found = false
+    if array.size(zones) > 0
+        for i = 0 to array.size(zones) - 1
+            SrZone z = array.get(zones, i)
+            if z.tf == tf and math.abs(z.mid - lvl) <= tol
+                found := true
+                break
+    found
+
+countTf(int tf) =>
+    int n = 0
+    if array.size(zones) > 0
+        for i = 0 to array.size(zones) - 1
+            if array.get(zones, i).tf == tf
+                n += 1
+    n
+
+dropOldestTf(int tf) =>
+    if array.size(zones) > 0
+        for i = 0 to array.size(zones) - 1
+            SrZone z = array.get(zones, i)
+            if z.tf == tf
+                box.delete(z.bx)
+                array.remove(zones, i)
+                break
+    0
+
+addZone(int tf, int kind, float lvl, float halfH, color border, color bg, string tag, int leftBars) =>
+    if not na(lvl) and atr15 > 0 and not zoneExists(tf, lvl, math.max(halfH * 0.9, 1.0))
+        while countTf(tf) >= maxZonesTf
+            dropOldestTf(tf)
+        float top = kind == 1 ? lvl + halfH : lvl + halfH * 0.35
+        float bot = kind == 1 ? lvl - halfH * 0.35 : lvl - halfH
+        box zb = box.new(math.max(bar_index - leftBars, 0), top, bar_index + 6, bot, border_color = border, bgcolor = bg, border_width = 1, text = tag, text_color = border, text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_center)
+        array.push(zones, SrZone.new(zb, tf, kind, top, bot, lvl))
+    0
+
+float h4Half = math.max(nz(h4atr, atr15) * 0.14, 3.0)
+float h1Half = math.max(nz(h1atr, atr15) * 0.16, 2.0)
+float m15Half = math.max(atr15 * 0.18, 1.2)
+
+if showSr4h and not na(h4ph)
+    addZone(240, -1, h4ph, h4Half, color.new(#c62828, 15), color.new(#c62828, 88), "4H SUPPLY", 48)
+if showSr4h and not na(h4pl)
+    addZone(240, 1, h4pl, h4Half, color.new(#2e7d32, 15), color.new(#2e7d32, 88), "4H DEMAND", 48)
+if showSr1h and not na(h1ph)
+    addZone(60, -1, h1ph, h1Half, color.new(#ef6c00, 20), color.new(#ef6c00, 88), "1H SUPPLY", 24)
+if showSr1h and not na(h1pl)
+    addZone(60, 1, h1pl, h1Half, color.new(#0277bd, 20), color.new(#0277bd, 88), "1H DEMAND", 24)
+
+float ph = ta.pivothigh(high, swingLen, swingLen)
+float pl = ta.pivotlow(low, swingLen, swingLen)
+if showSr15 and not na(ph)
+    addZone(15, -1, ph, m15Half, color.new(#8e24aa, 25), color.new(#8e24aa, 90), "15m SUPPLY", swingLen + 2)
+if showSr15 and not na(pl)
+    addZone(15, 1, pl, m15Half, color.new(#00838f, 25), color.new(#00838f, 90), "15m DEMAND", swingLen + 2)
+
+if array.size(zones) > 0
+    for i = array.size(zones) - 1 to 0
+        SrZone z = array.get(zones, i)
+        float breakBuf = math.max(atr15 * 0.12, 0.8)
+        bool broken = z.kind == 1 ? close < z.bot - breakBuf : close > z.top + breakBuf
+        if broken
+            box.delete(z.bx)
+            array.remove(zones, i)
+        else
+            box.set_right(z.bx, bar_index + 4)
+
+nearKind(int kind) =>
+    bool hit = false
+    float dist = math.max(nz(atr15, 1.0) * srNearAtr, 1.5)
+    if array.size(zones) > 0
+        for i = 0 to array.size(zones) - 1
+            SrZone z = array.get(zones, i)
+            if z.kind == kind
+                bool touch = low <= z.top + dist and high >= z.bot - dist
+                if touch
+                    hit := true
+                    break
+    hit
+
+nearestZoneMid(int kind) =>
+    float best = float(na)
+    float bestDist = 1e10
+    if array.size(zones) > 0
+        for i = 0 to array.size(zones) - 1
+            SrZone z = array.get(zones, i)
+            if z.kind == kind
+                float dist = math.abs(close - z.mid)
+                if dist < bestDist
+                    bestDist := dist
+                    best := z.mid
+    best
+
+nearestZoneTag(int kind) =>
+    string tag = "none"
+    float bestDist = 1e10
+    int bestTf = 0
+    if array.size(zones) > 0
+        for i = 0 to array.size(zones) - 1
+            SrZone z = array.get(zones, i)
+            if z.kind == kind
+                float dist = math.abs(close - z.mid)
+                if dist < bestDist
+                    bestDist := dist
+                    bestTf := z.tf
+    if bestTf == 240
+        tag := "4H"
+    else if bestTf == 60
+        tag := "1H"
+    else if bestTf == 15
+        tag := "15m"
+    tag
+
+bool nearDemand = nearKind(1)
+bool nearSupply = nearKind(-1)
+bool bullFvgHere = overlapsFvg(1)
+bool bearFvgHere = overlapsFvg(-1)
+
+var float swingH = float(na)
+var float swingH2 = float(na)
+var float swingL = float(na)
+var float swingL2 = float(na)
+if not na(ph)
+    swingH2 := swingH
+    swingH := ph
+if not na(pl)
+    swingL2 := swingL
+    swingL := pl
+
+bool equalHighs = not na(swingH) and not na(swingH2) and math.abs(swingH - swingH2) <= eqTol
+bool equalLows  = not na(swingL) and not na(swingL2) and math.abs(swingL - swingL2) <= eqTol
+
+nearRound(float px) =>
+    math.abs(px - math.round(px / 10.0) * 10.0) <= 2.0
+
+nearLevel(float px, float lvl, float tol) =>
+    not na(lvl) and math.abs(px - lvl) <= tol
+
+bool realBuySweep = false
+bool realSellSweep = false
+float buyLevel = float(na)
+float sellLevel = float(na)
+float buySweepExt = float(na)
+float sellSweepExt = float(na)
+
+if not na(swingL) and not na(atr15) and atr15 > 0
+    float pierceL = swingL - low
+    bool reclaimL = close > swingL
+    bool notRunawayL = pierceL > 0.08 * atr15 and pierceL <= maxPierceAtr * atr15
+    realBuySweep := low < swingL and reclaimL and notRunawayL
+    buyLevel := swingL
+    buySweepExt := low
+
+if not na(swingH) and not na(atr15) and atr15 > 0
+    float pierceH = high - swingH
+    bool reclaimH = close < swingH
+    bool notRunawayH = pierceH > 0.08 * atr15 and pierceH <= maxPierceAtr * atr15
+    realSellSweep := high > swingH and reclaimH and notRunawayH
+    sellLevel := swingH
+    sellSweepExt := high
+
+bool asiaBuySweep  = not na(asiaLo) and low < asiaLo and close > asiaLo
+bool asiaSellSweep = not na(asiaHi) and high > asiaHi and close < asiaHi
+
+float srTol = math.max(nz(h1atr, atr15) * 0.35, 1.5)
+bool buyConf = not needConfluence or equalLows or nearRound(nz(buyLevel, low)) or nearLevel(nz(buyLevel, low), h1Sup, srTol) or nearDemand
+bool sellConf = not needConfluence or equalHighs or nearRound(nz(sellLevel, high)) or nearLevel(nz(sellLevel, high), h1Res, srTol) or nearSupply
+
+scoreBuy() =>
+    int s = 0
+    if htfBull
+        s += 2
+    if biasD == 1
+        s += 1
+    if inKillzone
+        s += 1
+    if equalLows
+        s += 1
+    if bullFvgHere
+        s += 1
+    if nearDemand
+        s += 1
+    if inDiscount
+        s += 1
+    if asiaBuySweep or (realBuySweep and needAsia)
+        s += 1
+    if adxOk
+        s += 1
+    if not stretchedLong
+        s += 1
+    s
+
+scoreSell() =>
+    int s = 0
+    if htfBear
+        s += 2
+    if biasD == -1
+        s += 1
+    if inKillzone
+        s += 1
+    if equalHighs
+        s += 1
+    if bearFvgHere
+        s += 1
+    if nearSupply
+        s += 1
+    if inPremium
+        s += 1
+    if asiaSellSweep or (realSellSweep and needAsia)
+        s += 1
+    if adxOk
+        s += 1
+    if not stretchedShort
+        s += 1
+    s
+
+int scBuy = scoreBuy()
+int scSell = scoreSell()
+
+var int pendingDir = 0
+var float pendingLvl = float(na)
+var float pendingSl = float(na)
+var int pendingAge = 0
+var int lastSignalBar = -999
+var float lastEntry = float(na)
+var float lastSl = float(na)
+var float lastTp1 = float(na)
+var float lastTp2 = float(na)
+var int lastDir = 0
+var int lastScore = 0
+var line lnSl = na
+var line lnTp1 = na
+var line lnTp2 = na
+
+bool armedBuy = realBuySweep and htfBull and inSession and kzOk and buyConf and (not needPd or inDiscount) and (not needAsia or asiaBuySweep or realBuySweep) and not stretchedLong and adxOk
+bool armedSell = realSellSweep and htfBear and inSession and kzOk and sellConf and (not needPd or inPremium) and (not needAsia or asiaSellSweep or realSellSweep) and not stretchedShort and adxOk
+
+if pendingDir == 0
+    if armedBuy
+        pendingDir := 1
+        pendingLvl := buyLevel
+        pendingSl := buySweepExt
+        pendingAge := 0
+    else if armedSell
+        pendingDir := -1
+        pendingLvl := sellLevel
+        pendingSl := sellSweepExt
+        pendingAge := 0
+else
+    pendingAge += 1
+
+bool failed = false
+if pendingDir == 1 and not na(pendingLvl) and pendingAge >= 1 and close < pendingLvl
+    failed := true
+if pendingDir == -1 and not na(pendingLvl) and pendingAge >= 1 and close > pendingLvl
+    failed := true
+if pendingDir != 0 and pendingAge > confirmBars
+    failed := true
+if failed
+    pendingDir := 0
+    pendingLvl := float(na)
+    pendingSl := float(na)
+    pendingAge := 0
+
+float body = math.abs(close - open)
+bool strongBody = body >= minBodyAtr * atr15
+bool closeStrongBuy  = close >= open + 0.55 * (high - low)
+bool closeStrongSell = close <= high - 0.55 * (high - low)
+bool buyConfirm = pendingDir == 1 and pendingAge >= 1 and close > high[1] and close > open and strongBody and closeStrongBuy and close > nz(pendingLvl, close)
+bool sellConfirm = pendingDir == -1 and pendingAge >= 1 and close < low[1] and close < open and strongBody and closeStrongSell and close < nz(pendingLvl, close)
+
+bool cooled = (bar_index - lastSignalBar) >= cooldownBars
+bool buyAligned = barstate.isconfirmed and buyConfirm and htfBull and inSession and kzOk and cooled and (not needFvgAlign or bullFvgHere) and (not needSrAlign or nearDemand) and scBuy >= minScore
+bool sellAligned = barstate.isconfirmed and sellConfirm and htfBear and inSession and kzOk and cooled and (not needFvgAlign or bearFvgHere) and (not needSrAlign or nearSupply) and scSell >= minScore
+bool buySignal = buyAligned
+bool sellSignal = sellAligned
+
+if buySignal or sellSignal
+    lastSignalBar := bar_index
+    lastEntry := close
+    lastSl := pendingSl
+    float risk = math.abs(close - nz(pendingSl, close))
+    lastTp1 := buySignal ? close + tp1R * risk : close - tp1R * risk
+    lastTp2 := buySignal ? close + tp2R * risk : close - tp2R * risk
+    lastDir := buySignal ? 1 : -1
+    lastScore := buySignal ? scBuy : scSell
+    if showTps
+        if not na(lnSl)
+            line.delete(lnSl)
+        if not na(lnTp1)
+            line.delete(lnTp1)
+        if not na(lnTp2)
+            line.delete(lnTp2)
+        lnSl := line.new(bar_index, lastSl, bar_index + 16, lastSl, color = color.orange, style = line.style_dashed, width = 1)
+        lnTp1 := line.new(bar_index, lastTp1, bar_index + 16, lastTp1, color = color.lime, style = line.style_dotted, width = 1)
+        lnTp2 := line.new(bar_index, lastTp2, bar_index + 16, lastTp2, color = color.teal, style = line.style_dotted, width = 1)
+    string lab = (buySignal ? "BUY " : "SELL ") + str.tostring(close, format.mintick) + "\nSL " + str.tostring(nz(pendingSl, close), format.mintick) + "\nTP1 " + str.tostring(lastTp1, format.mintick) + "  sc " + str.tostring(lastScore)
+    label.new(bar_index, buySignal ? low : high, lab, style = buySignal ? label.style_label_up : label.style_label_down, color = buySignal ? color.new(color.lime, 20) : color.new(color.red, 20), textcolor = color.white, size = size.tiny)
+    alert((buySignal ? "XAUUSD HP BUY " : "XAUUSD HP SELL ") + str.tostring(close, format.mintick) + " SL " + str.tostring(nz(pendingSl, close), format.mintick) + " TP1 " + str.tostring(lastTp1, format.mintick), alert.freq_once_per_bar_close)
+    pendingDir := 0
+    pendingLvl := float(na)
+    pendingSl := float(na)
+    pendingAge := 0
+
+plotshape(buySignal, title = "BUY arrow", style = shape.triangleup, location = location.belowbar, color = color.lime, size = size.large)
+plotshape(sellSignal, title = "SELL arrow", style = shape.triangledown, location = location.abovebar, color = color.red, size = size.large)
+
+plot(showSrLines ? h1Res : na, "1H resistance", color.new(color.red, 50), style = plot.style_stepline)
+plot(showSrLines ? h1Sup : na, "1H support", color.new(color.lime, 50), style = plot.style_stepline)
+plot(pdEq, "4H-window EQ", color.new(color.gray, 70), style = plot.style_stepline)
+
+biasText(int b) =>
+    b == 1 ? "BULL" : b == -1 ? "BEAR" : "CHOP"
+
+string miss = ""
+if not htfAligned
+    miss := "HTF not aligned"
+else if not inSession
+    miss := "outside session"
+else if useKillzone and not inKillzone
+    miss := "wait London/NY killzone"
+else if pendingDir == 0
+    miss := "wait sweep"
+else if pendingDir == 1 and needFvgAlign and not bullFvgHere
+    miss := "need 15m bull FVG"
+else if pendingDir == -1 and needFvgAlign and not bearFvgHere
+    miss := "need 15m bear FVG"
+else if pendingDir == 1 and needSrAlign and not nearDemand
+    miss := "need demand zone"
+else if pendingDir == -1 and needSrAlign and not nearSupply
+    miss := "need supply zone"
+else if pendingDir == 1 and scBuy < minScore
+    miss := "score " + str.tostring(scBuy) + " < " + str.tostring(minScore)
+else if pendingDir == -1 and scSell < minScore
+    miss := "score " + str.tostring(scSell) + " < " + str.tostring(minScore)
+else if pendingDir != 0
+    miss := "wait displacement"
+else
+    miss := "filters"
+
+string enterTxt = "NO TRADE"
+if buySignal
+    enterTxt := "ENTER BUY " + str.tostring(close, format.mintick)
+else if sellSignal
+    enterTxt := "ENTER SELL " + str.tostring(close, format.mintick)
+else if pendingDir == 1
+    enterTxt := "BUY if displace > " + str.tostring(pendingLvl, format.mintick)
+else if pendingDir == -1
+    enterTxt := "SELL if displace < " + str.tostring(pendingLvl, format.mintick)
+else if htfBull
+    enterTxt := "WATCH longs @ " + str.tostring(nz(nearestZoneMid(1), nz(nearestFvgMid(1), close)), format.mintick)
+else if htfBear
+    enterTxt := "WATCH shorts @ " + str.tostring(nz(nearestZoneMid(-1), nz(nearestFvgMid(-1), close)), format.mintick)
+
+string slTxt = "-"
+if (buySignal or sellSignal) and not na(lastSl)
+    slTxt := str.tostring(lastSl, format.mintick) + "  TP1 " + str.tostring(lastTp1, format.mintick)
+else if pendingDir != 0 and not na(pendingSl)
+    slTxt := "invalidation " + str.tostring(pendingSl, format.mintick)
+else if lastDir != 0 and not na(lastEntry)
+    slTxt := (lastDir == 1 ? "last BUY " : "last SELL ") + str.tostring(lastEntry, format.mintick)
+
+string fvgSrTxt = (bullFvgHere ? "FVG▲ " : "") + (bearFvgHere ? "FVG▼ " : "") + (nearDemand ? "DEM " + nearestZoneTag(1) + " " : "") + (nearSupply ? "SPLY " + nearestZoneTag(-1) : "")
+if str.length(fvgSrTxt) < 2
+    fvgSrTxt := "no FVG / zone touch"
+
+int showScore = htfBull ? scBuy : htfBear ? scSell : math.max(scBuy, scSell)
+string kzTxt = inKillzone ? "KZ ON" : inSession ? "session" : "WAIT"
+string pdTxt = inDiscount ? "DISCOUNT" : inPremium ? "PREMIUM" : "EQ"
+
+var table panel = table.new(position.top_right, 2, 12, bgcolor = color.new(#101418, 10), border_width = 1)
+if showTable and barstate.islast
+    table.cell(panel, 0, 0, "XAUUSD 15m HP", text_color = color.white, text_size = size.small)
+    table.cell(panel, 1, 0, "score " + str.tostring(showScore) + "/" + str.tostring(minScore), text_color = showScore >= minScore ? color.lime : color.orange, text_size = size.small)
+    table.cell(panel, 0, 1, "Daily", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 1, biasText(biasD), text_color = biasD == 1 ? color.lime : biasD == -1 ? color.red : color.orange, text_size = size.small)
+    table.cell(panel, 0, 2, "4H / 1H", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 2, biasText(bias4h) + " / " + biasText(bias1h), text_color = htfAligned ? color.lime : color.orange, text_size = size.small)
+    table.cell(panel, 0, 3, "Aligned", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 3, htfAligned ? "YES" : "NO TRADE", text_color = htfAligned ? color.lime : color.orange, text_size = size.small)
+    table.cell(panel, 0, 4, "Window", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 4, kzTxt, text_color = inKillzone ? color.lime : color.gray, text_size = size.small)
+    table.cell(panel, 0, 5, "PD array", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 5, pdTxt, text_color = inDiscount ? color.lime : inPremium ? color.red : color.orange, text_size = size.tiny)
+    table.cell(panel, 0, 6, "Pending", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 6, pendingDir == 1 ? "BUY wait displace" : pendingDir == -1 ? "SELL wait displace" : miss, text_color = color.white, text_size = size.tiny)
+    table.cell(panel, 0, 7, "Enter", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 7, enterTxt, text_color = buySignal ? color.lime : sellSignal ? color.red : color.white, text_size = size.tiny)
+    table.cell(panel, 0, 8, "Stop / TP", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 8, slTxt, text_color = color.orange, text_size = size.tiny)
+    table.cell(panel, 0, 9, "FVG / SD", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 9, fvgSrTxt, text_color = color.aqua, text_size = size.tiny)
+    table.cell(panel, 0, 10, "ADX", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 10, str.tostring(nz(adxVal, 0), "#.0") + (adxOk ? " ok" : " chop"), text_color = adxOk ? color.lime : color.orange, text_size = size.tiny)
+    table.cell(panel, 0, 11, "Asia", text_color = color.silver, text_size = size.tiny)
+    table.cell(panel, 1, 11, na(asiaHi) ? "building" : (asiaBuySweep ? "swept low" : asiaSellSweep ? "swept high" : "held"), text_color = color.gray, text_size = size.tiny)
+
+alertcondition(buySignal, title = "XAUUSD HP BUY", message = "XAUUSD HP BUY: daily/4H/1H, killzone, sweep + displace, score pass")
+alertcondition(sellSignal, title = "XAUUSD HP SELL", message = "XAUUSD HP SELL: daily/4H/1H, killzone, sweep + displace, score pass")
