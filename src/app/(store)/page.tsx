@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/store/product-card";
 import { productCardInclude } from "@/lib/catalog";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Truck, RotateCcw, ShieldCheck, Headset } from "lucide-react";
+import { AskAtria } from "@/components/store/ask-atria";
 
 export const dynamic = "force-dynamic";
 
@@ -110,6 +111,8 @@ export default async function HomePage() {
           </div>
         </section>
       ) : null}
+
+      <AskAtria />
 
       {show("categories") ? (
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
