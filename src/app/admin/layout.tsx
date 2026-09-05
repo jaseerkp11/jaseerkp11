@@ -19,6 +19,12 @@ const links = [
   { href: "/admin/tickets", label: "Support" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/settings", label: "Settings" },
+  { type: "divider" as const, href: "", label: "" },
+  { href: "/admin/drops", label: "Drops" },
+  { href: "/admin/finds", label: "Finds" },
+  { href: "/admin/collections", label: "Collections" },
+  { href: "/admin/demand-signals", label: "Demand Signals" },
+  { href: "/admin/recommendations", label: "Recommendations" },
 ];
 
 export default async function AdminLayout({
@@ -38,11 +44,15 @@ export default async function AdminLayout({
           <p className="font-display text-2xl">{brand.brandName}</p>
         </div>
         <nav className="flex flex-col gap-1 px-3 pb-8 text-sm">
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className="rounded-lg px-3 py-2 hover:bg-white/10">
-              {link.label}
-            </Link>
-          ))}
+          {links.map((link, i) =>
+            "type" in link && link.type === "divider" ? (
+              <div key={i} className="my-2 border-t border-white/10" />
+            ) : (
+              <Link key={link.href} href={link.href} className="rounded-lg px-3 py-2 hover:bg-white/10">
+                {link.label}
+              </Link>
+            ),
+          )}
           <Link href="/" className="mt-4 rounded-lg px-3 py-2 text-[#c4a574]">
             View store
           </Link>

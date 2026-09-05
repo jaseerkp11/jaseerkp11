@@ -260,6 +260,16 @@ export default async function ProductPage({
           </div>
         </section>
       ) : null}
+      <section className="mt-12 rounded-2xl border border-line bg-card p-5">
+        <h2 className="font-display text-2xl">Demand signal</h2>
+        <p className="mt-2 text-sm text-muted">
+          {available > 0
+            ? available <= product.lowStockThreshold
+              ? `Only ${available} left — demand is high for this SKU.`
+              : "In stock with comfortable availability."
+            : "Currently unavailable. Similar styles are shown above."}
+        </p>
+      </section>
       <div className="sticky bottom-0 -mx-4 mt-10 border-t border-line bg-background/95 p-3 backdrop-blur sm:hidden">
         <form action="/api/cart" method="post" className="flex gap-2">
           <input type="hidden" name="productId" value={product.id} />
