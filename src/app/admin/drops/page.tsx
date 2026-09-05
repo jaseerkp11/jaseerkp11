@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDropsPage() {
-  const drops = await prisma.banner.findMany({
-    where: { placement: "atria-drop" },
+  const drops = await prisma.homepageSection.findMany({
+    where: { key: { startsWith: "drop-" } },
     orderBy: { sortOrder: "asc" },
   });
   return (
@@ -16,7 +16,7 @@ export default async function AdminDropsPage() {
         </a>
       </div>
       <p className="mt-2 text-sm text-muted">
-        Curated temporary events stored as banners with placement `atria-drop`.
+        Curated temporary events stored as homepage sections with key prefix `drop-`.
       </p>
       <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
         {drops.length === 0 ? (
@@ -35,7 +35,7 @@ export default async function AdminDropsPage() {
                 <div>
                   <p className="font-medium">{d.title}</p>
                   <p className="text-xs text-muted">
-                    {d.subtitle} · {cfg.status ?? "DRAFT"} · {(cfg.productIds as string[])?.length ?? 0} products
+                    {(cfg.subtitle as string) ?? ""} · {cfg.status ?? "DRAFT"} · {(cfg.productIds as string[])?.length ?? 0} products
                   </p>
                 </div>
                 <div className="flex gap-2">

@@ -15,16 +15,17 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const drop = await getDropBySlug(slug);
-  if (!drop) return { title: "Drop" };
+  const result = await getDropBySlug(slug);
+  if (!result) return { title: "Drop" };
+  const { section, config } = result;
   const brand = getBrand();
   return {
-    title: drop.title,
-    description: drop.subtitle,
+    title: section.title,
+    description: (config.subtitle as string) ?? "",
     openGraph: {
-      title: drop.title,
-      description: drop.subtitle,
-      images: drop.imageUrl ? [drop.imageUrl] : [],
+      title: section.title,
+      description: (config.subtitle as string) ?? "",
+      images: config.imageUrl ? [config.imageUrl as string] : [],
     },
   };
 }
@@ -35,24 +36,13 @@ export default async function DropPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const drop = await getDropBySlug(slug);
-  if (!drop) notFound();
+  const result = await getDropBySlug(slug);
+  if (!result) notFound();
 
-  const cfg = drop.config as Record<string, unknown>;
-  const isLive = cfg.status === "LIVE";
-  const isUpcoming = cfg.status === "SCHEDULED";
-  const isEnded = cfg.status === "ENDED" || cfg.status === "ARCHIVED";
-  const products = (drop.products ?? []) as Array<{
-    id: string;
-    name: string;
-    slug: string;
-    sellingPaise: number;
-    compareAtPaise: number | null;
-    stock: number;
-    reservedStock: number;
-    images: Array<{ url: string; alt: string }>;
-    reviews: Array<{ rating: number }>;
-  }>;
+  const { section, config, products } = result;
+  const isLive = (config.status as string) === "LIVE";
+  const isUpcoming = (config.status as string) === "SCHEDULED";
+  const isEnded = (config.status as string) === "ENDED" || (config.status as string) === "ARCHIVED";
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -60,24 +50,24 @@ export default async function DropPage({
         data={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: drop.title,
-          description: drop.subtitle,
-          url: publicUrl(`/drops/${cfg.slug}`),
+          name: section.title,
+          description: (config.subtitle as string) ?? "",
+          url: publicUrl(`/drops/${config.slug}`),
         }}
       />
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <h1 className="font-display text-4xl">{drop.title}</h1>
-          <p className="mt-2 text-sm text-muted">{drop.subtitle}</p>
+          <h1 className="font-display text-4xl">{section.title}</h1>
+          <p className="mt-2 text-sm text-muted">{(config.subtitle as string) ?? ""}</p>
           <span className={`mt-4 inline-flex rounded-full px-3 py-1 text-xs font-medium ${
             isLive ? "bg-[#2f6b4f] text-white" : isUpcoming ? "bg-[#b4553a] text-white" : "bg-[#ece6dc] text-[#5c564e]"
           }`}>
-            {isLive ? "Live now" : isUpcoming ? "Coming soon" : String(cfg.status ?? "drop").toLowerCase()}
+            {isLive ? "Live now" : isUpcoming ? "Coming soon" : String(config.status ?? "drop").toLowerCase()}
           </span>
         </div>
-        {drop.imageUrl ? (
+        {(config.imageUrl as string) ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={drop.imageUrl} alt={drop.title} className="aspect-[4/3] w-full rounded-[2rem] object-cover" />
+          <img src={config.imageUrl as string} alt={section.title} className="aspect-[4/3] w-full rounded-[2rem] object-cover" />
         ) : null}
       </div>
 

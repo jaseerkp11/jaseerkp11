@@ -9,11 +9,11 @@ export default async function EditDropPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const banner = await prisma.banner.findUnique({ where: { id } });
-  if (!banner) notFound();
+  const section = await prisma.homepageSection.findUnique({ where: { id } });
+  if (!section) notFound();
   const cfg = (() => {
     try {
-      return JSON.parse(banner.config);
+      return JSON.parse(section.config);
     } catch {
       return {};
     }
@@ -28,11 +28,11 @@ export default async function EditDropPage({
     <div>
       <h1 className="font-display text-3xl">Edit Drop</h1>
       <form action={`/api/admin/drops/${id}`} method="post" className="mt-6 grid max-w-3xl gap-4 rounded-2xl border border-line bg-card p-5">
-        <input name="name" required defaultValue={banner.title} placeholder="Drop name" className="h-11 rounded-xl border border-line px-3 text-sm" />
+        <input name="name" required defaultValue={section.title} placeholder="Drop name" className="h-11 rounded-xl border border-line px-3 text-sm" />
         <input name="slug" required defaultValue={cfg.slug ?? ""} placeholder="slug" className="h-11 rounded-xl border border-line px-3 text-sm" />
-        <textarea name="shortDescription" defaultValue={banner.subtitle ?? ""} placeholder="Short description" className="min-h-20 rounded-xl border border-line px-3 py-2 text-sm" />
+        <textarea name="shortDescription" defaultValue={(cfg.subtitle as string) ?? ""} placeholder="Short description" className="min-h-20 rounded-xl border border-line px-3 py-2 text-sm" />
         <textarea name="description" defaultValue={""} placeholder="Full description" className="min-h-32 rounded-xl border border-line px-3 py-2 text-sm" />
-        <input name="coverImage" defaultValue={banner.imageUrl ?? ""} placeholder="Cover image URL" className="h-11 rounded-xl border border-line px-3 text-sm" />
+        <input name="coverImage" defaultValue={(cfg.imageUrl as string) ?? ""} placeholder="Cover image URL" className="h-11 rounded-xl border border-line px-3 text-sm" />
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-sm">
             Start at

@@ -4,7 +4,7 @@ import { getBrand, publicUrl } from "@/config/brand";
 import { ProductCard } from "@/components/store/product-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { JsonLd } from "@/components/seo/json-ld";
-import { getPublicDrops } from "@/lib/services/atria-banners";
+import { getPublicDrops, parseSectionConfig } from "@/lib/services/atria-banners";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +18,8 @@ export async function generateMetadata() {
 
 export default async function DropsPage() {
   const drops = await getPublicDrops();
-  const live = drops.find((d) => (d.config as Record<string, unknown>).status === "LIVE");
-  const upcoming = drops.find((d) => (d.config as Record<string, unknown>).status === "SCHEDULED");
+  const live = drops.find((d) => (parseSectionConfig(d).status as string) === "LIVE");
+  const upcoming = drops.find((d) => (parseSectionConfig(d).status as string) === "SCHEDULED");
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -38,19 +38,19 @@ export default async function DropsPage() {
 
       {live ? (
         <section className="mt-8">
-          <Link href={`/drops/${(live.config as Record<string, unknown>).slug}`} className="block overflow-hidden rounded-[2rem] border border-line bg-card">
+          <Link href={`/drops/${(parseSectionConfig(live).slug as string) ?? live.id}`} className="block overflow-hidden rounded-[2rem] border border-line bg-card">
             <div className="grid gap-0 md:grid-cols-2">
               <div className="p-6 sm:p-10">
                 <span className="inline-flex rounded-full bg-[#2f6b4f] px-3 py-1 text-xs font-medium text-white">Live now</span>
                 <h2 className="mt-3 font-display text-3xl">{live.title}</h2>
-                <p className="mt-2 text-sm text-muted">{live.subtitle}</p>
+                <p className="mt-2 text-sm text-muted">{(parseSectionConfig(live).subtitle as string) ?? ""}</p>
                 <span className="mt-4 inline-flex h-11 items-center rounded-full bg-primary px-5 text-sm text-[#f6f1ea]">
                   View Drop
                 </span>
               </div>
-              {live.imageUrl ? (
+              {(parseSectionConfig(live).imageUrl as string) ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={live.imageUrl} alt={live.title} className="aspect-[4/3] w-full object-cover md:aspect-auto" />
+                <img src={parseSectionConfig(live).imageUrl as string} alt={live.title} className="aspect-[4/3] w-full object-cover md:aspect-auto" />
               ) : null}
             </div>
           </Link>
@@ -62,11 +62,11 @@ export default async function DropsPage() {
               <div className="p-6 sm:p-10">
                 <span className="inline-flex rounded-full bg-[#b4553a] px-3 py-1 text-xs font-medium text-white">Coming soon</span>
                 <h2 className="mt-3 font-display text-3xl">{upcoming.title}</h2>
-                <p className="mt-2 text-sm text-muted">{upcoming.subtitle}</p>
+                <p className="mt-2 text-sm text-muted">{(parseSectionConfig(upcoming).subtitle as string) ?? ""}</p>
               </div>
-              {upcoming.imageUrl ? (
+              {(parseSectionConfig(upcoming).imageUrl as string) ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={upcoming.imageUrl} alt={upcoming.title} className="aspect-[4/3] w-full object-cover md:aspect-auto" />
+                <img src={parseSectionConfig(upcoming).imageUrl as string} alt={upcoming.title} className="aspect-[4/3] w-full object-cover md:aspect-auto" />
               ) : null}
             </div>
           </div>
@@ -86,9 +86,9 @@ export default async function DropsPage() {
           <h2 className="font-display text-2xl">All Drops</h2>
           <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
             {drops.map((d) => (
-              <Link key={d.id} href={`/drops/${(d.config as Record<string, unknown>).slug}`} className="rounded-2xl border border-line bg-card p-4">
+              <Link key={d.id} href={`/drops/${(parseSectionConfig(d).slug as string) ?? d.id}`} className="rounded-2xl border border-line bg-card p-4">
                 <p className="font-medium">{d.title}</p>
-                <p className="mt-1 text-xs text-muted">{(d.config as Record<string, unknown>).status as string}</p>
+                <p className="mt-1 text-xs text-muted">{(parseSectionConfig(d).status as string) ?? "DRAFT"}</p>
               </Link>
             ))}
           </div>

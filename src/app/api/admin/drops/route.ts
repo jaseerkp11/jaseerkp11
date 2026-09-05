@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/auth";
 import { jsonError } from "@/lib/validation";
 import { getBrand } from "@/config/brand";
-import { listBannersByPlacement, createBannerItem } from "@/lib/services/atria-banners";
+import { listSectionsByPrefix, createSectionItem } from "@/lib/services/atria-banners";
 
 export async function GET() {
   const session = await getSessionUser();
@@ -12,7 +12,7 @@ export async function GET() {
     return jsonError("Unauthorized", 401);
   }
   if (!hasPermission(session!.role, PERMISSIONS.manageMarketing)) return jsonError("Forbidden", 403);
-  const drops = await listBannersByPlacement("atria-drop");
+  const drops = await listSectionsByPrefix("drop-");
   return Response.json({ drops });
 }
 
@@ -39,18 +39,12 @@ export async function POST(request: NextRequest) {
   const productIds = form.getAll("productIds") as string[];
   config.productIds = productIds;
 
-  const drop = await createBannerItem(
-    {
-      title: String(form.get("name") ?? "").trim(),
-      subtitle: String(form.get("shortDescription") ?? "").trim(),
-      imageUrl: String(form.get("coverImage") ?? "").trim() || undefined,
-      href: "/drops",
-      placement: "atria-drop",
-      enabled: String(form.get("status") ?? "DRAFT") === "LIVE",
-      sortOrder: Number(form.get("sortOrder") ?? 0),
-      config,
-    },
-    session!.id,
-  );
-  return Response.redirect(new URL("/admin/drops", getBrand().siteUrl), 303);
+  const drop = await createSectionItem({
+    key: `drop-${String(form.get("slug") ?? "").trim()}`,
+    title: String(form.get("name") ?? "").trim(),
+    enabled: String(form.get("status") ?? "DRAFT") === "LIVE",
+    sortOrder: Number(form.get("sortOrder") ?? 0),
+    config,
+  });
+  return Response.redirect(new URL("/admin/drops", getBrand().siteUrl ?? "/admin/drops"), 303);
 }

@@ -4,7 +4,7 @@ import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/a
 import { jsonError } from "@/lib/validation";
 import { getBrand } from "@/config/brand";
 import { writeAudit } from "@/lib/audit";
-import { getBannerById, updateBannerItem, deleteBannerItem, parseBannerConfig } from "@/lib/services/atria-banners";
+import { getSectionById, updateSectionItem, deleteSectionItem, parseSectionConfig } from "@/lib/services/atria-banners";
 
 export async function GET(
   request: NextRequest,
@@ -18,9 +18,9 @@ export async function GET(
   }
   if (!hasPermission(session!.role, PERMISSIONS.manageMarketing)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
-  const banner = await getBannerById(id);
-  if (!banner) return jsonError("Not found", 404);
-  return Response.json({ banner, config: parseBannerConfig(banner) });
+  const section = await getSectionById(id);
+  if (!section) return jsonError("Not found", 404);
+  return Response.json({ section, config: parseSectionConfig(section) });
 }
 
 export async function POST(
@@ -36,9 +36,14 @@ export async function POST(
   if (!hasPermission(session!.role, PERMISSIONS.manageMarketing)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
   const form = await request.formData();
+  const existing = await getSectionById(id);
+  const cfg = existing ? parseSectionConfig(existing) : {};
+  const slug = String(form.get("slug") ?? (cfg.slug as string) ?? "").trim();
+  const key = `drop-${slug}`;
   const config: Record<string, unknown> = {
-    slug: String(form.get("slug") ?? "").trim(),
+    slug,
     status: String(form.get("status") ?? "DRAFT"),
+    productIds: form.getAll("productIds") as string[],
   };
   const startAt = String(form.get("startAt") ?? "").trim();
   const endAt = String(form.get("endAt") ?? "").trim();
@@ -47,23 +52,18 @@ export async function POST(
   if (endAt) config.endAt = endAt;
   if (publishedAt) config.publishedAt = publishedAt;
 
-  const productIds = form.getAll("productIds") as string[];
-  config.productIds = productIds;
-
-  const banner = await updateBannerItem(
+  const section = await updateSectionItem(
     id,
     {
+      key,
       title: String(form.get("name") ?? "").trim(),
-      subtitle: String(form.get("shortDescription") ?? "").trim(),
-      imageUrl: String(form.get("coverImage") ?? "").trim() || undefined,
-      placement: "atria-drop",
       enabled: String(form.get("status") ?? "DRAFT") === "LIVE",
       sortOrder: Number(form.get("sortOrder") ?? 0),
       config,
     },
     session!.id,
   );
-  return Response.redirect(new URL(`/admin/drops/${id}`, getBrand().siteUrl), 303);
+  return Response.redirect(new URL(`/admin/drops/${id}`, getBrand().siteUrl ?? "/admin/drops"), 303);
 }
 
 export async function DELETE(
@@ -78,6 +78,6 @@ export async function DELETE(
   }
   if (!hasPermission(session!.role, PERMISSIONS.manageMarketing)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
-  await deleteBannerItem(id, session!.id);
+  await deleteSectionItem(id, session!.id);
   return Response.json({ ok: true });
 }

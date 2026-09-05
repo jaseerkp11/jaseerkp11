@@ -13,16 +13,17 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const find = await getFindBySlug(slug);
-  if (!find) return { title: "Find" };
+  const result = await getFindBySlug(slug);
+  if (!result) return { title: "Find" };
+  const { section, config } = result;
   const brand = getBrand();
   return {
-    title: find.title,
-    description: find.subtitle,
+    title: section.title,
+    description: (config.subtitle as string) ?? "",
     openGraph: {
-      title: find.title,
-      description: find.subtitle,
-      images: find.imageUrl ? [find.imageUrl] : [],
+      title: section.title,
+      description: (config.subtitle as string) ?? "",
+      images: config.imageUrl ? [config.imageUrl as string] : [],
     },
   };
 }
@@ -33,10 +34,9 @@ export default async function FindPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const find = await getFindBySlug(slug);
-  if (!find) return null;
-  const cfg = find.config as Record<string, unknown>;
-  const products = (find as unknown as { products?: Array<any> }).products ?? [];
+  const result = await getFindBySlug(slug);
+  if (!result) return null;
+  const { section, config, products } = result;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -44,19 +44,19 @@ export default async function FindPage({
         data={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: find.title,
-          description: find.subtitle,
-          url: publicUrl(`/finds/${cfg.slug}`),
+          name: section.title,
+          description: (config.subtitle as string) ?? "",
+          url: publicUrl(`/finds/${config.slug}`),
         }}
       />
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <h1 className="font-display text-4xl">{find.title}</h1>
-          <p className="mt-2 text-sm text-muted">{find.subtitle}</p>
+          <h1 className="font-display text-4xl">{section.title}</h1>
+          <p className="mt-2 text-sm text-muted">{(config.subtitle as string) ?? ""}</p>
         </div>
-        {find.imageUrl ? (
+        {(config.imageUrl as string) ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={find.imageUrl} alt={find.title} className="aspect-[4/3] w-full rounded-[2rem] object-cover" />
+          <img src={config.imageUrl as string} alt={section.title} className="aspect-[4/3] w-full rounded-[2rem] object-cover" />
         ) : null}
       </div>
       {products.length > 0 ? (

@@ -9,11 +9,11 @@ export default async function EditFindPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const banner = await prisma.banner.findUnique({ where: { id } });
-  if (!banner) notFound();
+  const section = await prisma.homepageSection.findUnique({ where: { id } });
+  if (!section) notFound();
   const cfg = (() => {
     try {
-      return JSON.parse(banner.config);
+      return JSON.parse(section.config);
     } catch {
       return {};
     }
@@ -28,15 +28,15 @@ export default async function EditFindPage({
     <div>
       <h1 className="font-display text-3xl">Edit Find</h1>
       <form action={`/api/admin/finds/${id}`} method="post" className="mt-6 grid max-w-3xl gap-4 rounded-2xl border border-line bg-card p-5">
-        <input name="name" required defaultValue={banner.title} placeholder="Find name" className="h-11 rounded-xl border border-line px-3 text-sm" />
+        <input name="name" required defaultValue={section.title} placeholder="Find name" className="h-11 rounded-xl border border-line px-3 text-sm" />
         <input name="slug" required defaultValue={cfg.slug ?? ""} placeholder="slug" className="h-11 rounded-xl border border-line px-3 text-sm" />
-        <input name="imageUrl" defaultValue={banner.imageUrl ?? ""} placeholder="Image URL" className="h-11 rounded-xl border border-line px-3 text-sm" />
-        <textarea name="shortDescription" defaultValue={banner.subtitle ?? ""} placeholder="Short description" className="min-h-20 rounded-xl border border-line px-3 py-2 text-sm" />
+        <input name="coverImage" defaultValue={(cfg.imageUrl as string) ?? ""} placeholder="Cover image URL" className="h-11 rounded-xl border border-line px-3 text-sm" />
+        <textarea name="shortDescription" defaultValue={(cfg.subtitle as string) ?? ""} placeholder="Short description" className="min-h-20 rounded-xl border border-line px-3 py-2 text-sm" />
         <textarea name="description" defaultValue={""} placeholder="Full description" className="min-h-32 rounded-xl border border-line px-3 py-2 text-sm" />
-        <input name="sortOrder" type="number" defaultValue={banner.sortOrder} className="h-11 rounded-xl border border-line px-3 text-sm" />
         <select name="status" defaultValue={cfg.status ?? "DRAFT"} className="h-11 rounded-xl border border-line px-3 text-sm">
           <option>DRAFT</option>
-          <option>ACTIVE</option>
+          <option>LIVE</option>
+          <option>ENDED</option>
           <option>ARCHIVED</option>
         </select>
         <fieldset>

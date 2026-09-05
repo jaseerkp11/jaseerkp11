@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function AdminCollectionsPage() {
-  const collections = await prisma.banner.findMany({
-    where: { placement: "atria-collection" },
+  const collections = await prisma.homepageSection.findMany({
+    where: { key: { startsWith: "collection-" } },
     orderBy: { sortOrder: "asc" },
   });
   return (
@@ -15,7 +15,7 @@ export default async function AdminCollectionsPage() {
           New Collection
         </a>
       </div>
-      <p className="mt-2 text-sm text-muted">Flexible product groupings stored as banners with placement `atria-collection`.</p>
+      <p className="mt-2 text-sm text-muted">Story-driven collections stored as homepage sections with key prefix `collection-`.</p>
       <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
         {collections.length === 0 ? (
           <li className="px-4 py-8 text-sm text-muted">No collections yet.</li>
@@ -33,7 +33,7 @@ export default async function AdminCollectionsPage() {
                 <div>
                   <p className="font-medium">{c.title}</p>
                   <p className="text-xs text-muted">
-                    {c.subtitle} · {(cfg.productIds as string[])?.length ?? 0} products
+                    {(cfg.subtitle as string) ?? ""} · {(cfg.productIds as string[])?.length ?? 0} products
                   </p>
                 </div>
                 <div className="flex gap-2">

@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function AdminFindsPage() {
-  const finds = await prisma.banner.findMany({
-    where: { placement: "atria-find" },
+  const finds = await prisma.homepageSection.findMany({
+    where: { key: { startsWith: "find-" } },
     orderBy: { sortOrder: "asc" },
   });
   return (
@@ -15,7 +15,7 @@ export default async function AdminFindsPage() {
           New Find
         </a>
       </div>
-      <p className="mt-2 text-sm text-muted">Permanent discovery collections stored as banners with placement `atria-find`.</p>
+      <p className="mt-2 text-sm text-muted">Permanent discovery collections stored as homepage sections with key prefix `find-`.</p>
       <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
         {finds.length === 0 ? (
           <li className="px-4 py-8 text-sm text-muted">No finds yet.</li>
@@ -33,7 +33,7 @@ export default async function AdminFindsPage() {
                 <div>
                   <p className="font-medium">{f.title}</p>
                   <p className="text-xs text-muted">
-                    {f.subtitle} · {(cfg.productIds as string[])?.length ?? 0} products
+                    {(cfg.subtitle as string) ?? ""} · {(cfg.productIds as string[])?.length ?? 0} products
                   </p>
                 </div>
                 <div className="flex gap-2">

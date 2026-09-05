@@ -13,16 +13,17 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const collection = await getCollectionBySlug(slug);
-  if (!collection) return { title: "Collection" };
+  const result = await getCollectionBySlug(slug);
+  if (!result) return { title: "Collection" };
+  const { section, config } = result;
   const brand = getBrand();
   return {
-    title: collection.title,
-    description: collection.subtitle,
+    title: section.title,
+    description: (config.subtitle as string) ?? "",
     openGraph: {
-      title: collection.title,
-      description: collection.subtitle,
-      images: collection.imageUrl ? [collection.imageUrl] : [],
+      title: section.title,
+      description: (config.subtitle as string) ?? "",
+      images: config.imageUrl ? [config.imageUrl as string] : [],
     },
   };
 }
@@ -33,10 +34,9 @@ export default async function CollectionPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const collection = await getCollectionBySlug(slug);
-  if (!collection) notFound();
-  const cfg = collection.config as Record<string, unknown>;
-  const products = (collection as unknown as { products?: Array<any> }).products ?? [];
+  const result = await getCollectionBySlug(slug);
+  if (!result) notFound();
+  const { section, config, products } = result;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -44,19 +44,19 @@ export default async function CollectionPage({
         data={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: collection.title,
-          description: collection.subtitle,
-          url: publicUrl(`/collections/${cfg.slug}`),
+          name: section.title,
+          description: (config.subtitle as string) ?? "",
+          url: publicUrl(`/collections/${config.slug}`),
         }}
       />
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <h1 className="font-display text-4xl">{collection.title}</h1>
-          <p className="mt-2 text-sm text-muted">{collection.subtitle}</p>
+          <h1 className="font-display text-4xl">{section.title}</h1>
+          <p className="mt-2 text-sm text-muted">{(config.subtitle as string) ?? ""}</p>
         </div>
-        {collection.imageUrl ? (
+        {(config.imageUrl as string) ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={collection.imageUrl} alt={collection.title} className="aspect-[4/3] w-full rounded-[2rem] object-cover" />
+          <img src={config.imageUrl as string} alt={section.title} className="aspect-[4/3] w-full rounded-[2rem] object-cover" />
         ) : null}
       </div>
       {products.length > 0 ? (

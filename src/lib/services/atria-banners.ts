@@ -2,170 +2,160 @@ import { prisma } from "@/lib/prisma";
 import { writeAudit } from "@/lib/audit";
 import { productCardInclude } from "@/lib/catalog";
 
-type BannerProductInput = {
+type SectionProductInput = {
   productId: string;
   sortOrder?: number;
 };
 
-type BannerInput = {
+type SectionInput = {
+  key: string;
   title: string;
   subtitle?: string;
   imageUrl?: string;
   href?: string;
-  placement: string;
+  placement?: string;
   enabled?: boolean;
   sortOrder?: number;
   config?: Record<string, unknown>;
-  products?: BannerProductInput[];
+  products?: SectionProductInput[];
 };
 
-export async function listBannersByPlacement(placement: string) {
-  return prisma.banner.findMany({
-    where: { placement },
+export async function listSectionsByPrefix(prefix: string) {
+  return prisma.homepageSection.findMany({
+    where: { key: { startsWith: prefix } },
     orderBy: { sortOrder: "asc" },
   });
 }
 
-export async function getBannerById(id: string) {
-  return prisma.banner.findUnique({ where: { id } });
+export async function getSectionById(id: string) {
+  return prisma.homepageSection.findUnique({ where: { id } });
 }
 
-export async function createBannerItem(input: BannerInput, actorId?: string) {
-  const { products, ...data } = input;
-  const banner = await prisma.banner.create({
+export async function createSectionItem(input: SectionInput, actorId?: string) {
+  const section = await prisma.homepageSection.create({
     data: {
-      ...data,
-      config: data.config ? JSON.stringify(data.config) : "{}",
+      key: input.key,
+      title: input.title,
+      config: input.config ? JSON.stringify(input.config) : "{}",
+      enabled: input.enabled ?? true,
+      sortOrder: input.sortOrder ?? 0,
     },
   });
   if (actorId) {
-    await writeAudit({ actorId, action: "banner.create", entity: "Banner", entityId: banner.id });
+    await writeAudit({ actorId, action: "section.create", entity: "HomepageSection", entityId: section.id });
   }
-  return banner;
+  return section;
 }
 
-export async function updateBannerItem(id: string, input: BannerInput, actorId?: string) {
-  const { products, ...data } = input;
-  const banner = await prisma.banner.update({
+export async function updateSectionItem(id: string, input: SectionInput, actorId?: string) {
+  const section = await prisma.homepageSection.update({
     where: { id },
     data: {
-      ...data,
-      config: data.config ? JSON.stringify(data.config) : "{}",
+      key: input.key,
+      title: input.title,
+      config: input.config !== undefined ? JSON.stringify(input.config) : undefined,
+      enabled: input.enabled ?? true,
+      sortOrder: input.sortOrder ?? 0,
     },
   });
   if (actorId) {
-    await writeAudit({ actorId, action: "banner.update", entity: "Banner", entityId: id });
+    await writeAudit({ actorId, action: "section.update", entity: "HomepageSection", entityId: id });
   }
-  return banner;
+  return section;
 }
 
-export async function deleteBannerItem(id: string, actorId?: string) {
-  await prisma.banner.delete({ where: { id } });
+export async function deleteSectionItem(id: string, actorId?: string) {
+  await prisma.homepageSection.delete({ where: { id } });
   if (actorId) {
-    await writeAudit({ actorId, action: "banner.delete", entity: "Banner", entityId: id });
+    await writeAudit({ actorId, action: "section.delete", entity: "HomepageSection", entityId: id });
   }
 }
 
-export function parseBannerConfig(banner: { config: string }) {
+export function parseSectionConfig(section: { config: string }) {
   try {
-    return JSON.parse(banner.config) as Record<string, unknown>;
+    return JSON.parse(section.config) as Record<string, unknown>;
   } catch {
     return {};
   }
 }
 
 export async function getDropBySlug(slug: string) {
-  const banners = await prisma.banner.findMany({
-    where: { placement: "atria-drop" },
+  const sections = await prisma.homepageSection.findMany({
+    where: { key: { startsWith: "drop-" } },
   });
-  const banner = banners.find((b) => {
-    const cfg = parseBannerConfig(b);
+  const section = sections.find((s) => {
+    const cfg = parseSectionConfig(s);
     return cfg.slug === slug;
   });
-  if (!banner) return null;
-  const cfg = parseBannerConfig(banner);
+  if (!section) return null;
+  const cfg = parseSectionConfig(section);
   const productIds = (cfg.productIds as string[]) ?? [];
   const products = productIds.length
     ? await prisma.product.findMany({
         where: { id: { in: productIds }, status: "ACTIVE" },
-        include: {
-          images: { orderBy: { position: "asc" }, take: 1 },
-          category: true,
-          reviews: { where: { status: "APPROVED" }, select: { rating: true } },
-        },
+        include: productCardInclude,
       })
     : [];
-  return { ...banner, config: cfg, products };
+  return { section, config: cfg, products };
 }
 
 export async function getPublicDrops() {
-  const banners = await prisma.banner.findMany({
-    where: { placement: "atria-drop", enabled: true },
+  return prisma.homepageSection.findMany({
+    where: { key: { startsWith: "drop-" }, enabled: true },
     orderBy: { sortOrder: "asc" },
   });
-  return banners.map((b) => ({ ...b, config: parseBannerConfig(b) }));
 }
 
 export async function getFindBySlug(slug: string) {
-  const banners = await prisma.banner.findMany({
-    where: { placement: "atria-find" },
+  const sections = await prisma.homepageSection.findMany({
+    where: { key: { startsWith: "find-" } },
   });
-  const banner = banners.find((b) => {
-    const cfg = parseBannerConfig(b);
+  const section = sections.find((s) => {
+    const cfg = parseSectionConfig(s);
     return cfg.slug === slug;
   });
-  if (!banner) return null;
-  const cfg = parseBannerConfig(banner);
+  if (!section) return null;
+  const cfg = parseSectionConfig(section);
   const productIds = (cfg.productIds as string[]) ?? [];
   const products = productIds.length
     ? await prisma.product.findMany({
         where: { id: { in: productIds }, status: "ACTIVE" },
-        include: {
-          images: { orderBy: { position: "asc" }, take: 1 },
-          category: true,
-          reviews: { where: { status: "APPROVED" }, select: { rating: true } },
-        },
+        include: productCardInclude,
       })
     : [];
-  return { ...banner, config: cfg, products };
+  return { section, config: cfg, products };
 }
 
 export async function getPublicFinds() {
-  const banners = await prisma.banner.findMany({
-    where: { placement: "atria-find", enabled: true },
+  return prisma.homepageSection.findMany({
+    where: { key: { startsWith: "find-" }, enabled: true },
     orderBy: { sortOrder: "asc" },
   });
-  return banners.map((b) => ({ ...b, config: parseBannerConfig(b) }));
 }
 
 export async function getCollectionBySlug(slug: string) {
-  const banners = await prisma.banner.findMany({
-    where: { placement: "atria-collection" },
+  const sections = await prisma.homepageSection.findMany({
+    where: { key: { startsWith: "collection-" } },
   });
-  const banner = banners.find((b) => {
-    const cfg = parseBannerConfig(b);
+  const section = sections.find((s) => {
+    const cfg = parseSectionConfig(s);
     return cfg.slug === slug;
   });
-  if (!banner) return null;
-  const cfg = parseBannerConfig(banner);
+  if (!section) return null;
+  const cfg = parseSectionConfig(section);
   const productIds = (cfg.productIds as string[]) ?? [];
   const products = productIds.length
     ? await prisma.product.findMany({
         where: { id: { in: productIds }, status: "ACTIVE" },
-        include: {
-          images: { orderBy: { position: "asc" }, take: 1 },
-          category: true,
-          reviews: { where: { status: "APPROVED" }, select: { rating: true } },
-        },
+        include: productCardInclude,
       })
     : [];
-  return { ...banner, config: cfg, products };
+  return { section, config: cfg, products };
 }
 
 export async function getPublicCollections() {
-  const banners = await prisma.banner.findMany({
-    where: { placement: "atria-collection", enabled: true },
+  return prisma.homepageSection.findMany({
+    where: { key: { startsWith: "collection-" }, enabled: true },
     orderBy: { sortOrder: "asc" },
   });
-  return banners.map((b) => ({ ...b, config: parseBannerConfig(b) }));
 }

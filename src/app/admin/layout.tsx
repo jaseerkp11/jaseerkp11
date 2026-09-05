@@ -5,7 +5,13 @@ import { getBrand } from "@/config/brand";
 
 export const dynamic = "force-dynamic";
 
-const links = [
+function isDivider(
+  link: { href: string; label: string } | { type: "divider" },
+): link is { type: "divider" } {
+  return "type" in link && link.type === "divider";
+}
+
+const links: Array<{ href: string; label: string } | { type: "divider" }> = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/products/new", label: "Add product" },
@@ -19,7 +25,7 @@ const links = [
   { href: "/admin/tickets", label: "Support" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/settings", label: "Settings" },
-  { type: "divider" },
+  { type: "divider" as const },
   { href: "/admin/drops", label: "Drops" },
   { href: "/admin/finds", label: "Finds" },
   { href: "/admin/collections", label: "Collections" },
@@ -45,7 +51,7 @@ export default async function AdminLayout({
         </div>
         <nav className="flex flex-col gap-1 px-3 pb-8 text-sm">
           {links.map((link, i) =>
-            "type" in link && link.type === "divider" ? (
+            isDivider(link) ? (
               <div key={i} className="my-2 border-t border-white/10" />
             ) : (
               <Link key={link.href} href={link.href} className="rounded-lg px-3 py-2 hover:bg-white/10">
