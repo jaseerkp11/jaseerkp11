@@ -33,7 +33,7 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
   return (
     <article className="group">
       <Link href={`/products/${product.slug}`} className="block">
-        <div className="relative overflow-hidden rounded-2xl bg-[#ece6dc]">
+        <div className="relative overflow-hidden rounded-[1.25rem] bg-[#efe8de] shadow-sm">
           {image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -51,32 +51,32 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
             {available <= 0 ? <Badge tone="muted">Out of stock</Badge> : null}
             {available > 0 && available <= 5 ? <Badge tone="ink">Low stock</Badge> : null}
           </div>
-          <span className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-card/90 text-foreground">
+          <span className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#161513] opacity-0 transition group-hover:opacity-100">
             <Heart className="h-4 w-4" aria-hidden />
             <span className="sr-only">Wishlist</span>
           </span>
         </div>
         <div className="mt-3 space-y-1">
-          <h3 className="text-[15px] font-medium leading-snug">{product.name}</h3>
+          <h3 className="text-[15px] font-medium leading-snug text-[#161513]">{product.name}</h3>
           {rating.count > 0 ? (
-            <p className="text-xs text-muted">
+            <p className="text-xs text-[#8a7e6b]">
               {rating.value} · {rating.count} review{rating.count === 1 ? "" : "s"}
             </p>
           ) : (
-            <p className="text-xs text-muted">No reviews yet</p>
+            <p className="text-xs text-[#8a7e6b]">No reviews yet</p>
           )}
           <p className="flex flex-wrap items-baseline gap-2 text-sm">
-            <span className="font-semibold">
+            <span className="font-semibold text-[#161513]">
               {formatMoney(product.sellingPaise, brand.currency, brand.currencySymbol)}
             </span>
             {product.compareAtPaise && product.compareAtPaise > product.sellingPaise ? (
-              <span className="text-muted line-through">
+              <span className="text-[#8a7e6b] line-through">
                 {formatMoney(product.compareAtPaise, brand.currency, brand.currencySymbol)}
               </span>
             ) : null}
           </p>
           {product.showCost && product.costPaise != null ? (
-            <p className="text-xs text-muted">
+            <p className="text-xs text-[#8a7e6b]">
               Margin {marginPercent(product.sellingPaise, product.costPaise)}%
             </p>
           ) : null}
@@ -88,7 +88,7 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
         <button
           type="submit"
           disabled={available <= 0}
-          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-line bg-card text-sm hover:bg-[#f3ece3] disabled:opacity-50"
+          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-[#e3ddd4] bg-white text-sm text-[#161513] transition hover:border-[#c4b8a8] hover:shadow-sm disabled:opacity-50"
         >
           <ShoppingBag className="h-4 w-4" />
           {available <= 0 ? "Unavailable" : "Add to cart"}
