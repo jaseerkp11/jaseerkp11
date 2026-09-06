@@ -113,8 +113,8 @@ export default async function HomePage() {
       ) : null}
 
       {show("categories") ? (
-        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
-          <div className="mb-10 flex items-end justify-between">
+        <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
+          <div className="mb-8 flex items-end justify-between">
             <div>
               <h2 className="font-display text-3xl text-[#161513]">Shop by room of life</h2>
               <p className="mt-2 text-sm text-[#5c564e]">Thoughtful goods for every part of your home.</p>
@@ -130,7 +130,7 @@ export default async function HomePage() {
                 href={`/category/${c.slug}`}
                 className="group rounded-[1.25rem] border border-[#e3ddd4] bg-white p-6 text-center transition hover:border-[#c4b8a8] hover:shadow-md"
               >
-                <p className="font-display text-lg text-[#161513]">{c.name}</p>
+                <p className="font-display text-lg text-[#161513] truncate">{c.name}</p>
                 <p className="mt-1 line-clamp-2 text-xs text-[#5c564e]">{c.description}</p>
               </Link>
             ))}
@@ -139,8 +139,8 @@ export default async function HomePage() {
       ) : null}
 
       <section className="bg-[#efe8de]/40">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-          <section className="mb-16">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+          <section className="mb-10">
             <AskAtria />
           </section>
 
@@ -278,7 +278,7 @@ export default async function HomePage() {
       </section>
 
       {show("promo") && promo ? (
-        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+        <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
           <Link href={promo.href} className="group grid overflow-hidden rounded-[2rem] bg-[#1f3d34] text-[#f6f1ea] md:grid-cols-2">
             <div className="p-8 md:p-12">
               <h2 className="font-display text-3xl sm:text-4xl">{promo.title}</h2>
@@ -293,8 +293,45 @@ export default async function HomePage() {
         </section>
       ) : null}
 
+      <section className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <Link href="/products?sort=new" className="group rounded-[2rem] border border-[#e3ddd4] bg-white p-8 transition hover:shadow-md">
+            <h3 className="font-display text-2xl text-[#161513]">New arrivals</h3>
+            <p className="mt-2 text-sm text-[#5c564e]">Fresh additions to the catalogue this week.</p>
+            <span className="mt-4 inline-flex h-10 items-center rounded-full bg-[#1f3d34] px-5 text-sm text-[#f6f1ea] transition group-hover:bg-[#16302a]">
+              Shop new
+            </span>
+          </Link>
+          <Link href="/products?sort=best" className="group rounded-[2rem] border border-[#e3ddd4] bg-white p-8 transition hover:shadow-md">
+            <h3 className="font-display text-2xl text-[#161513]">Best sellers</h3>
+            <p className="mt-2 text-sm text-[#5c564e]">The pieces our customers keep choosing.</p>
+            <span className="mt-4 inline-flex h-10 items-center rounded-full bg-[#c4a574] px-5 text-sm text-[#161513] transition group-hover:bg-[#b49a6a]">
+              Shop best sellers
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <Link href="/drops" className="group block rounded-[2rem] border border-[#e3ddd4] bg-white overflow-hidden transition hover:shadow-md">
+          <div className="grid gap-0 md:grid-cols-2">
+            <div className="p-8 md:p-10">
+              <span className="inline-flex rounded-full bg-[#1f3d34] px-3 py-1 text-xs font-medium text-white">Limited drops</span>
+              <h3 className="mt-4 font-display text-2xl text-[#161513]">Atria Drops</h3>
+              <p className="mt-2 text-sm text-[#5c564e]">Curated temporary collections with limited availability.</p>
+              <span className="mt-4 inline-flex h-10 items-center rounded-full border border-[#d5cfc6] px-5 text-sm transition group-hover:bg-[#f3ece3]">
+                Explore drops
+              </span>
+            </div>
+            <div className="bg-[#efe8de] p-8 flex items-center justify-center">
+              <p className="font-display text-xl text-[#8a7e6b]">Limited time only</p>
+            </div>
+          </div>
+        </Link>
+      </section>
+
       {show("trust") ? (
-        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+        <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { icon: Truck, title: "Pincode-based delivery", body: "Estimates from a shipping table. No invented tracking." },
@@ -313,7 +350,7 @@ export default async function HomePage() {
       ) : null}
 
       {show("reviews") ? (
-        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+        <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
           <h2 className="font-display text-3xl text-[#161513]">From the catalogue</h2>
           {approvedReviews.length === 0 ? (
             <p className="mt-6 text-sm text-[#5c564e]">

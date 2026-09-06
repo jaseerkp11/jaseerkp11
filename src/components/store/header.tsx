@@ -57,7 +57,7 @@ export function Header({
         </Link>
         <nav className="ml-6 hidden items-center gap-5 text-sm lg:flex">
           {categories.slice(0, 7).map((c) => (
-            <Link key={c.slug} href={`/category/${c.slug}`} className="text-[#3f3a34] hover:text-foreground">
+            <Link key={c.slug} href={`/category/${c.slug}`} className="text-[#3f3a34] hover:text-foreground truncate max-w-[100px]">
               {c.name}
             </Link>
           ))}
