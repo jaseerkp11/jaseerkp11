@@ -113,8 +113,8 @@ export default async function HomePage() {
       ) : null}
 
       {show("categories") ? (
-        <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
-          <div className="mb-8 flex items-end justify-between">
+        <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6">
+          <div className="mb-6 flex items-end justify-between">
             <div>
               <h2 className="font-display text-3xl text-[#161513]">Shop by room of life</h2>
               <p className="mt-2 text-sm text-[#5c564e]">Thoughtful goods for every part of your home.</p>
@@ -139,8 +139,8 @@ export default async function HomePage() {
       ) : null}
 
       <section className="bg-[#efe8de]/40">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-          <section className="mb-10">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+          <section className="mb-6">
             <AskAtria />
           </section>
 
