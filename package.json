@@ -15,9 +15,6 @@
     "db:setup": "prisma generate && prisma db push && tsx prisma/seed.ts",
     "postinstall": "prisma generate"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "dependencies": {
     "@prisma/client": "6.16.2",
     "bcryptjs": "^3.0.3",

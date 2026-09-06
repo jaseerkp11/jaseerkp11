@@ -35,9 +35,15 @@ export default async function HomePage() {
   });
   const drops = await getPublicDrops();
   const finds = await getPublicFinds();
+  const sections = await prisma.homepageSection.findMany({ orderBy: { sortOrder: "asc" } });
+  const enabled = new Set(sections.filter((s) => s.enabled).map((s) => s.key));
 
   const liveDrop = drops.find((d) => (parseSectionConfig(d).status as string) === "LIVE");
   const upcomingDrop = drops.find((d) => (parseSectionConfig(d).status as string) === "SCHEDULED");
+
+  function show(key: string) {
+    return enabled.size === 0 || enabled.has(key);
+  }
 
   return (
     <div>
