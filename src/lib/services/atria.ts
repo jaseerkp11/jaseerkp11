@@ -62,7 +62,11 @@ export async function surpriseMe(options?: { sessionId?: string; userId?: string
       category: true,
       reviews: { where: { status: "APPROVED" }, select: { rating: true } },
     },
-    orderBy: { featured: "desc", trending: "desc", createdAt: "desc" },
+    orderBy: [
+      { featured: "desc" },
+      { trending: "desc" },
+      { createdAt: "desc" },
+    ],
     take: 20,
   });
 
