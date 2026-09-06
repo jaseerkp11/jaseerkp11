@@ -4,7 +4,15 @@ export const productCardInclude = {
   images: { orderBy: { position: "asc" as const }, take: 2 },
   reviews: { where: { status: "APPROVED" as const }, select: { rating: true } },
   category: true,
-} satisfies Prisma.ProductInclude;
+} as const satisfies Prisma.ProductInclude;
+
+export const productCardIncludeWithStock = {
+  images: { orderBy: { position: "asc" as const }, take: 2 },
+  reviews: { where: { status: "APPROVED" as const }, select: { rating: true } },
+  category: true,
+  stock: true,
+  reservedStock: true,
+} as any satisfies Prisma.ProductInclude;
 
 export function averageRating(reviews: Array<{ rating: number }>): {
   value: number;

@@ -13,6 +13,7 @@ import { PincodeChecker } from "@/components/store/pincode-checker";
 import { ProductGallery } from "@/components/store/product-gallery";
 import { splitProductImages } from "@/lib/services/product-image-slots";
 import { whyAtriaPicked, getPairsWellWith } from "@/lib/services/atria-discovery";
+import { getRecommendationsForProduct } from "@/lib/services/recommendations";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -75,6 +76,7 @@ export default async function ProductPage({
       : 0;
   const discoveryReasons = whyAtriaPicked(product);
   const pairs = await getPairsWellWith(product.id);
+  const recommendations = await getRecommendationsForProduct(product.id);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -283,6 +285,24 @@ export default async function ProductPage({
           </div>
         </section>
       ) : null}
+      {recommendations.map((group) => (
+        <section key={group.type} className="mt-12">
+          <h2 className="font-display text-2xl">
+            {group.type === "related" && "Related products"}
+            {group.type === "complementary" && "Pairs well with"}
+            {group.type === "trending" && "Trending now"}
+            {group.type === "featured" && "Featured"}
+            {group.type === "frequently_bought_together" && "Frequently bought together"}
+          </h2>
+          {group.products.length > 0 ? (
+            <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+              {group.products.map((item) => (
+                <ProductCard key={item.id} product={item as any} />
+              ))}
+            </div>
+          ) : null}
+        </section>
+      ))}
       <div className="sticky bottom-0 -mx-4 mt-10 border-t border-line bg-background/95 p-3 backdrop-blur sm:hidden">
         <form action="/api/cart" method="post" className="flex gap-2">
           <input type="hidden" name="productId" value={product.id} />
