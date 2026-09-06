@@ -26,6 +26,15 @@ export async function Footer({
                 <Link href={`/category/${c.slug}`}>{c.name}</Link>
               </li>
             ))}
+            <li>
+              <Link href="/drops">Drops</Link>
+            </li>
+            <li>
+              <Link href="/finds">Finds</Link>
+            </li>
+            <li>
+              <Link href="/collections">Collections</Link>
+            </li>
           </ul>
         </div>
         <div>

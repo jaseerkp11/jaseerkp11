@@ -61,6 +61,15 @@ export function Header({
               {c.name}
             </Link>
           ))}
+          <Link href="/drops" className="text-[#3f3a34] hover:text-foreground">
+            Drops
+          </Link>
+          <Link href="/finds" className="text-[#3f3a34] hover:text-foreground">
+            Finds
+          </Link>
+          <Link href="/collections" className="text-[#3f3a34] hover:text-foreground">
+            Collections
+          </Link>
           <Link href="/products" className="text-[#3f3a34] hover:text-foreground">
             All
           </Link>
@@ -155,6 +164,15 @@ export function Header({
                   {c.name}
                 </Link>
               ))}
+              <Link href="/drops" onClick={() => setOpen(false)}>
+                Drops
+              </Link>
+              <Link href="/finds" onClick={() => setOpen(false)}>
+                Finds
+              </Link>
+              <Link href="/collections" onClick={() => setOpen(false)}>
+                Collections
+              </Link>
               <Link href="/products" onClick={() => setOpen(false)}>
                 All products
               </Link>
