@@ -1,22 +1,22 @@
 import { NextRequest } from "next/server";
-import { getSessionUser } from "@/lib/auth";
-import { jsonError } from "@/lib/validation";
-import { askAtria } from "@/lib/services/atria";
+import { askAtria, detectIntent, detectBudget } from "@/lib/services/atria";
 
 export async function POST(request: NextRequest) {
   try {
-    const form = await request.formData();
-    const query = String(form.get("query") ?? "").trim();
-    const session = await getSessionUser();
-    if (!query) return jsonError("Query required", 400);
+    const body = await request.json().catch(() => ({}));
+    const query = String(body.query ?? "").trim();
+    if (!query) return Response.json({ products: [], message: "Please enter a query." });
     const result = await askAtria({
       query,
       sessionId: request.headers.get("x-session-id") ?? undefined,
-      userId: session?.id,
+      userId: body.userId,
+      intent: body.intent,
+      budgetMin: body.budgetMin,
+      budgetMax: body.budgetMax,
     });
     return Response.json(result);
   } catch {
-    return jsonError("Atria is taking a quick break. Try again shortly.", 500);
+    return Response.json({ products: [], message: "Atria is taking a quick break. Try again shortly." }, { status: 500 });
   }
 }
 
@@ -24,14 +24,15 @@ export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams.get("q") ?? "";
   if (!q.trim()) return Response.json({ products: [], message: "Enter a question or request." });
   try {
-    const session = await getSessionUser();
     const result = await askAtria({
       query: q,
       sessionId: request.headers.get("x-session-id") ?? undefined,
-      userId: session?.id,
+      intent: detectIntent(q).intent,
+      budgetMin: detectBudget(q)?.minPaise,
+      budgetMax: detectBudget(q)?.maxPaise,
     });
     return Response.json(result);
   } catch {
-    return jsonError("Atria is taking a quick break. Try again shortly.", 500);
+    return Response.json({ products: [], message: "Atria is taking a quick break. Try again shortly." }, { status: 500 });
   }
 }

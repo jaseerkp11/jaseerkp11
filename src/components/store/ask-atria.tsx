@@ -39,15 +39,15 @@ export function AskAtria() {
     try {
       const res = await fetch("/api/atria/ask", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ query: q }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q }),
       });
       const data = await res.json();
       if (data.products) {
         setProducts(data.products);
         setMessage(data.message);
       } else {
-        setMessage(data.error || "Something went wrong.");
+        setMessage(data.error || data.message || "Something went wrong.");
       }
       trackClientEvent("ai_query", { query: q, resultCount: data.products?.length ?? 0 });
     } catch {
