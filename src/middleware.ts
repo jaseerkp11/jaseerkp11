@@ -13,7 +13,10 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const secret = process.env.AUTH_SECRET || "local-dev-auth-secret-change-before-production-use";
+    const secret = process.env.AUTH_SECRET;
+    if (!secret) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
     const role = typeof payload.role === "string" ? payload.role : "";
     if (!STAFF.has(role)) {

@@ -133,6 +133,7 @@ export async function getDemandSignals(days = 30, compareDays = 7) {
   const allProducts = await prisma.product.findMany({
     where: { status: "ACTIVE" },
     select: { id: true, name: true, slug: true },
+    take: 500,
   });
   const productNameMap = new Map(allProducts.map((p) => [p.id, p]));
 

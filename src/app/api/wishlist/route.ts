@@ -21,5 +21,8 @@ export async function POST(request: NextRequest) {
     await prisma.wishlistItem.create({ data: { userId: user.id, productId } });
   }
   const referer = request.headers.get("referer") ?? "/account/wishlist";
-  return Response.redirect(new URL(referer, getBrand().siteUrl), 303);
+  const origin = new URL(getBrand().siteUrl).origin;
+  const safe =
+    referer && (referer.startsWith(origin) || referer.startsWith("/")) ? referer : "/account/wishlist";
+  return Response.redirect(new URL(safe, getBrand().siteUrl), 303);
 }

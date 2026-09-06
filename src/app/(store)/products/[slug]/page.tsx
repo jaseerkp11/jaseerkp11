@@ -68,8 +68,18 @@ export default async function ProductPage({
   });
   const rating = averageRating(product.reviews);
   const available = availableStock(product.stock, product.reservedStock);
-  const highlights = JSON.parse(product.highlights) as string[];
-  const specs = JSON.parse(product.specifications) as Record<string, string>;
+  let highlights: string[] = [];
+  let specs: Record<string, string> = {};
+  try {
+    highlights = JSON.parse(product.highlights) as string[];
+  } catch {
+    highlights = [];
+  }
+  try {
+    specs = (JSON.parse(product.specifications) as Record<string, string>) || {};
+  } catch {
+    specs = {};
+  }
   const savings =
     product.compareAtPaise && product.compareAtPaise > product.sellingPaise
       ? product.compareAtPaise - product.sellingPaise

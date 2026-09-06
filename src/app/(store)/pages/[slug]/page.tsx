@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { publicUrl } from "@/config/brand";
+import { sanitizeRichText } from "@/lib/sanitize";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -33,8 +34,8 @@ export default async function CmsPage({
   if (!page) notFound();
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <h1 className="font-display text-4xl">{page.title}</h1>
-      <p className="mt-6 whitespace-pre-wrap text-sm leading-7 text-[#3f3a34]">{page.body}</p>
+      <h1 className="font-display text-4xl">{sanitizeRichText(page.title)}</h1>
+      <p className="mt-6 whitespace-pre-wrap text-sm leading-7 text-[#3f3a34]">{sanitizeRichText(page.body)}</p>
       {slug === "contact" && sent ? (
         <p className="mt-6 rounded-2xl border border-line bg-card p-4 text-sm">We received your message. We will reply to the email you entered.</p>
       ) : null}

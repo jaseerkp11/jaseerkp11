@@ -19,5 +19,8 @@ export async function POST(request: NextRequest) {
     return jsonError(error instanceof Error ? error.message : "Could not add to cart", 400);
   }
   const referer = request.headers.get("referer");
-  return Response.redirect(new URL(referer || "/cart", getBrand().siteUrl), 303);
+  const origin = new URL(getBrand().siteUrl).origin;
+  const safe =
+    referer && (referer.startsWith(origin) || referer.startsWith("/")) ? referer : "/cart";
+  return Response.redirect(new URL(safe, getBrand().siteUrl), 303);
 }

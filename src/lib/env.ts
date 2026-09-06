@@ -2,7 +2,7 @@ function requiredInProduction(name: string, fallback: string): string {
   const value = process.env[name]?.trim();
   if (value) return value;
   if (process.env.NODE_ENV === "production" && process.env.VERCEL) {
-    return fallback;
+    return "";
   }
   return fallback;
 }
@@ -14,6 +14,9 @@ export const serverEnv = {
     "local-dev-auth-secret-change-before-production-use",
   ),
   adminEmail: process.env.ADMIN_EMAIL ?? "admin@local.test",
-  adminPassword: process.env.ADMIN_PASSWORD ?? "ChangeMe_admin_123",
+  adminPassword: requiredInProduction(
+    "ADMIN_PASSWORD",
+    "ChangeMe_admin_123",
+  ),
   seedDemo: process.env.SEED_DEMO !== "false",
 };
