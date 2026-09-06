@@ -19,6 +19,7 @@ export function AskAtria() {
     reservedStock: number;
     images: Array<{ url: string; alt: string }>;
     reviews: Array<{ rating: number }>;
+    reasons?: string[];
   }>>([]);
   const [message, setMessage] = useState("");
 
@@ -123,7 +124,12 @@ export function AskAtria() {
             {products.length > 0 ? (
               <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
                 {products.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <div key={p.id}>
+                    <ProductCard product={p} />
+                    {p.reasons && p.reasons.length > 0 ? (
+                      <p className="mt-2 text-xs text-muted">{p.reasons[0]}</p>
+                    ) : null}
+                  </div>
                 ))}
               </div>
             ) : null}

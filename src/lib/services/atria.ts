@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { trackEvent } from "@/lib/analytics/track";
+import { whyAtriaPicked } from "./atria-discovery";
 
 export async function askAtria(input: {
   query: string;
@@ -47,7 +48,13 @@ export async function askAtria(input: {
     metadata: { query: q, resultCount: products.length, sessionId: input.sessionId, userId: input.userId },
   });
 
-  return { products, message };
+  return {
+    products: products.map((p) => ({
+      ...p,
+      reasons: whyAtriaPicked(p, q),
+    })),
+    message,
+  };
 }
 
 export async function surpriseMe(options?: { sessionId?: string; userId?: string; excludeProductId?: string }) {

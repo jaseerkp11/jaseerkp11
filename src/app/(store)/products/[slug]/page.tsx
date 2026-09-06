@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { PincodeChecker } from "@/components/store/pincode-checker";
 import { ProductGallery } from "@/components/store/product-gallery";
 import { splitProductImages } from "@/lib/services/product-image-slots";
+import { whyAtriaPicked, getPairsWellWith } from "@/lib/services/atria-discovery";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -72,6 +73,8 @@ export default async function ProductPage({
     product.compareAtPaise && product.compareAtPaise > product.sellingPaise
       ? product.compareAtPaise - product.sellingPaise
       : 0;
+  const discoveryReasons = whyAtriaPicked(product);
+  const pairs = await getPairsWellWith(product.id);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -255,6 +258,26 @@ export default async function ProductPage({
           <h2 className="font-display text-2xl">Related</h2>
           <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
             {related.map((item) => (
+              <ProductCard key={item.id} product={item} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+      {discoveryReasons.length > 0 ? (
+        <section className="mt-12 rounded-2xl border border-line bg-card p-5">
+          <h2 className="font-display text-2xl">Why Atria picked this</h2>
+          <ul className="mt-3 list-disc pl-5 text-sm text-muted">
+            {discoveryReasons.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {pairs.length > 0 ? (
+        <section className="mt-12">
+          <h2 className="font-display text-2xl">Pairs well with</h2>
+          <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+            {pairs.map((item) => (
               <ProductCard key={item.id} product={item} />
             ))}
           </div>
