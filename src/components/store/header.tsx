@@ -156,11 +156,8 @@ export function Header({
         </div>
       </div>
       {open ? (
-        <div className="fixed inset-0 z-50 bg-black/40 lg:hidden" onClick={() => setOpen(false)}>
-          <div
-            className="h-full w-[min(100%,20rem)] bg-white p-5 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 z-50 bg-white lg:hidden" onClick={() => setOpen(false)}>
+          <div className="p-5" onClick={(e) => e.stopPropagation()}>
             <div className="mb-6 flex items-center justify-between">
               <span className="font-display text-xl">{brandName}</span>
               <button aria-label="Close menu" onClick={() => setOpen(false)}>
