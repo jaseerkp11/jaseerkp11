@@ -158,7 +158,7 @@ export function Header({
       {open ? (
         <div className="fixed inset-0 z-50 bg-black/40 lg:hidden" onClick={() => setOpen(false)}>
           <div
-            className="h-full w-[min(100%,20rem)] bg-background p-5"
+            className="h-full w-[min(100%,20rem)] bg-[#f6f1ea] p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 flex items-center justify-between">
@@ -167,28 +167,30 @@ export function Header({
                 <X />
               </button>
             </div>
-            <nav className="flex flex-col gap-3 text-base">
+            <nav className="flex flex-col gap-3 text-base text-[#161513]">
               {categories.map((c) => (
-                <Link key={c.slug} href={`/category/${c.slug}`} onClick={() => setOpen(false)}>
+                <Link key={c.slug} href={`/category/${c.slug}`} onClick={() => setOpen(false)} className="font-medium">
                   {c.name}
                 </Link>
               ))}
-              <Link href="/drops" onClick={() => setOpen(false)}>
+              <Link href="/drops" onClick={() => setOpen(false)} className="font-medium">
                 Drops
               </Link>
-              <Link href="/finds" onClick={() => setOpen(false)}>
+              <Link href="/finds" onClick={() => setOpen(false)} className="font-medium">
                 Finds
               </Link>
-              <Link href="/collections" onClick={() => setOpen(false)}>
+              <Link href="/collections" onClick={() => setOpen(false)} className="font-medium">
                 Collections
               </Link>
-              <Link href="/products" onClick={() => setOpen(false)}>
+              <Link href="/products" onClick={() => setOpen(false)} className="font-medium">
                 All products
               </Link>
-              <Link href="/account" onClick={() => setOpen(false)}>
-                Account
-              </Link>
-              <Link href="/account/wishlist" onClick={() => setOpen(false)}>
+              <div className="mt-4 border-t border-line pt-4">
+                <Link href="/account" onClick={() => setOpen(false)} className="font-medium">
+                  Account
+                </Link>
+              </div>
+              <Link href="/account/wishlist" onClick={() => setOpen(false)} className="font-medium">
                 Wishlist
               </Link>
             </nav>

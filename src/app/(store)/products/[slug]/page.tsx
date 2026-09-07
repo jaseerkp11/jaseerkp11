@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { PincodeChecker } from "@/components/store/pincode-checker";
 import { ProductGallery } from "@/components/store/product-gallery";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { splitProductImages } from "@/lib/services/product-image-slots";
 import { whyAtriaPicked, getPairsWellWith } from "@/lib/services/atria-discovery";
 import { getRecommendationsForProduct } from "@/lib/services/recommendations";
@@ -260,9 +261,12 @@ export default async function ProductPage({
         <form action="/api/cart" method="post" className="flex gap-2">
           <input type="hidden" name="productId" value={product.id} />
           <input type="hidden" name="quantity" value="1" />
-          <button className="h-12 flex-1 rounded-full bg-primary text-sm text-[#f6f1ea]" disabled={available <= 0}>
+          <SubmitButton className="h-12 flex-1 rounded-full bg-primary text-sm text-[#f6f1ea]" disabled={available <= 0}>
             Add · {formatMoney(product.sellingPaise)}
-          </button>
+          </SubmitButton>
+          <SubmitButton className="h-12 flex-1 rounded-full bg-[#161513] text-sm text-[#f6f1ea]" disabled={available <= 0} name="buyNow" value="1">
+            Buy now
+          </SubmitButton>
         </form>
       </div>
     </div>

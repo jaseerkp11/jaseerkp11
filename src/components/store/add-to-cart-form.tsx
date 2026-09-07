@@ -66,12 +66,9 @@ export function AddToCartForm({ productId, available, sellingPaise, currency, cu
         <SubmitButton className="h-12 flex-1 rounded-full bg-primary text-sm text-[#f6f1ea] disabled:opacity-50" disabled={available <= 0}>
           Add to cart
         </SubmitButton>
-        <a
-          href="/checkout"
-          className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-[#161513] text-sm text-[#f6f1ea]"
-        >
+        <SubmitButton className="h-12 flex-1 rounded-full bg-[#161513] text-sm text-[#f6f1ea]" disabled={available <= 0} name="buyNow" value="1">
           Buy now
-        </a>
+        </SubmitButton>
       </div>
     </form>
   );

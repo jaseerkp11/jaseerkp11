@@ -18,6 +18,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return jsonError(error instanceof Error ? error.message : "Could not add to cart", 400);
   }
+  const buyNow = form.get("buyNow");
+  if (buyNow === "1") {
+    return Response.redirect(new URL("/checkout", getBrand().siteUrl), 303);
+  }
   const referer = request.headers.get("referer");
   const origin = new URL(getBrand().siteUrl).origin;
   const safe =
