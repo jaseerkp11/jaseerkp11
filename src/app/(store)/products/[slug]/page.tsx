@@ -66,7 +66,7 @@ export default async function ProductPage({
     where: { categoryId: product.categoryId, id: { not: product.id }, status: "ACTIVE" },
     include: productCardInclude,
     take: 4,
-  });
+  }).catch(() => []);
   const rating = averageRating(product.reviews);
   const available = availableStock(product.stock, product.reservedStock);
   let highlights: string[] = [];
@@ -86,8 +86,8 @@ export default async function ProductPage({
       ? product.compareAtPaise - product.sellingPaise
       : 0;
   const discoveryReasons = whyAtriaPicked(product);
-  const pairs = await getPairsWellWith(product.id);
-  const recommendations = await getRecommendationsForProduct(product.id);
+  const pairs = await getPairsWellWith(product.id).catch(() => []);
+  const recommendations = await getRecommendationsForProduct(product.id).catch(() => []);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
