@@ -150,11 +150,11 @@ export async function placeOrder(input: {
         ...notificationTemplates.orderConfirmed(
           order.orderNumber,
           formatMoney(order.totalPaise),
-          "Cash on delivery",
+          input.paymentMethod === "cod" ? "Cash on delivery" : "Online payment",
         ),
       });
-    } catch {
-      /* order is already saved */
+    } catch (error) {
+      console.error("checkout.email", error);
     }
     try {
       await trackEvent({ name: "purchase", metadata: { orderId: order.id } });
