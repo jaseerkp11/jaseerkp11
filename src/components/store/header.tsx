@@ -22,17 +22,24 @@ export function Header({
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searching, setSearching] = useState(false);
   const visibleHits = query.trim().length < 2 ? [] : hits;
 
   useEffect(() => {
     if (query.trim().length < 2) {
+      setSearching(false);
       return;
     }
+    setSearching(true);
     const handle = window.setTimeout(async () => {
       const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        setSearching(false);
+        return;
+      }
       const data = (await res.json()) as { hits: SearchHit[] };
       setHits(data.hits);
+      setSearching(false);
     }, 220);
     return () => window.clearTimeout(handle);
   }, [query]);
@@ -57,7 +64,7 @@ export function Header({
         </Link>
         <nav className="ml-6 hidden items-center gap-5 text-sm lg:flex">
           {categories.slice(0, 7).map((c) => (
-            <Link key={c.slug} href={`/category/${c.slug}`} className="text-[#3f3a34] hover:text-foreground truncate max-w-[100px]">
+            <Link key={c.slug} href={`/category/${c.slug}`} className="text-[#3f3a34] hover:text-foreground truncate max-w-[90px]" title={c.name}>
               {c.name}
             </Link>
           ))}
@@ -87,7 +94,9 @@ export function Header({
             />
             {searchOpen && (visibleHits.length > 0 || query.length >= 2) ? (
               <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-line bg-card shadow-lg">
-                {visibleHits.length === 0 ? (
+                {searching ? (
+                  <p className="px-4 py-3 text-sm text-muted">Searching…</p>
+                ) : visibleHits.length === 0 ? (
                   <p className="px-4 py-3 text-sm text-muted">No suggestions</p>
                 ) : (
                   visibleHits.map((hit) => (

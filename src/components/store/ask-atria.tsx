@@ -96,6 +96,7 @@ export function AskAtria() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="✨ Ask Atria anything..."
               className="h-12 flex-1 rounded-full border border-line bg-background px-4 text-sm"
+              aria-label="Ask Atria"
             />
             <Button type="submit" disabled={loading} className="h-12 px-6">
               {loading ? "Searching..." : "Ask"}
@@ -111,7 +112,7 @@ export function AskAtria() {
               key={s}
               type="button"
               onClick={() => submit(s)}
-              className="rounded-full border border-line px-3 py-1 text-xs hover:bg-[#f3ece3]"
+              className="rounded-full border border-line px-4 py-2 text-sm hover:bg-[#f3ece3]"
             >
               {s}
             </button>
