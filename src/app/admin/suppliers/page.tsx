@@ -1,23 +1,46 @@
 import { prisma } from "@/lib/prisma";
+import { SupplierForm } from "@/components/admin/supplier-form";
+import { Pagination } from "@/components/admin/pagination";
 
 export const dynamic = "force-dynamic";
 
-export default async function SuppliersPage() {
-  const suppliers = await prisma.supplier.findMany({
-    include: { _count: { select: { products: true, mappings: true } } },
-  });
+export default async function SuppliersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; page?: string }>;
+}) {
+  const { q, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam ?? "1"));
+  const pageSize = 20;
+  const where: Record<string, unknown> = {};
+  if (q) {
+    where.OR = [
+      { name: { contains: q } },
+      { email: { contains: q } },
+    ];
+  }
+  const [suppliers, total] = await Promise.all([
+    prisma.supplier.findMany({
+      where,
+      include: { _count: { select: { products: true, mappings: true } } },
+      orderBy: { name: "asc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.supplier.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
   return (
     <div>
       <h1 className="font-display text-3xl">Suppliers</h1>
-      <form action="/api/admin/suppliers" method="post" className="mt-6 grid max-w-xl gap-3 rounded-2xl border border-line bg-card p-5">
-        <input name="name" required placeholder="Name" className="h-11 rounded-xl border border-line px-3 text-sm" />
-        <input name="contactPerson" placeholder="Contact" className="h-11 rounded-xl border border-line px-3 text-sm" />
-        <input name="email" placeholder="Email" className="h-11 rounded-xl border border-line px-3 text-sm" />
-        <input name="phone" placeholder="Phone" className="h-11 rounded-xl border border-line px-3 text-sm" />
-        <textarea name="notes" placeholder="Notes" className="min-h-20 rounded-xl border border-line px-3 py-2 text-sm" />
-        <button className="h-11 rounded-full bg-primary text-sm text-[#f6f1ea]">Add supplier</button>
-      </form>
-      <ul className="mt-8 divide-y divide-line rounded-2xl border border-line bg-card">
+      <SupplierForm />
+      <div className="mt-6">
+        <form method="get" className="flex items-center gap-2">
+          <input name="q" defaultValue={q ?? ""} placeholder="Search suppliers..." className="h-11 w-full max-w-md rounded-xl border border-line bg-card px-3 text-sm" />
+          <button type="submit" className="h-11 rounded-full border border-line px-4 text-sm">Search</button>
+        </form>
+      </div>
+      <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
         {suppliers.map((s) => (
           <li key={s.id} className="px-4 py-3 text-sm">
             <p className="font-medium">{s.name}</p>
@@ -27,6 +50,7 @@ export default async function SuppliersPage() {
           </li>
         ))}
       </ul>
+      <Pagination page={page} totalPages={totalPages} baseUrl="/admin/suppliers" searchParams={{ q }} />
     </div>
   );
 }

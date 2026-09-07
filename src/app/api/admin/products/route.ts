@@ -4,35 +4,9 @@ import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/a
 import { rupeesToPaise } from "@/lib/money";
 import { writeAudit } from "@/lib/audit";
 import { jsonError } from "@/lib/validation";
+import { productInputSchema } from "@/lib/validation";
 import { adjustInventory } from "@/lib/services/inventory";
 import { syncProductImages } from "@/lib/services/product-images";
-
-function parseProduct(form: FormData) {
-  return {
-    sku: String(form.get("sku") ?? "").trim(),
-    name: String(form.get("name") ?? "").trim(),
-    slug: String(form.get("slug") ?? "").trim(),
-    description: String(form.get("description") ?? ""),
-    shortDescription: String(form.get("shortDescription") ?? ""),
-    categoryId: String(form.get("categoryId") ?? ""),
-    supplierId: String(form.get("supplierId") ?? "") || null,
-    brand: String(form.get("brand") ?? ""),
-    costPaise: rupeesToPaise(Number(form.get("costRupees") ?? 0)),
-    sellingPaise: rupeesToPaise(Number(form.get("sellingRupees") ?? 0)),
-    compareAtPaise: form.get("compareRupees")
-      ? rupeesToPaise(Number(form.get("compareRupees")))
-      : null,
-    stock: Number(form.get("stock") ?? 0),
-    lowStockThreshold: Number(form.get("lowStockThreshold") ?? 5),
-    status: String(form.get("status") ?? "DRAFT") as "DRAFT" | "ACTIVE" | "ARCHIVED" | "OUT_OF_STOCK",
-    featured: form.get("featured") === "on",
-    trending: form.get("trending") === "on",
-    bestSeller: form.get("bestSeller") === "on",
-    newArrival: form.get("newArrival") === "on",
-    seoTitle: String(form.get("seoTitle") ?? "") || null,
-    seoDescription: String(form.get("seoDescription") ?? "") || null,
-  };
-}
 
 export async function POST(request: NextRequest) {
   const session = await getSessionUser();
@@ -43,21 +17,40 @@ export async function POST(request: NextRequest) {
   }
   if (!hasPermission(session!.role, PERMISSIONS.editProducts)) return jsonError("Forbidden", 403);
   const form = await request.formData();
-  const data = parseProduct(form);
-  if (!data.sku || !data.name || !data.slug || !data.categoryId) {
-    return jsonError("Missing required fields", 400);
-  }
+  const parsed = productInputSchema.safeParse({
+    sku: form.get("sku"),
+    name: form.get("name"),
+    slug: form.get("slug"),
+    description: form.get("description"),
+    shortDescription: form.get("shortDescription"),
+    categoryId: form.get("categoryId"),
+    supplierId: form.get("supplierId") || null,
+    brand: form.get("brand"),
+    costPaise: rupeesToPaise(Number(form.get("costRupees") ?? 0)),
+    sellingPaise: rupeesToPaise(Number(form.get("sellingRupees") ?? 0)),
+    compareAtPaise: form.get("compareRupees") ? rupeesToPaise(Number(form.get("compareRupees"))) : null,
+    stock: Number(form.get("stock") ?? 0),
+    lowStockThreshold: Number(form.get("lowStockThreshold") ?? 5),
+    status: form.get("status") || "DRAFT",
+    featured: form.get("featured") === "on",
+    trending: form.get("trending") === "on",
+    bestSeller: form.get("bestSeller") === "on",
+    newArrival: form.get("newArrival") === "on",
+    seoTitle: form.get("seoTitle") || null,
+    seoDescription: form.get("seoDescription") || null,
+  });
+  if (!parsed.success) return jsonError("Invalid product", 400, parsed.error.flatten());
   const product = await prisma.product.create({
     data: {
-      ...data,
+      ...parsed.data,
       stock: 0,
     },
   });
-  await syncProductImages(product.id, data.name, form);
-  if (data.stock > 0) {
+  await syncProductImages(product.id, parsed.data.name, form);
+  if (parsed.data.stock > 0) {
     await adjustInventory({
       productId: product.id,
-      delta: data.stock,
+      delta: parsed.data.stock,
       reason: "RECEIPT",
       note: "Initial stock on create",
       actorId: session!.id,

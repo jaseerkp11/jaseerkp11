@@ -4,6 +4,7 @@ import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/a
 import { rupeesToPaise } from "@/lib/money";
 import { writeAudit } from "@/lib/audit";
 import { jsonError } from "@/lib/validation";
+import { productInputSchema } from "@/lib/validation";
 import { syncProductImages } from "@/lib/services/product-images";
 
 export async function POST(
@@ -19,31 +20,31 @@ export async function POST(
   if (!hasPermission(session!.role, PERMISSIONS.editProducts)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
   const form = await request.formData();
+  const parsed = productInputSchema.safeParse({
+    sku: form.get("sku"),
+    name: form.get("name"),
+    slug: form.get("slug"),
+    description: form.get("description"),
+    shortDescription: form.get("shortDescription"),
+    categoryId: form.get("categoryId"),
+    supplierId: form.get("supplierId") || null,
+    brand: form.get("brand"),
+    costPaise: rupeesToPaise(Number(form.get("costRupees") ?? 0)),
+    sellingPaise: rupeesToPaise(Number(form.get("sellingRupees") ?? 0)),
+    compareAtPaise: form.get("compareRupees") ? rupeesToPaise(Number(form.get("compareRupees"))) : null,
+    lowStockThreshold: Number(form.get("lowStockThreshold") ?? 5),
+    status: form.get("status") || "ACTIVE",
+    featured: form.get("featured") === "on",
+    trending: form.get("trending") === "on",
+    bestSeller: form.get("bestSeller") === "on",
+    newArrival: form.get("newArrival") === "on",
+    seoTitle: form.get("seoTitle") || null,
+    seoDescription: form.get("seoDescription") || null,
+  });
+  if (!parsed.success) return jsonError("Invalid product", 400, parsed.error.flatten());
   const product = await prisma.product.update({
     where: { id },
-    data: {
-      sku: String(form.get("sku") ?? ""),
-      name: String(form.get("name") ?? ""),
-      slug: String(form.get("slug") ?? ""),
-      description: String(form.get("description") ?? ""),
-      shortDescription: String(form.get("shortDescription") ?? ""),
-      categoryId: String(form.get("categoryId") ?? ""),
-      supplierId: String(form.get("supplierId") ?? "") || null,
-      brand: String(form.get("brand") ?? ""),
-      costPaise: rupeesToPaise(Number(form.get("costRupees") ?? 0)),
-      sellingPaise: rupeesToPaise(Number(form.get("sellingRupees") ?? 0)),
-      compareAtPaise: form.get("compareRupees")
-        ? rupeesToPaise(Number(form.get("compareRupees")))
-        : null,
-      lowStockThreshold: Number(form.get("lowStockThreshold") ?? 5),
-      status: String(form.get("status") ?? "ACTIVE") as "DRAFT" | "ACTIVE" | "ARCHIVED" | "OUT_OF_STOCK",
-      featured: form.get("featured") === "on",
-      trending: form.get("trending") === "on",
-      bestSeller: form.get("bestSeller") === "on",
-      newArrival: form.get("newArrival") === "on",
-      seoTitle: String(form.get("seoTitle") ?? "") || null,
-      seoDescription: String(form.get("seoDescription") ?? "") || null,
-    },
+    data: parsed.data,
   });
   await syncProductImages(product.id, product.name, form);
   await writeAudit({

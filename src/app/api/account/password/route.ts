@@ -10,13 +10,17 @@ export async function POST(request: NextRequest) {
   if (!session) return jsonError("Sign in required", 401);
   const form = await request.formData();
   const next = passwordSchema.safeParse(form.get("next"));
-  if (!next.success) return jsonError("New password is too short", 400);
+  if (!next.success) {
+    return Response.redirect(new URL("/account/settings?error=New+password+is+too+short", getBrand().siteUrl), 303);
+  }
   const user = await prisma.user.findUnique({ where: { id: session.id } });
   if (!user) return jsonError("User not found", 404);
   const ok = await verifyPassword(String(form.get("current") ?? ""), user.passwordHash);
-  if (!ok) return jsonError("Current password is incorrect", 400);
+  if (!ok) {
+    return Response.redirect(new URL("/account/settings?error=Current+password+is+incorrect", getBrand().siteUrl), 303);
+  }
   await prisma.user.update({
-    where: { id: user.id },
+    where: { id: session.id },
     data: { passwordHash: await hashPassword(next.data) },
   });
   await writeAudit({
@@ -25,5 +29,5 @@ export async function POST(request: NextRequest) {
     entity: "User",
     entityId: user.id,
   });
-  return Response.redirect(new URL("/account/settings", getBrand().siteUrl), 303);
+  return Response.redirect(new URL("/account/settings?updated=1", getBrand().siteUrl), 303);
 }

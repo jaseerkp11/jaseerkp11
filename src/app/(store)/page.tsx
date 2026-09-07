@@ -8,6 +8,7 @@ import { Truck, RotateCcw, ShieldCheck, Headset } from "lucide-react";
 import { AskAtria } from "@/components/store/ask-atria";
 import { HeroCarousel } from "@/components/store/hero-carousel";
 import { getPublicDrops, getPublicFinds, parseSectionConfig } from "@/lib/services/atria-banners";
+import { NewsletterForm } from "@/components/store/newsletter-form";
 
 export const dynamic = "force-dynamic";
 
@@ -379,18 +380,7 @@ export default async function HomePage() {
             <p className="mt-4 max-w-md text-sm text-[#b7b0a6]">
               Newsletter delivery requires an email provider. Until then this form records the request only if you connect one.
             </p>
-            <form action="/api/newsletter" method="post" className="mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="Email"
-                className="h-12 flex-1 rounded-full bg-white/10 px-5 text-sm text-[#f6f1ea] placeholder:text-[#b7b0a6] backdrop-blur"
-              />
-              <button className="h-12 rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition hover:bg-[#b49a6a]" type="submit">
-                Request updates
-              </button>
-            </form>
+            <NewsletterForm />
           </div>
         </section>
       ) : null}

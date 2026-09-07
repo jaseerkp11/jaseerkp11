@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUser, isStaff } from "@/lib/auth";
 import { getBrand } from "@/config/brand";
+import { Breadcrumbs } from "@/components/admin/breadcrumbs";
 
 export const dynamic = "force-dynamic";
 
@@ -73,7 +74,10 @@ export default async function AdminLayout({
             New product
           </Link>
         </header>
-        <div className="flex-1 p-4 md:p-8">{children}</div>
+        <div className="flex-1 p-4 md:p-8">
+          <Breadcrumbs />
+          {children}
+        </div>
       </div>
     </div>
   );

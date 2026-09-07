@@ -38,7 +38,9 @@ export async function POST(
   const form = await request.formData();
   const status = String(form.get("status")) as OrderStatus;
   if (!allowed.includes(status)) return jsonError("Invalid status", 400);
-  const trackingNumber = String(form.get("trackingNumber") ?? "") || null;
+  const trackingNumber = String(form.get("trackingNumber") ?? "").trim() || null;
+  const note = String(form.get("note") ?? "").trim();
+  if (note.length > 1000) return jsonError("Note too long", 400);
   const order = await prisma.order.findUnique({ where: { id }, include: { items: true } });
   if (!order) return jsonError("Not found", 404);
 
@@ -86,7 +88,7 @@ export async function POST(
     data: {
       orderId: id,
       status,
-      note: String(form.get("note") ?? ""),
+      note,
       actorId: session!.id,
     },
   });

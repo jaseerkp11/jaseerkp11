@@ -1,16 +1,41 @@
 import { prisma } from "@/lib/prisma";
+import { Pagination } from "@/components/admin/pagination";
 
 export const dynamic = "force-dynamic";
 
-export default async function CustomersPage() {
-  const customers = await prisma.user.findMany({
-    where: { role: "CUSTOMER" },
-    include: { _count: { select: { orders: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+export default async function CustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; page?: string }>;
+}) {
+  const { q, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam ?? "1"));
+  const pageSize = 20;
+  const where: Record<string, unknown> = { role: "CUSTOMER" };
+  if (q) {
+    where.OR = [
+      { name: { contains: q } },
+      { email: { contains: q } },
+    ];
+  }
+  const [customers, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      include: { _count: { select: { orders: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.user.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
   return (
     <div>
       <h1 className="font-display text-3xl">Customers</h1>
+      <form method="get" className="mt-4 flex items-center gap-2">
+        <input name="q" defaultValue={q ?? ""} placeholder="Search customers..." className="h-11 w-full max-w-md rounded-xl border border-line bg-card px-3 text-sm" />
+        <button type="submit" className="h-11 rounded-full border border-line px-4 text-sm">Search</button>
+      </form>
       {customers.length === 0 ? (
         <p className="mt-4 text-sm text-muted">No customer accounts yet.</p>
       ) : (
@@ -25,6 +50,7 @@ export default async function CustomersPage() {
           ))}
         </ul>
       )}
+      <Pagination page={page} totalPages={totalPages} baseUrl="/admin/customers" searchParams={{ q }} />
     </div>
   );
 }

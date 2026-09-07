@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/auth";
 import { jsonError } from "@/lib/validation";
+import { adminSectionSchema } from "@/lib/validation";
 import { getBrand } from "@/config/brand";
 import { writeAudit } from "@/lib/audit";
 import { getSectionById, updateSectionItem, deleteSectionItem, parseSectionConfig } from "@/lib/services/atria-banners";
@@ -39,30 +40,48 @@ export async function POST(
   const existing = await getSectionById(id);
   const cfg = existing ? parseSectionConfig(existing) : {};
   const slug = String(form.get("slug") ?? (cfg.slug as string) ?? "").trim();
-  const key = `drop-${slug}`;
-  const config: Record<string, unknown> = {
+  const parsed = adminSectionSchema.safeParse({
+    name: form.get("name"),
     slug,
-    status: String(form.get("status") ?? "DRAFT"),
-    productIds: form.getAll("productIds") as string[],
-  };
-  const startAt = String(form.get("startAt") ?? "").trim();
-  const endAt = String(form.get("endAt") ?? "").trim();
-  const publishedAt = String(form.get("publishedAt") ?? "").trim();
-  if (startAt) config.startAt = startAt;
-  if (endAt) config.endAt = endAt;
-  if (publishedAt) config.publishedAt = publishedAt;
-
+    shortDescription: form.get("shortDescription") || "",
+    description: form.get("description") || "",
+    coverImage: form.get("coverImage") || null,
+    status: form.get("status") || "DRAFT",
+    productIds: form.getAll("productIds"),
+    startAt: form.get("startAt") || null,
+    endAt: form.get("endAt") || null,
+    publishedAt: form.get("publishedAt") || null,
+    sortOrder: Number(form.get("sortOrder") ?? 0),
+  });
+  if (!parsed.success) return jsonError("Invalid drop", 400, parsed.error.flatten());
+  const key = `drop-${slug}`;
   const section = await updateSectionItem(
     id,
     {
       key,
-      title: String(form.get("name") ?? "").trim(),
-      enabled: String(form.get("status") ?? "DRAFT") === "LIVE",
-      sortOrder: Number(form.get("sortOrder") ?? 0),
-      config,
+      title: parsed.data.name,
+      enabled: parsed.data.status === "LIVE",
+      sortOrder: parsed.data.sortOrder,
+      config: {
+        slug: parsed.data.slug,
+        status: parsed.data.status,
+        productIds: parsed.data.productIds,
+        shortDescription: parsed.data.shortDescription,
+        description: parsed.data.description,
+        coverImage: parsed.data.coverImage,
+        startAt: parsed.data.startAt,
+        endAt: parsed.data.endAt,
+        publishedAt: parsed.data.publishedAt,
+      },
     },
     session!.id,
   );
+  await writeAudit({
+    actorId: session!.id,
+    action: "drop.update",
+    entity: "BannerSection",
+    entityId: id,
+  });
   return Response.redirect(new URL(`/admin/drops/${id}`, getBrand().siteUrl ?? "/admin/drops"), 303);
 }
 

@@ -3,6 +3,8 @@ import { quoteCart } from "@/lib/services/cart";
 import { formatMoney } from "@/lib/money";
 import { getBrand } from "@/config/brand";
 import { EmptyState } from "@/components/ui/empty-state";
+import { CartItemUpdateForm, CartItemRemoveForm } from "@/components/cart/cart-item-form";
+import { CouponForm } from "@/components/cart/coupon-form";
 
 export const dynamic = "force-dynamic";
 
@@ -44,22 +46,8 @@ export default async function CartPage() {
                   <p className="mt-1 text-sm">
                     {formatMoney(price, brand.currency, brand.currencySymbol)}
                   </p>
-                  <form action="/api/cart/update" method="post" className="mt-2 flex items-center gap-2">
-                    <input type="hidden" name="itemId" value={item.id} />
-                    <input
-                      name="quantity"
-                      type="number"
-                      min={1}
-                      max={20}
-                      defaultValue={item.quantity}
-                      className="h-9 w-16 rounded-lg border border-line px-2 text-sm"
-                    />
-                    <button className="text-sm underline">Update</button>
-                  </form>
-                  <form action="/api/cart/remove" method="post">
-                    <input type="hidden" name="itemId" value={item.id} />
-                    <button className="mt-1 text-xs text-muted underline">Remove</button>
-                  </form>
+                  <CartItemUpdateForm itemId={item.id} quantity={item.quantity} />
+                  <CartItemRemoveForm itemId={item.id} />
                 </div>
               </li>
             );
@@ -86,15 +74,7 @@ export default async function CartPage() {
             </div>
           </dl>
           <p className="mt-2 text-xs text-muted">Prices include tax. Delivery is ₹80 on every order.</p>
-          <form action="/api/cart/coupon" method="post" className="mt-4 space-y-2">
-            <input
-              name="code"
-              defaultValue={cart.couponCode ?? ""}
-              placeholder="Coupon code"
-              className="h-11 w-full rounded-xl border border-line px-3 text-sm uppercase"
-            />
-            <button className="h-10 w-full rounded-full border border-line text-sm">Apply coupon</button>
-          </form>
+          <CouponForm defaultValue={cart.couponCode ?? ""} />
           {couponMessage ? <p className="mt-2 text-xs text-[#9b2c2c]">{couponMessage}</p> : null}
           {cart.couponCode && !couponMessage ? (
             <p className="mt-2 text-xs text-[#2f6b4f]">Coupon {cart.couponCode} applied.</p>

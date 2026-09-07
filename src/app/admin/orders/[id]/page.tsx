@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +52,7 @@ export default async function AdminOrderDetail({
         </select>
         <input name="trackingNumber" defaultValue={order.trackingNumber ?? ""} placeholder="Tracking number" className="h-11 rounded-xl border border-line px-3 text-sm" />
         <input name="note" placeholder="Timeline note" className="h-11 rounded-xl border border-line px-3 text-sm" />
-        <button className="h-11 rounded-full bg-primary text-sm text-[#f6f1ea]">Update order</button>
+        <SubmitButton className="h-11 rounded-full bg-primary text-sm text-[#f6f1ea]">Update order</SubmitButton>
       </form>
       <ul className="mt-6 space-y-2 text-sm">
         {order.items.map((item) => (

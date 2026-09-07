@@ -1,29 +1,44 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatMoney, marginPercent } from "@/lib/money";
+import { AdminFilters } from "@/components/admin/filters-form";
+import { Pagination } from "@/components/admin/pagination";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
-  const { q } = await searchParams;
-  const products = await prisma.product.findMany({
-    where: q
-      ? {
-          OR: [{ name: { contains: q } }, { sku: { contains: q } }],
-        }
-      : undefined,
-    include: {
-      category: true,
-      supplier: true,
-      images: { orderBy: { position: "asc" }, take: 1 },
-    },
-    orderBy: { updatedAt: "desc" },
-    take: 100,
-  });
+  const { q, status, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam ?? "1"));
+  const pageSize = 20;
+  const where: Record<string, unknown> = {};
+  if (q) {
+    where.OR = [
+      { name: { contains: q } },
+      { sku: { contains: q } },
+    ];
+  }
+  if (status && ["DRAFT", "ACTIVE", "ARCHIVED", "OUT_OF_STOCK"].includes(status)) {
+    where.status = status;
+  }
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: {
+        category: true,
+        supplier: true,
+        images: { orderBy: { position: "asc" }, take: 1 },
+      },
+      orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.product.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -35,9 +50,7 @@ export default async function AdminProductsPage({
       <p className="mt-2 text-sm text-muted">
         Click a product name to edit. Photo slots (main + 4 extra) are at the top of the edit page.
       </p>
-      <form className="mt-4">
-        <input name="q" defaultValue={q} placeholder="Search name or SKU" className="h-11 w-full max-w-md rounded-xl border border-line bg-card px-3 text-sm" />
-      </form>
+      <AdminFilters defaultQ={q ?? ""} defaultStatus={status ?? ""} />
       <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-card">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b border-line text-xs uppercase text-muted">
@@ -85,6 +98,7 @@ export default async function AdminProductsPage({
           </tbody>
         </table>
       </div>
+      <Pagination page={page} totalPages={totalPages} baseUrl="/admin/products" searchParams={{ q, status }} />
     </div>
   );
 }

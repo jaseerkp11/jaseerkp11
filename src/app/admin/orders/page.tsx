@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AdminFilters } from "@/components/admin/filters-form";
+import { Pagination } from "@/components/admin/pagination";
 import type { OrderStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -9,15 +11,31 @@ export const dynamic = "force-dynamic";
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
-  const { status } = await searchParams;
-  const where = status ? { status: status as OrderStatus } : undefined;
-  const orders = await prisma.order.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    take: 100,
-  });
+  const { q, status, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam ?? "1"));
+  const pageSize = 20;
+  const where: Record<string, unknown> = {};
+  if (status && ["PENDING", "CONFIRMED", "PROCESSING", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED", "FAILED", "RETURN_REQUESTED", "RETURNED", "REFUNDED", "PARTIALLY_REFUNDED"].includes(status)) {
+    where.status = status as OrderStatus;
+  }
+  if (q) {
+    where.OR = [
+      { orderNumber: { contains: q } },
+      { email: { contains: q } },
+    ];
+  }
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.order.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
   return (
     <div>
       <h1 className="font-display text-3xl">Orders</h1>
@@ -26,12 +44,13 @@ export default async function AdminOrdersPage({
           <Link
             key={s || "all"}
             href={s ? `/admin/orders?status=${s}` : "/admin/orders"}
-            className="rounded-full border border-line bg-card px-3 py-1"
+            className={`rounded-full border px-3 py-1 ${status === s || (!s && !status) ? "border-primary bg-primary text-[#f6f1ea]" : "border-line bg-card"}`}
           >
             {s || "All"}
           </Link>
         ))}
       </div>
+      <AdminFilters defaultQ={q ?? ""} />
       {orders.length === 0 ? (
         <div className="mt-8">
           <EmptyState title="No orders" description="Orders appear after a real checkout." />
@@ -50,6 +69,7 @@ export default async function AdminOrdersPage({
           ))}
         </ul>
       )}
+      <Pagination page={page} totalPages={totalPages} baseUrl="/admin/orders" searchParams={{ q, status }} />
     </div>
   );
 }
