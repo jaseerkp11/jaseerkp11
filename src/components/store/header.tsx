@@ -173,7 +173,7 @@ export function Header({
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <nav className="flex flex-1 flex-col gap-1 text-base text-[#161513]">
+              <nav className="flex flex-1 flex-col gap-1 overflow-y-auto text-base text-[#161513]">
                 {categories.map((c) => (
                   <Link
                     key={c.slug}
