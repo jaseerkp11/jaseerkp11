@@ -99,17 +99,29 @@ export function Header({
                 ) : visibleHits.length === 0 ? (
                   <p className="px-4 py-3 text-sm text-muted">No suggestions</p>
                 ) : (
-                  visibleHits.map((hit) => (
-                    <Link
-                      key={hit.id}
-                      href={hit.href}
-                      className="block px-4 py-2.5 text-sm hover:bg-[#f3ece3]"
-                      onClick={() => setSearchOpen(false)}
-                    >
-                      <span className="block">{hit.title}</span>
-                      <span className="text-xs text-muted">{hit.subtitle}</span>
-                    </Link>
-                  ))
+                  <div className="max-h-80 overflow-y-auto">
+                    {visibleHits.map((hit) => (
+                      <Link
+                        key={hit.id}
+                        href={hit.href}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-[#f3ece3]"
+                        onClick={() => setSearchOpen(false)}
+                      >
+                        {hit.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={hit.imageUrl} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover bg-[#ece6dc]" />
+                        ) : (
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ece6dc] text-[10px] text-muted">
+                            {hit.type === "category" ? "Cat" : "Prd"}
+                          </span>
+                        )}
+                        <span className="min-w-0">
+                          <span className="block truncate">{hit.title}</span>
+                          <span className="text-xs text-muted">{hit.subtitle}</span>
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
                 )}
                 <Link
                   href={`/search?q=${encodeURIComponent(query)}`}

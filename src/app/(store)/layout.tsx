@@ -19,7 +19,6 @@ export default async function StoreLayout({
   const brand = getBrand();
   let categories: Array<{ name: string; slug: string }> = [];
   let cartCount = 0;
-  let announcement: string | null = null;
   let dbOk = true;
   try {
     categories = await prisma.category.findMany({
@@ -32,10 +31,6 @@ export default async function StoreLayout({
     cartCount = cart
       ? cart.items.filter((i) => !i.savedForLater).reduce((s, i) => s + i.quantity, 0)
       : 0;
-    const setting = await prisma.siteSetting.findUnique({
-      where: { id: "announcement" },
-    });
-    announcement = setting?.value ?? null;
     await ensureBusinessPages();
   } catch {
     dbOk = false;
@@ -47,11 +42,6 @@ export default async function StoreLayout({
 
   return (
     <>
-      {announcement ? (
-        <div className="bg-primary px-4 py-2 text-center text-xs text-[#f6f1ea] sm:text-sm">
-          {announcement}
-        </div>
-      ) : null}
       <Header categories={categories} cartCount={cartCount} brandName={brand.brandName} />
       <main className="flex-1">{children}</main>
       <Footer categories={categories} />

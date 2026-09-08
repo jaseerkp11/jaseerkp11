@@ -7,6 +7,7 @@ export type SearchHit = {
   title: string;
   href: string;
   subtitle?: string;
+  imageUrl?: string;
 };
 
 export interface SearchProvider {
@@ -29,7 +30,7 @@ export class DatabaseSearchProvider implements SearchProvider {
           ],
         },
         take: 6,
-        select: { id: true, name: true, slug: true, brand: true },
+        select: { id: true, name: true, slug: true, brand: true, images: { orderBy: { position: "asc" }, take: 1 } },
       }),
       prisma.category.findMany({
         where: { name: { contains: q }, status: "ACTIVE" },
@@ -51,6 +52,7 @@ export class DatabaseSearchProvider implements SearchProvider {
         title: p.name,
         href: `/products/${p.slug}`,
         subtitle: p.brand,
+        imageUrl: p.images[0]?.url ?? undefined,
       })),
     ];
   }
