@@ -62,8 +62,12 @@ export default async function HomePage() {
       />
 
       {show("hero") && hero ? (
-        <section className="relative overflow-hidden bg-[#1f3d34]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_#c4a57422,_transparent_50%),radial-gradient(circle_at_bottom_left,_#f6f1ea11,_transparent_50%)]" />
+        <section className="relative overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+          />
+          <div className="absolute inset-0 bg-[#161513]/60" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
             <div>
               <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea]">
