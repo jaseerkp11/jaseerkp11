@@ -62,27 +62,28 @@ export default async function HomePage() {
       />
 
       {show("hero") && hero ? (
-        <section className="bg-gradient-to-b from-[#f6f1ea] to-[#efe8de]">
-          <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
+        <section className="relative overflow-hidden bg-[#1f3d34]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_#c4a57422,_transparent_50%),radial-gradient(circle_at_bottom_left,_#f6f1ea11,_transparent_50%)]" />
+          <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
             <div>
-              <h1 className="mt-6 font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#161513]">
-                {hero.title ?? brand.tagline}
+              <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea]">
+                {brand.tagline}
               </h1>
               {hero.subtitle ? (
-                <p className="mt-6 max-w-lg text-base text-[#5c564e]">
+                <p className="mt-6 max-w-lg text-base text-[#b7b0a6]">
                   {hero.subtitle}
                 </p>
               ) : null}
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href={hero.href ?? "/products"}
-                  className="inline-flex h-12 items-center rounded-full bg-[#1f3d34] px-8 text-sm font-medium text-[#f6f1ea] transition hover:bg-[#16302a]"
+                  className="inline-flex h-12 items-center rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition hover:bg-[#b49a6a]"
                 >
                   Shop the catalogue
                 </Link>
                 <Link
                   href="/category/new-arrivals"
-                  className="inline-flex h-12 items-center rounded-full border border-[#d5cfc6] bg-white px-8 text-sm transition hover:border-[#c4b8a8]"
+                  className="inline-flex h-12 items-center rounded-full border border-[#f6f1ea33] bg-transparent px-8 text-sm text-[#f6f1ea] transition hover:bg-[#f6f1ea15]"
                 >
                   New arrivals
                 </Link>
