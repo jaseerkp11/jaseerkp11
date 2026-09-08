@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { AdminFilters } from "@/components/admin/filters-form";
 import { Pagination } from "@/components/admin/pagination";
 
 export const dynamic = "force-dynamic";
@@ -32,10 +33,7 @@ export default async function CustomersPage({
   return (
     <div>
       <h1 className="font-display text-3xl">Customers</h1>
-      <form method="get" className="mt-4 flex items-center gap-2">
-        <input name="q" defaultValue={q ?? ""} placeholder="Search customers..." className="h-11 w-full max-w-md rounded-xl border border-line bg-card px-3 text-sm" />
-        <button type="submit" className="h-11 rounded-full border border-line px-4 text-sm">Search</button>
-      </form>
+      <AdminFilters defaultQ={q ?? ""} />
       {customers.length === 0 ? (
         <p className="mt-4 text-sm text-muted">No customer accounts yet.</p>
       ) : (

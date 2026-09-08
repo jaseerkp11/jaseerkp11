@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { availableStock } from "@/lib/services/inventory";
 import { InventoryForm } from "@/components/admin/inventory-form";
+import { AdminFilters } from "@/components/admin/filters-form";
 import { Pagination } from "@/components/admin/pagination";
 
 export const dynamic = "force-dynamic";
@@ -37,10 +38,7 @@ export default async function InventoryPage({
       <p className="mt-1 text-sm text-muted">Stock changes write a ledger row. Do not overwrite silently.</p>
       <InventoryForm products={products} />
       <div className="mt-6">
-        <form method="get" className="flex items-center gap-2">
-          <input name="q" defaultValue={q ?? ""} placeholder="Search products..." className="h-11 w-full max-w-md rounded-xl border border-line bg-card px-3 text-sm" />
-          <button type="submit" className="h-11 rounded-full border border-line px-4 text-sm">Search</button>
-        </form>
+        <AdminFilters defaultQ={q ?? ""} />
       </div>
       <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-card">
         <table className="w-full min-w-[640px] text-left text-sm">

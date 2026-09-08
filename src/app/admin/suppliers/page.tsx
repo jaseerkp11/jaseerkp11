@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { SupplierForm } from "@/components/admin/supplier-form";
+import { AdminFilters } from "@/components/admin/filters-form";
 import { Pagination } from "@/components/admin/pagination";
 
 export const dynamic = "force-dynamic";
@@ -35,10 +36,7 @@ export default async function SuppliersPage({
       <h1 className="font-display text-3xl">Suppliers</h1>
       <SupplierForm />
       <div className="mt-6">
-        <form method="get" className="flex items-center gap-2">
-          <input name="q" defaultValue={q ?? ""} placeholder="Search suppliers..." className="h-11 w-full max-w-md rounded-xl border border-line bg-card px-3 text-sm" />
-          <button type="submit" className="h-11 rounded-full border border-line px-4 text-sm">Search</button>
-        </form>
+        <AdminFilters defaultQ={q ?? ""} />
       </div>
       <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
         {suppliers.map((s) => (
