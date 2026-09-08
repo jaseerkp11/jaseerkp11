@@ -158,7 +158,7 @@ export function Header({
       {open ? (
         <div className="fixed inset-0 z-50 bg-black/40 lg:hidden" onClick={() => setOpen(false)}>
           <div
-            className="h-full w-[min(100%,20rem)] bg-white p-5 shadow-2xl"
+            className="h-full w-[min(100%,20rem)] bg-white p-5 pl-0 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 flex items-center justify-between">
