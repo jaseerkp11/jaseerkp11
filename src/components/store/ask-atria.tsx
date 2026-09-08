@@ -90,20 +90,22 @@ export function AskAtria() {
             submit(query);
           }}
         >
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="✨ Ask Atria anything..."
-              className="h-12 flex-1 rounded-full border border-line bg-background px-4 text-sm"
+              className="h-12 w-full rounded-full border border-line bg-background px-4 text-sm sm:flex-1"
               aria-label="Ask Atria"
             />
-            <Button type="submit" disabled={loading} className="h-12 px-6">
-              {loading ? "Searching..." : "Ask"}
-            </Button>
-            <Button type="button" variant="ghost" onClick={surprise} disabled={loading} className="h-12 px-6">
-              ✨ Surprise Me
-            </Button>
+            <div className="flex gap-2">
+              <Button type="submit" disabled={loading} className="h-12 flex-1 px-6 sm:flex-none">
+                {loading ? "Searching..." : "Ask"}
+              </Button>
+              <Button type="button" variant="ghost" onClick={surprise} disabled={loading} className="h-12 flex-1 px-6 sm:flex-none">
+                ✨ Surprise Me
+              </Button>
+            </div>
           </div>
         </form>
         <div className="mt-3 flex flex-wrap gap-2">

@@ -212,7 +212,7 @@ export function Header({
                 >
                   All products
                 </Link>
-                <div className="mt-auto space-y-1 border-t border-line pt-4">
+                <div className="space-y-1 border-t border-line pt-4">
                   <Link
                     href="/account"
                     onClick={() => setOpen(false)}
