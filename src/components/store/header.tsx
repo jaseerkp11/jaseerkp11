@@ -158,42 +158,44 @@ export function Header({
       {open ? (
         <div className="fixed inset-0 z-50 bg-black/40 lg:hidden" onClick={() => setOpen(false)}>
           <div
-            className="h-full w-[min(100%,20rem)] bg-white p-5 pl-0 shadow-2xl"
+            className="h-full w-[min(100%,20rem)] bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-6 flex items-center justify-between">
-              <span className="font-display text-xl">{brandName}</span>
-              <button aria-label="Close menu" onClick={() => setOpen(false)}>
-                <X />
-              </button>
-            </div>
-            <nav className="flex flex-col gap-3 text-base text-[#161513] bg-white">
-              {categories.map((c) => (
-                <Link key={c.slug} href={`/category/${c.slug}`} onClick={() => setOpen(false)} className="font-medium">
-                  {c.name}
-                </Link>
-              ))}
-              <Link href="/drops" onClick={() => setOpen(false)} className="font-medium">
-                Drops
-              </Link>
-              <Link href="/finds" onClick={() => setOpen(false)} className="font-medium">
-                Finds
-              </Link>
-              <Link href="/collections" onClick={() => setOpen(false)} className="font-medium">
-                Collections
-              </Link>
-              <Link href="/products" onClick={() => setOpen(false)} className="font-medium">
-                All products
-              </Link>
-              <div className="mt-4 border-t border-line pt-4">
-                <Link href="/account" onClick={() => setOpen(false)} className="font-medium">
-                  Account
-                </Link>
+            <div className="p-5">
+              <div className="mb-6 flex items-center justify-between">
+                <span className="font-display text-xl">{brandName}</span>
+                <button aria-label="Close menu" onClick={() => setOpen(false)}>
+                  <X />
+                </button>
               </div>
-              <Link href="/account/wishlist" onClick={() => setOpen(false)} className="font-medium">
-                Wishlist
-              </Link>
-            </nav>
+              <nav className="flex flex-col gap-4 text-base text-[#161513]">
+                {categories.map((c) => (
+                  <Link key={c.slug} href={`/category/${c.slug}`} onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                    {c.name}
+                  </Link>
+                ))}
+                <Link href="/drops" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                  Drops
+                </Link>
+                <Link href="/finds" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                  Finds
+                </Link>
+                <Link href="/collections" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                  Collections
+                </Link>
+                <Link href="/products" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                  All products
+                </Link>
+                <div className="mt-2 border-t border-line pt-4">
+                  <Link href="/account" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                    Account
+                  </Link>
+                </div>
+                <Link href="/account/wishlist" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                  Wishlist
+                </Link>
+              </nav>
+            </div>
           </div>
         </div>
       ) : null}
