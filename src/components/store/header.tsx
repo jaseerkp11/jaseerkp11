@@ -156,44 +156,78 @@ export function Header({
         </div>
       </div>
       {open ? (
-        <div className="fixed inset-0 z-50 bg-black/40 lg:hidden" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-50 lg:hidden" onClick={() => setOpen(false)}>
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
           <div
-            className="h-full w-[min(100%,20rem)] bg-white shadow-2xl"
+            className="relative h-screen w-[min(100%,20rem)] bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-5">
-              <div className="mb-6 flex items-center justify-between">
+            <div className="flex h-full flex-col p-6">
+              <div className="mb-8 flex items-center justify-between">
                 <span className="font-display text-xl">{brandName}</span>
-                <button aria-label="Close menu" onClick={() => setOpen(false)}>
-                  <X />
+                <button
+                  aria-label="Close menu"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-black/5"
+                >
+                  <X className="h-5 w-5" />
                 </button>
               </div>
-              <nav className="flex flex-col gap-4 text-base text-[#161513]">
+              <nav className="flex flex-1 flex-col gap-1 text-base text-[#161513]">
                 {categories.map((c) => (
-                  <Link key={c.slug} href={`/category/${c.slug}`} onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                  <Link
+                    key={c.slug}
+                    href={`/category/${c.slug}`}
+                    onClick={() => setOpen(false)}
+                    className="rounded-xl px-3 py-2.5 font-medium transition hover:bg-black/5"
+                  >
                     {c.name}
                   </Link>
                 ))}
-                <Link href="/drops" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                <Link
+                  href="/drops"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-2.5 font-medium transition hover:bg-black/5"
+                >
                   Drops
                 </Link>
-                <Link href="/finds" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                <Link
+                  href="/finds"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-2.5 font-medium transition hover:bg-black/5"
+                >
                   Finds
                 </Link>
-                <Link href="/collections" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                <Link
+                  href="/collections"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-2.5 font-medium transition hover:bg-black/5"
+                >
                   Collections
                 </Link>
-                <Link href="/products" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                <Link
+                  href="/products"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-2.5 font-medium transition hover:bg-black/5"
+                >
                   All products
                 </Link>
-                <div className="mt-2 border-t border-line pt-4">
-                  <Link href="/account" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
+                <div className="mt-auto space-y-1 border-t border-line pt-4">
+                  <Link
+                    href="/account"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-xl px-3 py-2.5 font-medium transition hover:bg-black/5"
+                  >
                     Account
                   </Link>
+                  <Link
+                    href="/account/wishlist"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-xl px-3 py-2.5 font-medium transition hover:bg-black/5"
+                  >
+                    Wishlist
+                  </Link>
                 </div>
-                <Link href="/account/wishlist" onClick={() => setOpen(false)} className="font-medium transition hover:text-primary">
-                  Wishlist
-                </Link>
               </nav>
             </div>
           </div>
