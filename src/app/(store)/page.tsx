@@ -65,13 +65,14 @@ export default async function HomePage() {
         <section className="bg-gradient-to-b from-[#f6f1ea] to-[#efe8de]">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
             <div>
-              <p className="text-sm uppercase tracking-[0.25em] text-[#8a7e6b]">India · configurable brand</p>
               <h1 className="mt-6 font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#161513]">
-                {hero.title ?? "Objects for rooms you actually live in"}
+                {hero.title ?? brand.tagline}
               </h1>
-              <p className="mt-6 max-w-lg text-base text-[#5c564e]">
-                {hero.subtitle ?? brand.tagline}
-              </p>
+              {hero.subtitle ? (
+                <p className="mt-6 max-w-lg text-base text-[#5c564e]">
+                  {hero.subtitle}
+                </p>
+              ) : null}
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href={hero.href ?? "/products"}

@@ -286,8 +286,8 @@ async function main() {
   await prisma.banner.createMany({
     data: [
       {
-        title: "New linen, cut for heat",
-        subtitle: "Overshirts and tees for the long afternoon.",
+        title: "Thoughtful everyday goods for modern Indian homes",
+        subtitle: "",
         imageUrl: "/images/products/linen-overshirt.svg",
         href: "/category/fashion",
         placement: "hero",
