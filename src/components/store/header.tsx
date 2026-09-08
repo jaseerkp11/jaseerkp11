@@ -167,7 +167,7 @@ export function Header({
                 <X />
               </button>
             </div>
-            <nav className="flex flex-col gap-3 text-base text-[#161513]">
+            <nav className="flex flex-col gap-3 text-base text-[#161513] bg-white">
               {categories.map((c) => (
                 <Link key={c.slug} href={`/category/${c.slug}`} onClick={() => setOpen(false)} className="font-medium">
                   {c.name}
