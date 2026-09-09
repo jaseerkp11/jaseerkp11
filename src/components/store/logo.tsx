@@ -13,8 +13,9 @@ export function Logo({ className = "" }: { className?: string }) {
   }
 
   return (
-    <span className={`font-display text-2xl tracking-[0.08em] normal-case ${className}`}>
-      <span className="text-[#c4a574]">The</span> <span className="text-[#161513]">Rareify</span>
+    <span className={`inline-flex items-baseline font-display text-[1.65rem] tracking-[0.06em] normal-case whitespace-nowrap ${className}`}>
+      <span className="text-[#c4a574]">The</span>
+      <span className="text-[#161513]">Rareify</span>
     </span>
   );
 }
