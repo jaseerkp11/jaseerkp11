@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { getBrand } from "@/config/brand";
+import { Logo } from "@/components/store/logo";
 import type { SearchHit } from "@/lib/search/provider";
 
 type CategoryLink = { name: string; slug: string };
@@ -54,13 +55,8 @@ export function Header({
         >
           <Menu className="h-5 w-5" />
         </button>
-        <Link href="/" className="font-display text-2xl tracking-tight">
-          {brand.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={brand.logoUrl} alt={brandName} className="h-8" />
-          ) : (
-            brandName
-          )}
+        <Link href="/" className="font-display">
+          <Logo />
         </Link>
         <nav className="ml-6 hidden items-center gap-5 text-sm lg:flex">
           {categories.slice(0, 7).map((c) => (
@@ -176,7 +172,7 @@ export function Header({
           >
             <div className="flex h-full flex-col p-6">
               <div className="mb-8 flex items-center justify-between">
-                <span className="font-display text-xl">{brandName}</span>
+                <span className="font-display text-xl tracking-[0.2em] uppercase">{brandName}</span>
                 <button
                   aria-label="Close menu"
                   onClick={() => setOpen(false)}
