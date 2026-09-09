@@ -9,6 +9,7 @@ import { AskAtria } from "@/components/store/ask-atria";
 import { HeroCarousel } from "@/components/store/hero-carousel";
 import { getPublicDrops, getPublicFinds, parseSectionConfig } from "@/lib/services/atria-banners";
 import { NewsletterForm } from "@/components/store/newsletter-form";
+import { HeroAnimations } from "@/components/store/hero-animations";
 
 export const dynamic = "force-dynamic";
 
@@ -68,54 +69,56 @@ export default async function HomePage() {
             style={{ backgroundImage: "url('/images/hero-bg.png')" }}
           />
           <div className="absolute inset-0 bg-[#161513]/60" />
-          <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
-            <div className="animate-fade-in-up">
-              <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea]">
-                {brand.tagline}
-              </h1>
-              {hero.subtitle ? (
-                <p className="mt-6 max-w-lg text-base text-[#b7b0a6] animate-fade-in-up animation-delay-100">
-                  {hero.subtitle}
-                </p>
-              ) : null}
-              <div className="mt-8 flex flex-wrap gap-3 animate-fade-in-up animation-delay-200">
-                <Link
-                  href={hero.href ?? "/products"}
-                  className="inline-flex h-12 items-center rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition hover:bg-[#b49a6a]"
-                >
-                  Shop the catalogue
-                </Link>
-                <Link
-                  href="/category/new-arrivals"
-                  className="inline-flex h-12 items-center rounded-full border border-[#f6f1ea33] bg-transparent px-8 text-sm text-[#f6f1ea] transition hover:bg-[#f6f1ea15]"
-                >
-                  New arrivals
-                </Link>
+          <HeroAnimations>
+            <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
+              <div>
+                <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea] animate-fade-in-up">
+                  {brand.tagline}
+                </h1>
+                {hero.subtitle ? (
+                  <p className="mt-6 max-w-lg text-base text-[#b7b0a6] animate-fade-in-up animation-delay-100">
+                    {hero.subtitle}
+                  </p>
+                ) : null}
+                <div className="mt-8 flex flex-wrap gap-3 animate-fade-in-up animation-delay-200">
+                  <Link
+                    href={hero.href ?? "/products"}
+                    className="inline-flex h-12 items-center rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition hover:bg-[#b49a6a]"
+                  >
+                    Shop the catalogue
+                  </Link>
+                  <Link
+                    href="/category/new-arrivals"
+                    className="inline-flex h-12 items-center rounded-full border border-[#f6f1ea33] bg-transparent px-8 text-sm text-[#f6f1ea] transition hover:bg-[#f6f1ea15]"
+                  >
+                    New arrivals
+                  </Link>
+                </div>
+              </div>
+              <div className="animate-fade-in-up animation-delay-300">
+                <HeroCarousel
+                  slides={[
+                    {
+                      id: hero.id,
+                      name: hero.title,
+                      slug: hero.href.replace("/products/", "").replace("/", ""),
+                      sellingPaise: 0,
+                      compareAtPaise: null,
+                      images: hero.imageUrl ? [{ url: hero.imageUrl, alt: hero.title }] : [],
+                    },
+                    ...(trending.slice(0, 3).map((p) => ({
+                      id: p.id,
+                      name: p.name,
+                      slug: p.slug,
+                      sellingPaise: p.sellingPaise,
+                      compareAtPaise: p.compareAtPaise,
+                      images: p.images,
+                    })) ?? []),
+                  ]}
+                />
               </div>
             </div>
-            <div className="animate-fade-in-up animation-delay-300">
-              <HeroCarousel
-                slides={[
-                  {
-                    id: hero.id,
-                    name: hero.title,
-                    slug: hero.href.replace("/products/", "").replace("/", ""),
-                    sellingPaise: 0,
-                    compareAtPaise: null,
-                    images: hero.imageUrl ? [{ url: hero.imageUrl, alt: hero.title }] : [],
-                  },
-                  ...(trending.slice(0, 3).map((p) => ({
-                    id: p.id,
-                    name: p.name,
-                    slug: p.slug,
-                    sellingPaise: p.sellingPaise,
-                    compareAtPaise: p.compareAtPaise,
-                    images: p.images,
-                  })) ?? []),
-                ]}
-              />
-            </div>
-          </div>
+          </HeroAnimations>
         </section>
       ) : null}
 
