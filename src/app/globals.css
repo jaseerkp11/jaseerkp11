@@ -94,6 +94,11 @@ h3,
   100% { transform: scale(1.05) translate(0, 0); }
 }
 
+@keyframes expand-line {
+  0% { width: 0; opacity: 0; }
+  100% { width: 5rem; opacity: 1; }
+}
+
 .animate-zoom-slow {
   animation: pan-slow 22s ease-in-out infinite;
 }
@@ -101,6 +106,12 @@ h3,
 .animate-fade-in-up {
   opacity: 0;
   animation: fade-in-up 1s ease-out forwards;
+}
+
+.animate-expand-line {
+  width: 0;
+  opacity: 0;
+  animation: expand-line 0.8s ease-out forwards;
 }
 
 .animation-delay-100 {

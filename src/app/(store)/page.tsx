@@ -69,12 +69,14 @@ export default async function HomePage() {
             style={{ backgroundImage: "url('/images/hero-bg.png')" }}
           />
           <div className="absolute inset-0 bg-[#161513]/60" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#f6f1ea] to-transparent" />
           <HeroAnimations>
             <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
               <div>
-                <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea] animate-fade-in-up">
+                <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea] animate-fade-in-up" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}>
                   {brand.tagline}
                 </h1>
+                <div className="mt-6 h-px w-0 bg-[#c4a574] animate-expand-line" />
                 {hero.subtitle ? (
                   <p className="mt-6 max-w-lg text-base text-[#b7b0a6] animate-fade-in-up animation-delay-100">
                     {hero.subtitle}
@@ -83,15 +85,17 @@ export default async function HomePage() {
                 <div className="mt-8 flex flex-wrap gap-3 animate-fade-in-up animation-delay-200">
                   <Link
                     href={hero.href ?? "/products"}
-                    className="inline-flex h-12 items-center rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition hover:bg-[#b49a6a]"
+                    className="group relative inline-flex h-12 items-center rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition-all duration-300 hover:bg-[#b49a6a] hover:shadow-[0_8px_30px_rgba(196,165,116,0.35)] hover:-translate-y-0.5"
                   >
-                    Shop the catalogue
+                    <span className="relative z-10">Shop the catalogue</span>
+                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   </Link>
                   <Link
                     href="/category/new-arrivals"
-                    className="inline-flex h-12 items-center rounded-full border border-[#f6f1ea33] bg-transparent px-8 text-sm text-[#f6f1ea] transition hover:bg-[#f6f1ea15]"
+                    className="group relative inline-flex h-12 items-center rounded-full border border-[#f6f1ea33] bg-transparent px-8 text-sm text-[#f6f1ea] transition-all duration-300 hover:bg-[#f6f1ea15] hover:-translate-y-0.5"
                   >
-                    New arrivals
+                    <span className="relative z-10">New arrivals</span>
+                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   </Link>
                 </div>
               </div>
