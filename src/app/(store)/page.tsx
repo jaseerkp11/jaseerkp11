@@ -28,12 +28,6 @@ export default async function HomePage() {
     prisma.product.findMany({ where: { status: "ACTIVE", newArrival: true }, include: productCardInclude, take: 8 }),
     prisma.product.findMany({ where: { status: "ACTIVE", compareAtPaise: { not: null } }, include: productCardInclude, take: 8 }),
   ]);
-  const approvedReviews = await prisma.review.findMany({
-    where: { status: "APPROVED" },
-    include: { product: { select: { name: true, slug: true } } },
-    take: 4,
-    orderBy: { createdAt: "desc" },
-  });
   const drops = await getPublicDrops();
   const finds = await getPublicFinds();
   const sections = await prisma.homepageSection.findMany({ orderBy: { sortOrder: "asc" } });
@@ -354,29 +348,6 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-        </section>
-      ) : null}
-
-      {show("reviews") ? (
-        <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
-          <h2 className="font-display text-3xl text-[#161513]">From the catalogue</h2>
-          {approvedReviews.length === 0 ? (
-            <p className="mt-6 text-sm text-[#5c564e]">
-              Customer reviews appear here after they are approved. Seed data is labelled and not presented as campaign social proof.
-            </p>
-          ) : (
-            <div className="mt-8 grid gap-4 md:grid-cols-2">
-              {approvedReviews.map((review) => (
-                <blockquote key={review.id} className="rounded-2xl border border-[#e3ddd4] bg-white p-6 transition hover:shadow-sm">
-                  <p className="text-sm font-medium text-[#161513]">{review.title}</p>
-                  <p className="mt-3 text-sm text-[#5c564e]">{review.content}</p>
-                  <p className="mt-4 text-xs uppercase tracking-wide text-[#8a7e6b]">
-                    {review.verifiedPurchase ? "Verified purchase" : "Unverified"} · {review.product.name}
-                  </p>
-                </blockquote>
-              ))}
-            </div>
-          )}
         </section>
       ) : null}
 
