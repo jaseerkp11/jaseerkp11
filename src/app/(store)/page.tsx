@@ -72,15 +72,10 @@ export default async function HomePage() {
           <HeroAnimations>
             <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
               <div>
-                <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea] animate-fade-in-up" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}>
-                  {brand.tagline}
-                </h1>
-                <div className="mt-6 h-px w-0 bg-[#c4a574] animate-expand-line" />
-                {hero.subtitle ? (
-                  <p className="mt-6 max-w-lg text-base text-[#b7b0a6] animate-fade-in-up animation-delay-100">
-                    {hero.subtitle}
-                  </p>
-                ) : null}
+              <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea] animate-fade-in-up" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}>
+                {brand.tagline}
+              </h1>
+              <div className="mt-6 h-px w-0 bg-[#c4a574] animate-expand-line" />
                 <div className="mt-8 flex flex-wrap gap-3 animate-fade-in-up animation-delay-200">
                   <Link
                     href={hero.href ?? "/products"}
