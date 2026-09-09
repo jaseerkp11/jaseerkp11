@@ -12,7 +12,7 @@ export async function generateMetadata() {
   const brand = getBrand();
   return {
     title: `Drops · ${brand.brandName}`,
-    description: "Curated temporary drops from Atria.",
+    description: "Curated temporary drops from THERAREIFY.",
   };
 }
 
@@ -27,7 +27,7 @@ export default async function DropsPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Atria Drops",
+           name: "THERAREIFY Drops",
           url: publicUrl("/drops"),
         }}
       />

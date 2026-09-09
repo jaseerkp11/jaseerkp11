@@ -11,7 +11,7 @@ export async function generateMetadata() {
   const brand = getBrand();
   return {
     title: `Collections · ${brand.brandName}`,
-    description: "Curated product collections from Atria.",
+    description: "Curated product collections from THERAREIFY.",
   };
 }
 
@@ -24,7 +24,7 @@ export default async function CollectionsPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Atria Collections",
+           name: "THERAREIFY Collections",
           url: publicUrl("/collections"),
         }}
       />
@@ -35,7 +35,7 @@ export default async function CollectionsPage() {
 
       {collections.length === 0 ? (
         <EmptyState
-          title="Atria is still discovering."
+            title="THERAREIFY is still discovering."
           description="Check back soon for curated collections."
         />
       ) : (

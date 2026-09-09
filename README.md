@@ -1,6 +1,6 @@
 # Commerce platform
 
-Configurable Indian ecommerce + resale storefront with an admin console. The default display name is **Atria** and is driven by environment variables so the brand can change without a rewrite.
+Configurable Indian ecommerce + resale storefront with an admin console. The default display name is **THERAREIFY** and is driven by environment variables so the brand can change without a rewrite.
 
 This repository started as an empty GitHub profile README. There was no existing Next.js app to preserve. The live URL `novara-storefront.vercel.app` returned 404 at audit time.
 

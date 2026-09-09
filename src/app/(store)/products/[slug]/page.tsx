@@ -14,7 +14,7 @@ import { PincodeChecker } from "@/components/store/pincode-checker";
 import { ProductGallery } from "@/components/store/product-gallery";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { splitProductImages } from "@/lib/services/product-image-slots";
-import { whyAtriaPicked, getPairsWellWith } from "@/lib/services/atria-discovery";
+import { whyTherareifyPicked, getPairsWellWith } from "@/lib/services/therareify-discovery";
 import { getRecommendationsForProduct } from "@/lib/services/recommendations";
 import type { Metadata } from "next";
 
@@ -86,7 +86,7 @@ export default async function ProductPage({
     product.compareAtPaise && product.compareAtPaise > product.sellingPaise
       ? product.compareAtPaise - product.sellingPaise
       : 0;
-  const discoveryReasons = whyAtriaPicked(product);
+  const discoveryReasons = whyTherareifyPicked(product);
   const pairs = await getPairsWellWith(product.id).catch(() => []);
   const recommendations = await getRecommendationsForProduct(product.id).catch(() => []);
 
@@ -221,7 +221,7 @@ export default async function ProductPage({
       ) : null}
       {discoveryReasons.length > 0 ? (
         <section className="mt-12 rounded-2xl border border-line bg-card p-5">
-          <h2 className="font-display text-2xl">Why Atria picked this</h2>
+          <h2 className="font-display text-2xl">Why THERAREIFY picked this</h2>
           <ul className="mt-3 list-disc pl-5 text-sm text-muted">
             {discoveryReasons.map((reason) => (
               <li key={reason}>{reason}</li>

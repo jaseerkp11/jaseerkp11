@@ -16,9 +16,9 @@ type ProductWithRelations = {
   images?: Array<{ url: string; alt: string }>;
 };
 
-export function whyAtriaPicked(product: ProductWithRelations, query?: string) {
+export function whyTherareifyPicked(product: ProductWithRelations, query?: string) {
   const reasons: string[] = [];
-  if (product.featured) reasons.push("Featured by Atria");
+  if (product.featured) reasons.push("Featured by THERAREIFY");
   if (product.trending) reasons.push("Trending now");
   if (product.bestSeller) reasons.push("Best seller");
   if (product.newArrival) reasons.push("New arrival");

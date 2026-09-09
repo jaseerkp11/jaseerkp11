@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { trackEvent } from "@/lib/analytics/track";
-import { whyAtriaPicked } from "./atria-discovery";
+import { whyTherareifyPicked } from "./therareify-discovery";
 
 type IntentHint = {
   intent: "gift" | "travel" | "desk" | "study" | "room" | "kitchen" | "fashion" | "beauty" | "electronics" | "general";
@@ -142,7 +142,7 @@ export async function askAtria(input: {
   return {
     products: ranked.map((r) => ({
       ...r.product,
-      reasons: whyAtriaPicked(r.product, q),
+      reasons: whyTherareifyPicked(r.product, q),
       score: r.score,
     })),
     message,

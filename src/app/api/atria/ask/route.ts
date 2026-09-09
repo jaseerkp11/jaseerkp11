@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { askAtria, detectIntent, detectBudget } from "@/lib/services/atria";
+import { askAtria, detectIntent, detectBudget } from "@/lib/services/therareify";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     });
     return Response.json(result);
   } catch {
-    return Response.json({ products: [], message: "Atria is taking a quick break. Try again shortly." }, { status: 500 });
+    return Response.json({ products: [], message: "THERAREIFY is taking a quick break. Try again shortly." }, { status: 500 });
   }
 }
 
@@ -33,6 +33,6 @@ export async function GET(request: NextRequest) {
     });
     return Response.json(result);
   } catch {
-    return Response.json({ products: [], message: "Atria is taking a quick break. Try again shortly." }, { status: 500 });
+    return Response.json({ products: [], message: "THERAREIFY is taking a quick break. Try again shortly." }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { jsonError } from "@/lib/validation";
-import { surpriseMe } from "@/lib/services/atria";
+import { surpriseMe } from "@/lib/services/therareify";
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,6 +15,6 @@ export async function GET(request: NextRequest) {
     if (!product) return jsonError("No products available right now.", 404);
     return Response.json({ product });
   } catch {
-    return jsonError("Atria is taking a quick break. Try again shortly.", 500);
+    return jsonError("THERAREIFY is taking a quick break. Try again shortly.", 500);
   }
 }
