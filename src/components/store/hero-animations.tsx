@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 export function HeroAnimations({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const el = ref.current;
@@ -13,9 +13,11 @@ export function HeroAnimations({ children }: { children: React.ReactNode }) {
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
+        } else {
+          setVisible(false);
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0, rootMargin: "0px 0px -5% 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
