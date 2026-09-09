@@ -64,21 +64,21 @@ export default async function HomePage() {
       {show("hero") && hero ? (
         <section className="relative overflow-hidden">
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center animate-zoom-slow"
             style={{ backgroundImage: "url('/images/hero-bg.png')" }}
           />
           <div className="absolute inset-0 bg-[#161513]/60" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
-            <div>
+            <div className="animate-fade-in-up">
               <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea]">
                 {brand.tagline}
               </h1>
               {hero.subtitle ? (
-                <p className="mt-6 max-w-lg text-base text-[#b7b0a6]">
+                <p className="mt-6 max-w-lg text-base text-[#b7b0a6] animate-fade-in-up animation-delay-100">
                   {hero.subtitle}
                 </p>
               ) : null}
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-wrap gap-3 animate-fade-in-up animation-delay-200">
                 <Link
                   href={hero.href ?? "/products"}
                   className="inline-flex h-12 items-center rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition hover:bg-[#b49a6a]"
@@ -93,7 +93,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-            <div>
+            <div className="animate-fade-in-up animation-delay-300">
               <HeroCarousel
                 slides={[
                   {

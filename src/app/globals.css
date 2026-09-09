@@ -77,3 +77,34 @@ h3,
     background: #fff;
   }
 }
+
+@keyframes zoom-slow {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(18px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-zoom-slow {
+  animation: zoom-slow 18s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fade-in-up 0.9s ease-out forwards;
+}
+
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.25s;
+}
+
+.animation-delay-300 {
+  animation-delay: 0.4s;
+}
