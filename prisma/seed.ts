@@ -2,8 +2,10 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { getBrand } from "@/config/brand";
 
 const prisma = new PrismaClient();
+const brand = getBrand();
 
 type Palette = { bg: string; a: string; b: string; c: string };
 
@@ -324,14 +326,214 @@ async function main() {
   }
 
   const policies = [
-    ["about", "About", "This store is a working catalogue for an Indian retail and resale business. Brand name, policies, and legal entity details are configurable and should be replaced before public launch."],
-    ["privacy", "Privacy Policy", "This is a placeholder privacy policy. Describe what personal data you collect, why, and how long you keep it. Do not treat this text as legal advice."],
-    ["terms", "Terms", "These are placeholder terms of use. Replace them with counsel-reviewed terms before taking paid orders at scale."],
-    ["shipping-policy", "Shipping Policy", "Placeholder shipping policy. Standard and express rates are calculated from pincode tables in the application. Carrier integrations are optional."],
-    ["return-policy", "Return Policy", "Placeholder return policy. State eligible windows, conditions, and how customers start a return."],
-    ["refund-policy", "Refund Policy", "Placeholder refund policy. Online gateway refunds require a configured payment provider. Cash-on-delivery refunds are handled operationally."],
-    ["cancellation-policy", "Cancellation Policy", "Placeholder cancellation policy. Orders can be cancelled before packing from the admin order screen when stock is released."],
-    ["contact", "Contact", "Use the contact form or email the support address configured for the brand. Response times depend on staffing."],
+    [
+      "about",
+      "About",
+      `We are an Indian retail and resale business focused on thoughtful everyday goods for modern Indian homes.
+
+Our curated catalogue spans home, kitchen, personal care, and lifestyle products. We work directly with makers and suppliers to keep quality high and prices fair.
+
+Business name: ${brand.brandName}
+Support: ${brand.supportEmail}
+GSTIN: (update in Admin → Settings)
+
+If you have a question, email us anytime. We read every message.`,
+    ],
+    [
+      "privacy",
+      "Privacy Policy",
+      `This Privacy Policy explains how we collect, use, and protect your personal information when you visit our store or place an order.
+
+Information we collect
+- Name, email, phone number, and delivery address when you register or checkout
+- Order history, payment status, and delivery tracking
+- Device and usage data collected automatically (IP address, browser type, pages visited)
+
+How we use your information
+- To process and deliver your orders
+- To send order confirmations and delivery updates
+- To respond to support requests
+- To improve our store and product selection
+
+Data sharing
+We do not sell your personal data. We share information only with courier partners, payment processors, and email service providers who need it to complete your order.
+
+Data retention
+We retain your account and order data for as long as your account is active and as required by Indian law (typically 7 years for financial records).
+
+Your rights
+You can request a copy of your data, correct inaccuracies, or delete your account by contacting ${brand.supportEmail}.
+
+Security
+We use SSL encryption and secure server-side storage. However, no method of transmission over the Internet is 100% secure.
+
+Changes to this policy
+We may update this policy from time to time. Continued use of the store after changes means you accept the updated policy.
+
+Disclaimer
+This policy is a template. Have it reviewed by legal counsel before launch.`,
+    ],
+    [
+      "terms",
+      "Terms & Conditions",
+      `By using this store, you agree to the following terms.
+
+Account
+- You are responsible for maintaining the confidentiality of your account
+- You must provide accurate and complete information when registering
+- One account per person
+
+Orders and payment
+- All prices are in Indian Rupees (INR) and include applicable taxes
+- We accept Cash on Delivery (COD) and online payments where configured
+- We reserve the right to cancel orders if stock is unavailable or pricing is incorrect
+
+Product information
+- We make every effort to show accurate colours, sizes, and descriptions
+- Slight variations may occur between the image and the actual product
+- Product availability is subject to stock
+
+Intellectual property
+- All content on this site belongs to ${brand.brandName} unless otherwise stated
+- You may not copy, reproduce, or distribute our content without permission
+
+Limitation of liability
+- We are not liable for indirect or consequential losses arising from use of our products or services
+- Our maximum liability for any claim is limited to the amount you paid for the product in question
+
+Governing law
+- These terms are governed by Indian law
+- Disputes shall be resolved in the courts of (update jurisdiction)
+
+Disclaimer
+These terms are a template. Have them reviewed by legal counsel before launch.`,
+    ],
+    [
+      "shipping-policy",
+      "Shipping Policy",
+      `We ship to most pincodes across India. Delivery timelines and charges are calculated at checkout based on your location.
+
+Delivery areas
+- Standard delivery: most urban and semi-urban pincodes
+- Remote areas: longer timelines, additional charges may apply
+- We do not ship internationally at this time
+
+Delivery timelines
+- Metro cities: 3–5 business days
+- Tier 2/3 cities: 5–8 business days
+- Remote areas: 7–12 business days
+
+Courier partners
+We use reputed national courier partners. Specific partner assignment depends on your pincode and order weight.
+
+Shipping charges
+- Free shipping on orders above ₹999 (metro pincodes)
+- Standard shipping: ₹49–₹99
+- Express shipping: ₹99–₹199 (where available)
+
+Order tracking
+You will receive a tracking number via email/SMS once your order is shipped. You can track it on our Track Order page.
+
+Failed deliveries
+If a COD order is not accepted after two delivery attempts, it will be returned to us and a restocking fee of ₹99 may be deducted from your refund.
+
+Contact
+For shipping queries, email ${brand.supportEmail}.`,
+    ],
+    [
+      "return-policy",
+      "Return Policy",
+      `We want you to be happy with your purchase. If you are not satisfied, you can return eligible items within 7 days of delivery.
+
+Eligible items
+- Products must be unused, unwashed, and in original packaging
+- Tags, labels, and seals must be intact
+- Innerwear, personal care items, and customised products cannot be returned
+
+How to initiate a return
+1. Go to My Account → Orders
+2. Select the order and click "Return"
+3. Provide a reason and upload photos if required
+4. We will review within 24–48 hours
+
+Return shipping
+- If the return is due to a defect or our error, we pay return shipping
+- If the return is due to change of mind, you pay return shipping
+
+Non-returnable items
+- Items marked as final sale or clearance
+- Products damaged after delivery due to misuse
+- Items without original packaging or tags
+
+Contact
+For return queries, email ${brand.supportEmail}.`,
+    ],
+    [
+      "refund-policy",
+      "Refund Policy",
+      `Refunds are processed after we receive and inspect the returned item.
+
+Refund timeline
+- We inspect returns within 24–48 hours of receipt
+- Approved refunds are processed within 5–7 business days
+- Refunds are issued to the original payment method
+
+Refund modes
+- Online payments: refunded to the original UPI/card/wallet
+- COD: refunded via bank transfer or store credit
+
+Partial refunds
+We may issue partial refunds if:
+- The item is returned with minor damage not covered under warranty
+- Only part of the order is returned
+- The product value has changed due to promotions
+
+Non-refundable items
+- Products that cannot be resold due to damage or missing parts
+- Items that fail the return eligibility criteria
+
+Late refunds
+If you have not received your refund within 7 business days, contact us at ${brand.supportEmail} with your order number.
+
+Disclaimer
+This policy is a template. Have it reviewed by legal counsel before launch.`,
+    ],
+    [
+      "cancellation-policy",
+      "Cancellation Policy",
+      `You can cancel your order before it is packed. Once packed, cancellation may not be possible.
+
+Customer-initiated cancellation
+- Cancel from My Account → Orders before the order status changes to "Packed"
+- Full refund is issued instantly
+- COD orders can be cancelled before dispatch
+
+Merchant-initiated cancellation
+We may cancel an order if:
+- The product is out of stock
+- The price was misprinted
+- There is a risk of fraud or suspicious activity
+
+Refund for cancelled orders
+- Online payments: refunded within 5–7 business days
+- COD: no charge since payment was not collected
+
+Contact
+For cancellation requests after packing, email ${brand.supportEmail}. We will try to help but cannot guarantee cancellation at that stage.`,
+    ],
+    [
+      "contact",
+      "Contact",
+      `We are here to help. Reach out and we will reply within one business day.
+
+Email: ${brand.supportEmail}
+Phone: (update with your number)
+Address: (update with your registered office/warehouse address)
+
+Business hours: Monday to Saturday, 10:00 AM to 6:00 PM IST
+
+For order issues, please include your order number in the subject line for faster resolution.`,
+    ],
   ];
   for (const [slug, title, body] of policies) {
     await prisma.cmsPage.create({ data: { slug, title, body } });
@@ -339,15 +541,18 @@ async function main() {
 
   await prisma.faq.createMany({
     data: [
-      { question: "Do you ship across India?", answer: "Shipping quotes are based on pincode. Remote areas may have longer estimates.", sortOrder: 0 },
-      { question: "Is cash on delivery available?", answer: "Yes, when the order is placed with COD. The order stays unpaid until delivery is confirmed.", sortOrder: 1 },
-      { question: "Can I pay with UPI?", answer: "UPI requires a configured Indian payment gateway such as Razorpay. Until keys are added, only COD is offered.", sortOrder: 2 },
+      { question: "Do you ship across India?", answer: "Yes, we ship to most pincodes in India. Delivery timelines and charges are calculated at checkout based on your location.", sortOrder: 0 },
+      { question: "Is cash on delivery available?", answer: "Yes, Cash on Delivery is available on most orders. A small COD convenience fee may apply depending on your location.", sortOrder: 1 },
+      { question: "What is your return window?", answer: "You can return eligible items within 7 days of delivery. Items must be unused, unwashed, and in original packaging with tags intact.", sortOrder: 2 },
+      { question: "How long does shipping take?", answer: "Metro cities: 3–5 business days. Tier 2/3 cities: 5–8 business days. Remote areas: 7–12 business days.", sortOrder: 3 },
+      { question: "Can I cancel my order?", answer: "Yes, you can cancel before the order is packed. Go to My Account → Orders and select Cancel. Once packed, cancellation may not be possible.", sortOrder: 4 },
+      { question: "Do you offer exchanges?", answer: "Yes, for size or colour exchanges on eligible items. Contact us within 7 days of delivery with your order number.", sortOrder: 5 },
     ],
   });
 
   await prisma.siteSetting.createMany({
     data: [
-      { id: "announcement", value: "Free standard shipping on metro pincodes for orders above ₹999 — check at checkout." },
+      { id: "announcement", value: "" },
       { id: "newsletter_blurb", value: "Occasionally, new objects and restocks. No daily mail." },
     ],
   });
