@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { createSession, hashPassword } from "@/lib/auth";
 import { registerSchema, jsonError } from "@/lib/validation";
 import { rateLimit } from "@/lib/rate-limit";
+import { emailProvider, notificationTemplates } from "@/lib/notifications/email";
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") ?? "local";
@@ -31,6 +32,14 @@ export async function POST(request: NextRequest) {
     },
   });
   await createSession({ id: user.id, name: user.name, email: user.email, role: user.role });
+  try {
+    await emailProvider.send({
+      to: user.email,
+      ...notificationTemplates.welcome(user.name),
+    });
+  } catch {
+    /* registration should still succeed even if email fails */
+  }
   return Response.redirect(new URL("/account", request.url), 303);
 }
 
