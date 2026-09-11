@@ -24,6 +24,7 @@ export function Header({
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const visibleHits = query.trim().length < 2 ? [] : hits;
 
   useEffect(() => {
@@ -45,6 +46,17 @@ export function Header({
     return () => window.clearTimeout(handle);
   }, [query]);
 
+  useEffect(() => {
+    if (!moreOpen) return;
+    const handle = (event: MouseEvent) => {
+      if (!(event.target as HTMLElement).closest("[data-more-menu]")) {
+        setMoreOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [moreOpen]);
+
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
@@ -58,8 +70,8 @@ export function Header({
         <Link href="/" className="font-display">
           <Logo />
         </Link>
-        <nav className="ml-6 hidden items-center gap-5 text-sm lg:flex">
-          {categories.slice(0, 7).map((c) => (
+        <nav className="ml-6 hidden min-w-0 flex-shrink items-center gap-5 text-sm lg:flex">
+          {categories.slice(0, 5).map((c) => (
             <Link key={c.slug} href={`/category/${c.slug}`} className="text-[#3f3a34] hover:text-foreground truncate max-w-[90px]" title={c.name}>
               {c.name}
             </Link>
@@ -76,6 +88,31 @@ export function Header({
           <Link href="/products" className="text-[#3f3a34] hover:text-foreground">
             All
           </Link>
+          {categories.length > 5 ? (
+            <div className="relative" data-more-menu>
+              <button
+                onClick={() => setMoreOpen((o) => !o)}
+                className="text-[#3f3a34] hover:text-foreground"
+                aria-expanded={moreOpen}
+              >
+                More
+              </button>
+              {moreOpen ? (
+                <div className="absolute top-full mt-2 w-40 rounded-2xl border border-line bg-card p-1 shadow-lg">
+                  {categories.slice(5).map((c) => (
+                    <Link
+                      key={c.slug}
+                      href={`/category/${c.slug}`}
+                      onClick={() => setMoreOpen(false)}
+                      className="block rounded-xl px-3 py-2 text-sm hover:bg-[#f3ece3]"
+                    >
+                      {c.name}
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <div className="relative hidden md:block">
@@ -85,7 +122,7 @@ export function Header({
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setSearchOpen(true)}
               placeholder="Search products"
-              className="h-10 w-64 rounded-full border border-line bg-card pl-9 pr-4 text-sm lg:w-80"
+               className="h-10 w-48 rounded-full border border-line bg-card pl-9 pr-4 text-sm lg:w-64"
               aria-label="Search"
             />
             {searchOpen && (visibleHits.length > 0 || query.length >= 2) ? (
