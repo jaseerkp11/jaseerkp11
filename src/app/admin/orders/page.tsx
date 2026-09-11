@@ -4,6 +4,7 @@ import { formatMoney } from "@/lib/money";
 import { EmptyState } from "@/components/ui/empty-state";
 import { AdminFilters } from "@/components/admin/filters-form";
 import { Pagination } from "@/components/admin/pagination";
+import { AdminDeleteForm } from "@/components/admin/admin-delete-form";
 import type { OrderStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -67,10 +68,7 @@ export default async function AdminOrdersPage({
                 <span>{order.paymentStatus}</span>
                 <span>{formatMoney(order.totalPaise)}</span>
               </div>
-              <form action={`/api/admin/orders/${order.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this order?")) event.preventDefault(); }}>
-                <input type="hidden" name="_method" value="DELETE" />
-                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
-              </form>
+              <AdminDeleteForm action={`/api/admin/orders/${order.id}`} label="order" />
             </li>
           ))}
         </ul>

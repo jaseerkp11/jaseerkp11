@@ -37,6 +37,21 @@ export async function POST(
   if (!hasPermission(session!.role, PERMISSIONS.viewOrders)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
   const form = await request.formData();
+  const _method = form.get("_method");
+  if (_method === "DELETE") {
+    try {
+      await prisma.order.delete({ where: { id } });
+    } catch {
+      return jsonError("Unable to delete this order. It may be referenced by payments or other records.", 409);
+    }
+    await writeAudit({
+      actorId: session!.id,
+      action: "order.delete",
+      entity: "Order",
+      entityId: id,
+    });
+    return Response.json({ ok: true });
+  }
   const status = String(form.get("status")) as OrderStatus;
   if (!allowed.includes(status)) return jsonError("Invalid status", 400);
   const trackingNumber = String(form.get("trackingNumber") ?? "").trim() || null;

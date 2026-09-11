@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { AdminDeleteForm } from "@/components/admin/admin-delete-form";
 
 export const dynamic = "force-dynamic";
 
@@ -30,10 +31,7 @@ export default async function AdminOrderDetail({
       <a href={`/admin/orders/${order.id}/invoice`} className="mt-4 inline-flex h-10 items-center rounded-full border border-line px-4 text-sm">
         Invoice / packing slip
       </a>
-      <form action={`/api/admin/orders/${order.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this order?")) event.preventDefault(); }} className="mt-4 inline-block">
-        <input type="hidden" name="_method" value="DELETE" />
-        <button type="submit" className="inline-flex h-10 items-center rounded-full border border-red-200 bg-red-50 px-4 text-sm text-red-700 hover:bg-red-100">Delete order</button>
-      </form>
+      <AdminDeleteForm action={`/api/admin/orders/${order.id}`} label="order" />
       <form action={`/api/admin/orders/${order.id}`} method="post" className="mt-6 grid max-w-lg gap-3 rounded-2xl border border-line bg-card p-5">
         <select name="status" defaultValue={order.status} className="h-11 rounded-xl border border-line px-3 text-sm">
           {[

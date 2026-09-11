@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { SupplierForm } from "@/components/admin/supplier-form";
 import { AdminFilters } from "@/components/admin/filters-form";
 import { Pagination } from "@/components/admin/pagination";
+import { AdminDeleteForm } from "@/components/admin/admin-delete-form";
 
 export const dynamic = "force-dynamic";
 
@@ -47,10 +48,7 @@ export default async function SuppliersPage({
                 {s._count.products} products · {s._count.mappings} mappings
               </p>
             </span>
-            <form action={`/api/admin/suppliers/${s.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this supplier?")) event.preventDefault(); }}>
-              <input type="hidden" name="_method" value="DELETE" />
-              <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
-            </form>
+              <AdminDeleteForm action={`/api/admin/suppliers/${s.id}`} label="supplier" />
           </li>
         ))}
       </ul>

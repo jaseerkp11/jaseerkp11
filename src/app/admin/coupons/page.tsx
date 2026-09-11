@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { CouponForm } from "@/components/admin/coupon-form";
 import { AdminFilters } from "@/components/admin/filters-form";
 import { Pagination } from "@/components/admin/pagination";
+import { AdminDeleteForm } from "@/components/admin/admin-delete-form";
 
 export const dynamic = "force-dynamic";
 
@@ -48,10 +49,7 @@ export default async function CouponsPage({
             </span>
             <div className="flex items-center gap-3">
               <span className="text-muted">{c._count.redemptions} uses</span>
-              <form action={`/api/admin/coupons/${c.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this coupon?")) event.preventDefault(); }}>
-                <input type="hidden" name="_method" value="DELETE" />
-                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
-              </form>
+              <AdminDeleteForm action={`/api/admin/coupons/${c.id}`} label="coupon" />
             </div>
           </li>
         ))}

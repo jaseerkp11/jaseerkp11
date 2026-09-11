@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ProductForm } from "@/components/admin/product-form";
 import { formatMoney, marginPercent, profitPaise } from "@/lib/money";
+import { AdminDeleteForm } from "@/components/admin/admin-delete-form";
 
 export const dynamic = "force-dynamic";
 
@@ -31,10 +32,7 @@ export default async function EditProductPage({
             {marginPercent(product.sellingPaise, product.costPaise)}%. Customers never see cost.
           </p>
         </div>
-        <form action={`/api/admin/products/${product.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this product?")) event.preventDefault(); }}>
-          <input type="hidden" name="_method" value="DELETE" />
-          <button type="submit" className="inline-flex h-10 items-center rounded-full border border-red-200 bg-red-50 px-4 text-sm text-red-700 hover:bg-red-100">Delete product</button>
-        </form>
+        <AdminDeleteForm action={`/api/admin/products/${product.id}`} label="product" />
       </div>
       <ProductForm categories={categories} suppliers={suppliers} product={product} />
     </div>

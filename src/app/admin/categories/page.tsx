@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { CategoryForm } from "@/components/admin/category-form";
 import { AdminFilters } from "@/components/admin/filters-form";
 import { Pagination } from "@/components/admin/pagination";
+import { AdminDeleteForm } from "@/components/admin/admin-delete-form";
 
 export const dynamic = "force-dynamic";
 
@@ -50,10 +51,7 @@ export default async function CategoriesAdminPage({
             <div className="flex items-center gap-3">
               <span className="text-muted">{c._count.products} products</span>
               <Link href={`/admin/categories/${c.id}`} className="text-xs underline">Edit</Link>
-              <form action={`/api/admin/categories/${c.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this category?")) event.preventDefault(); }}>
-                <input type="hidden" name="_method" value="DELETE" />
-                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
-              </form>
+              <AdminDeleteForm action={`/api/admin/categories/${c.id}`} label="category" />
             </div>
           </li>
         ))}

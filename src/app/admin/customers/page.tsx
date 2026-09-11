@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AdminFilters } from "@/components/admin/filters-form";
 import { Pagination } from "@/components/admin/pagination";
+import { AdminDeleteForm } from "@/components/admin/admin-delete-form";
 
 export const dynamic = "force-dynamic";
 
@@ -46,10 +47,7 @@ export default async function CustomersPage({
                   {c.email} · {c._count.orders} orders
                 </p>
               </span>
-              <form action={`/api/admin/customers/${c.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this customer?")) event.preventDefault(); }}>
-                <input type="hidden" name="_method" value="DELETE" />
-                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
-              </form>
+              <AdminDeleteForm action={`/api/admin/customers/${c.id}`} label="customer" />
             </li>
           ))}
         </ul>
