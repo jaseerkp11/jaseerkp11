@@ -4,6 +4,7 @@ import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/a
 import { rupeesToPaise } from "@/lib/money";
 import { writeAudit } from "@/lib/audit";
 import { jsonError } from "@/lib/validation";
+import { getBrand } from "@/config/brand";
 import { productInputSchema } from "@/lib/validation";
 import { syncProductImages } from "@/lib/services/product-images";
 
@@ -20,6 +21,17 @@ export async function POST(
   if (!hasPermission(session!.role, PERMISSIONS.editProducts)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
   const form = await request.formData();
+  const _method = form.get("_method");
+  if (_method === "DELETE") {
+    await prisma.product.delete({ where: { id } });
+    await writeAudit({
+      actorId: session!.id,
+      action: "product.delete",
+      entity: "Product",
+      entityId: id,
+    });
+    return Response.redirect(new URL("/admin/products", getBrand().siteUrl), 303);
+  }
   const parsed = productInputSchema.safeParse({
     sku: form.get("sku"),
     name: form.get("name"),
@@ -54,4 +66,26 @@ export async function POST(
     entityId: product.id,
   });
   return Response.redirect(new URL(`/admin/products/${product.id}`, request.url), 303);
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) {
+  const session = await getSessionUser();
+  try {
+    assertStaff(session);
+  } catch {
+    return jsonError("Unauthorized", 401);
+  }
+  if (!hasPermission(session!.role, PERMISSIONS.editProducts)) return jsonError("Forbidden", 403);
+  const { id } = await context.params;
+  await prisma.product.delete({ where: { id } });
+  await writeAudit({
+    actorId: session!.id,
+    action: "product.delete",
+    entity: "Product",
+    entityId: id,
+  });
+  return Response.json({ ok: true });
 }

@@ -42,11 +42,17 @@ export default async function CouponsPage({
       <AdminFilters defaultQ={q ?? ""} defaultStatus={status ?? ""} />
       <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
         {coupons.map((c) => (
-          <li key={c.id} className="flex justify-between px-4 py-3 text-sm">
+          <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
             <span>
               {c.code} · {c.type} {c.value}
             </span>
-            <span className="text-muted">{c._count.redemptions} uses</span>
+            <div className="flex items-center gap-3">
+              <span className="text-muted">{c._count.redemptions} uses</span>
+              <form action={`/api/admin/coupons/${c.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this coupon?")) event.preventDefault(); }}>
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
+              </form>
+            </div>
           </li>
         ))}
       </ul>

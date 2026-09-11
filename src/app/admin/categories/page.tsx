@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { CategoryForm } from "@/components/admin/category-form";
 import { AdminFilters } from "@/components/admin/filters-form";
@@ -42,11 +43,18 @@ export default async function CategoriesAdminPage({
       <AdminFilters defaultQ={q ?? ""} defaultStatus={status ?? ""} />
       <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
         {categories.map((c) => (
-          <li key={c.id} className="flex justify-between px-4 py-3 text-sm">
+          <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
             <span>
               {c.name} {c.parent ? `· child of ${c.parent.name}` : ""}
             </span>
-            <span className="text-muted">{c._count.products} products</span>
+            <div className="flex items-center gap-3">
+              <span className="text-muted">{c._count.products} products</span>
+              <Link href={`/admin/categories/${c.id}`} className="text-xs underline">Edit</Link>
+              <form action={`/api/admin/categories/${c.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this category?")) event.preventDefault(); }}>
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
+              </form>
+            </div>
           </li>
         ))}
       </ul>

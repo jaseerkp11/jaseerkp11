@@ -39,11 +39,17 @@ export default async function CustomersPage({
       ) : (
         <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
           {customers.map((c) => (
-            <li key={c.id} className="px-4 py-3 text-sm">
-              <p className="font-medium">{c.name}</p>
-              <p className="text-muted">
-                {c.email} · {c._count.orders} orders
-              </p>
+            <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
+              <span>
+                <p className="font-medium">{c.name}</p>
+                <p className="text-muted">
+                  {c.email} · {c._count.orders} orders
+                </p>
+              </span>
+              <form action={`/api/admin/customers/${c.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this customer?")) event.preventDefault(); }}>
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
+              </form>
             </li>
           ))}
         </ul>

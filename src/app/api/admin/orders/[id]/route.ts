@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser, assertStaff, hasPermission, PERMISSIONS } from "@/lib/auth";
 import { jsonError } from "@/lib/validation";
+import { getBrand } from "@/config/brand";
 import { writeAudit } from "@/lib/audit";
 import { redirectTo } from "@/lib/http";
 import type { OrderStatus } from "@prisma/client";
@@ -100,4 +101,26 @@ export async function POST(
     metadata: { status },
   });
   return redirectTo(request, `/admin/orders/${id}`);
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) {
+  const session = await getSessionUser();
+  try {
+    assertStaff(session);
+  } catch {
+    return jsonError("Unauthorized", 401);
+  }
+  if (!hasPermission(session!.role, PERMISSIONS.refundOrders)) return jsonError("Forbidden", 403);
+  const { id } = await context.params;
+  await prisma.order.delete({ where: { id } });
+  await writeAudit({
+    actorId: session!.id,
+    action: "order.delete",
+    entity: "Order",
+    entityId: id,
+  });
+  return Response.json({ ok: true });
 }

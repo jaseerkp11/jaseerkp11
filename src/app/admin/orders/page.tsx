@@ -58,13 +58,19 @@ export default async function AdminOrdersPage({
       ) : (
         <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
           {orders.map((order) => (
-            <li key={order.id} className="flex items-center justify-between px-4 py-3 text-sm">
-              <Link href={`/admin/orders/${order.id}`} className="underline">
-                {order.orderNumber}
-              </Link>
-              <span>{order.status}</span>
-              <span>{order.paymentStatus}</span>
-              <span>{formatMoney(order.totalPaise)}</span>
+            <li key={order.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
+              <div className="flex items-center gap-3">
+                <Link href={`/admin/orders/${order.id}`} className="underline">
+                  {order.orderNumber}
+                </Link>
+                <span>{order.status}</span>
+                <span>{order.paymentStatus}</span>
+                <span>{formatMoney(order.totalPaise)}</span>
+              </div>
+              <form action={`/api/admin/orders/${order.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this order?")) event.preventDefault(); }}>
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
+              </form>
             </li>
           ))}
         </ul>

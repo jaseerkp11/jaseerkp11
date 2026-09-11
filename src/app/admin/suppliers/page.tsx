@@ -40,11 +40,17 @@ export default async function SuppliersPage({
       </div>
       <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
         {suppliers.map((s) => (
-          <li key={s.id} className="px-4 py-3 text-sm">
-            <p className="font-medium">{s.name}</p>
-            <p className="text-muted">
-              {s._count.products} products · {s._count.mappings} mappings
-            </p>
+          <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
+            <span>
+              <p className="font-medium">{s.name}</p>
+              <p className="text-muted">
+                {s._count.products} products · {s._count.mappings} mappings
+              </p>
+            </span>
+            <form action={`/api/admin/suppliers/${s.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this supplier?")) event.preventDefault(); }}>
+              <input type="hidden" name="_method" value="DELETE" />
+              <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
+            </form>
           </li>
         ))}
       </ul>

@@ -23,8 +23,12 @@ export default async function ContentPage() {
         </label>
         {pages.map((page) => (
           <details key={page.id} className="rounded-xl border border-line p-3">
-            <summary className="cursor-pointer text-sm font-medium">
-              {page.title} ({page.slug})
+            <summary className="flex cursor-pointer items-center justify-between text-sm font-medium">
+              <span>{page.title} ({page.slug})</span>
+              <form action={`/api/admin/content/${page.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this page?")) event.preventDefault(); }} className="inline">
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
+              </form>
             </summary>
             <input name={`title_${page.id}`} defaultValue={page.title} className="mt-3 h-11 w-full rounded-xl border border-line px-3 text-sm" />
             <textarea name={`body_${page.id}`} defaultValue={page.body} className="mt-2 min-h-32 w-full rounded-xl border border-line px-3 py-2 text-sm" />
@@ -53,8 +57,12 @@ export default async function ContentPage() {
         <h2 className="font-medium">Banners</h2>
         <ul className="mt-3 text-sm">
           {banners.map((b) => (
-            <li key={b.id}>
-              {b.placement}: {b.title} ({b.imageUrl})
+            <li key={b.id} className="flex items-center justify-between gap-2">
+              <span>{b.placement}: {b.title} ({b.imageUrl})</span>
+              <form action={`/api/admin/content/${b.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this banner?")) event.preventDefault(); }}>
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
+              </form>
             </li>
           ))}
         </ul>

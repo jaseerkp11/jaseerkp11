@@ -43,13 +43,19 @@ export default async function AdminTicketsPage({
       ) : (
         <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card">
           {tickets.map((ticket) => (
-            <li key={ticket.id} className="px-4 py-3 text-sm">
-              <Link href={`/admin/tickets/${ticket.id}`} className="font-medium underline">
-                {ticket.subject}
-              </Link>
-              <p className="text-muted">
-                {ticket.status} · {ticket.email} · {ticket.createdAt.toLocaleString("en-IN")}
-              </p>
+            <li key={ticket.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
+              <span>
+                <Link href={`/admin/tickets/${ticket.id}`} className="font-medium underline">
+                  {ticket.subject}
+                </Link>
+                <p className="text-muted">
+                  {ticket.status} · {ticket.email} · {ticket.createdAt.toLocaleString("en-IN")}
+                </p>
+              </span>
+              <form action={`/api/admin/tickets/${ticket.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this ticket?")) event.preventDefault(); }}>
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
+              </form>
             </li>
           ))}
         </ul>

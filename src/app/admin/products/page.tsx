@@ -62,30 +62,33 @@ export default async function AdminProductsPage({
               <th>Margin</th>
               <th>Stock</th>
               <th>Status</th>
+              <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {products.map((p) => (
               <tr key={p.id} className="border-b border-line last:border-0">
                 <td className="px-4 py-3">
-                  <Link href={`/admin/products/${p.id}`} className="flex items-center gap-3">
-                    {p.images[0] ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={p.images[0].url}
-                        alt=""
-                        className="h-12 w-12 shrink-0 rounded-lg object-cover bg-[#ece6dc]"
-                      />
-                    ) : (
-                      <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#ece6dc] text-[10px] text-muted">
-                        No img
+                  <div className="flex items-center gap-2">
+                    <Link href={`/admin/products/${p.id}`} className="flex items-center gap-3">
+                      {p.images[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={p.images[0].url}
+                          alt=""
+                          className="h-12 w-12 shrink-0 rounded-lg object-cover bg-[#ece6dc]"
+                        />
+                      ) : (
+                        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#ece6dc] text-[10px] text-muted">
+                          No img
+                        </span>
+                      )}
+                      <span>
+                        <span className="block font-medium underline">{p.name}</span>
+                        <span className="block text-xs text-muted no-underline">{p.category.name}</span>
                       </span>
-                    )}
-                    <span>
-                      <span className="block font-medium underline">{p.name}</span>
-                      <span className="block text-xs text-muted no-underline">{p.category.name}</span>
-                    </span>
-                  </Link>
+                    </Link>
+                  </div>
                 </td>
                 <td>{p.sku}</td>
                 <td>{formatMoney(p.sellingPaise)}</td>
@@ -93,6 +96,12 @@ export default async function AdminProductsPage({
                 <td>{marginPercent(p.sellingPaise, p.costPaise)}%</td>
                 <td>{p.stock - p.reservedStock}</td>
                 <td>{p.status}</td>
+                <td className="px-4 py-3 text-right">
+                  <form action={`/api/admin/products/${p.id}`} method="post" onSubmit={(event) => { if (!confirm("Delete this product?")) event.preventDefault(); }}>
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <button type="submit" className="text-xs text-red-600 hover:text-red-700">Delete</button>
+                  </form>
+                </td>
               </tr>
             ))}
           </tbody>
