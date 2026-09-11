@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { Menu, Search, ShoppingBag, User, X, ChevronDown } from "lucide-react";
 import { getBrand } from "@/config/brand";
 import { Logo } from "@/components/store/logo";
 import type { SearchHit } from "@/lib/search/provider";
@@ -70,12 +70,7 @@ export function Header({
         <Link href="/" className="font-display">
           <Logo />
         </Link>
-        <nav className="ml-6 hidden min-w-0 flex-shrink items-center gap-5 text-sm lg:flex">
-          {categories.slice(0, 5).map((c) => (
-            <Link key={c.slug} href={`/category/${c.slug}`} className="text-[#3f3a34] hover:text-foreground truncate max-w-[90px]" title={c.name}>
-              {c.name}
-            </Link>
-          ))}
+        <nav className="ml-6 hidden min-w-0 flex-shrink items-center gap-2 text-sm lg:flex">
           <Link href="/drops" className="text-[#3f3a34] hover:text-foreground">
             Drops
           </Link>
@@ -88,18 +83,19 @@ export function Header({
           <Link href="/products" className="text-[#3f3a34] hover:text-foreground">
             All
           </Link>
-          {categories.length > 5 ? (
+          {categories.length > 0 ? (
             <div className="relative" data-more-menu>
               <button
                 onClick={() => setMoreOpen((o) => !o)}
-                className="text-[#3f3a34] hover:text-foreground"
+                className="inline-flex items-center gap-1 rounded-full border border-line bg-card px-3 py-1.5 text-[#3f3a34] hover:border-[#c4b8a8]"
                 aria-expanded={moreOpen}
               >
                 More
+                <ChevronDown className="h-3.5 w-3.5" />
               </button>
               {moreOpen ? (
-                <div className="absolute top-full mt-2 w-40 rounded-2xl border border-line bg-card p-1 shadow-lg">
-                  {categories.slice(5).map((c) => (
+                <div className="absolute top-full mt-2 w-44 rounded-2xl border border-line bg-card p-1 shadow-lg">
+                  {categories.map((c) => (
                     <Link
                       key={c.slug}
                       href={`/category/${c.slug}`}
