@@ -71,7 +71,7 @@ export function Header({
           <Logo />
         </Link>
         <nav className="ml-6 hidden min-w-0 flex-shrink items-center gap-2 text-sm lg:flex">
-          {["fashion", "beauty", "kids", "gadgets"].map((slug) => {
+          {["fashion", "beauty", "kids", "gadgets", "accessories"].map((slug) => {
             const category = categories.find((c) => c.slug === slug);
             if (!category) return null;
             return (
@@ -104,16 +104,18 @@ export function Header({
               </button>
               {moreOpen ? (
                 <div className="absolute top-full mt-2 w-44 rounded-2xl border border-line bg-card p-1 shadow-lg">
-                  {categories.map((c) => (
-                    <Link
-                      key={c.slug}
-                      href={`/category/${c.slug}`}
-                      onClick={() => setMoreOpen(false)}
-                      className="block rounded-xl px-3 py-2 text-sm hover:bg-[#f3ece3]"
-                    >
-                      {c.name}
-                    </Link>
-                  ))}
+                  {categories
+                    .filter((c) => !["fashion", "beauty", "kids", "gadgets", "accessories"].includes(c.slug))
+                    .map((c) => (
+                      <Link
+                        key={c.slug}
+                        href={`/category/${c.slug}`}
+                        onClick={() => setMoreOpen(false)}
+                        className="block rounded-xl px-3 py-2 text-sm hover:bg-[#f3ece3]"
+                      >
+                        {c.name}
+                      </Link>
+                    ))}
                 </div>
               ) : null}
             </div>
