@@ -71,7 +71,7 @@ export function Header({
           <Logo />
         </Link>
         <nav className="ml-6 hidden min-w-0 flex-shrink items-center gap-2 text-sm lg:flex">
-          {["fashion", "beauty", "kids", "gadgets", "accessories"].map((slug) => {
+          {["fashion", "beauty", "kids", "gadgets", "accessories", "home-kitchen"].map((slug) => {
             const category = categories.find((c) => c.slug === slug);
             if (!category) return null;
             return (
@@ -82,9 +82,6 @@ export function Header({
           })}
           <Link href="/drops" className="text-[#3f3a34] hover:text-foreground">
             Drops
-          </Link>
-          <Link href="/finds" className="text-[#3f3a34] hover:text-foreground">
-            Finds
           </Link>
           <Link href="/collections" className="text-[#3f3a34] hover:text-foreground">
             Collections
@@ -105,7 +102,7 @@ export function Header({
               {moreOpen ? (
                 <div className="absolute top-full mt-2 w-44 rounded-2xl border border-line bg-card p-1 shadow-lg">
                   {categories
-                    .filter((c) => !["fashion", "beauty", "kids", "gadgets", "accessories"].includes(c.slug))
+                    .filter((c) => !["fashion", "beauty", "kids", "gadgets", "accessories", "home-kitchen"].includes(c.slug))
                     .map((c) => (
                       <Link
                         key={c.slug}
