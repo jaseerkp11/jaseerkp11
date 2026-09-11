@@ -59,7 +59,7 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-background/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:px-6">
         <button
           className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-card lg:hidden"
           aria-label="Open menu"
@@ -70,12 +70,12 @@ export function Header({
         <Link href="/" className="font-display">
           <Logo />
         </Link>
-        <nav className="ml-6 hidden min-w-0 flex-shrink items-center gap-2 text-sm lg:flex">
-          {["fashion", "beauty", "kids", "gadgets", "accessories", "home-kitchen"].map((slug) => {
+        <nav className="ml-4 hidden min-w-0 flex-shrink items-center gap-1.5 text-sm lg:flex">
+          {["fashion", "beauty", "gadgets", "accessories", "home-kitchen"].map((slug) => {
             const category = categories.find((c) => c.slug === slug);
             if (!category) return null;
             return (
-              <Link key={category.slug} href={`/category/${category.slug}`} className="text-[#3f3a34] hover:text-foreground truncate max-w-[90px]" title={category.name}>
+              <Link key={category.slug} href={`/category/${category.slug}`} className="text-[#3f3a34] hover:text-foreground whitespace-nowrap" title={category.name}>
                 {category.name}
               </Link>
             );
@@ -102,7 +102,7 @@ export function Header({
               {moreOpen ? (
                 <div className="absolute top-full mt-2 w-44 rounded-2xl border border-line bg-card p-1 shadow-lg">
                   {categories
-                    .filter((c) => !["fashion", "beauty", "kids", "gadgets", "accessories", "home-kitchen"].includes(c.slug))
+                    .filter((c) => !["fashion", "beauty", "gadgets", "accessories", "home-kitchen"].includes(c.slug))
                     .map((c) => (
                       <Link
                         key={c.slug}
@@ -118,7 +118,7 @@ export function Header({
             </div>
           ) : null}
         </nav>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1.5">
           <div className="relative hidden md:block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
             <input
