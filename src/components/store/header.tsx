@@ -71,11 +71,15 @@ export function Header({
           <Logo />
         </Link>
         <nav className="ml-6 hidden min-w-0 flex-shrink items-center gap-2 text-sm lg:flex">
-          {categories.slice(0, 4).map((c) => (
-            <Link key={c.slug} href={`/category/${c.slug}`} className="text-[#3f3a34] hover:text-foreground truncate max-w-[90px]" title={c.name}>
-              {c.name}
-            </Link>
-          ))}
+          {["fashion", "beauty", "kids", "gadgets"].map((slug) => {
+            const category = categories.find((c) => c.slug === slug);
+            if (!category) return null;
+            return (
+              <Link key={category.slug} href={`/category/${category.slug}`} className="text-[#3f3a34] hover:text-foreground truncate max-w-[90px]" title={category.name}>
+                {category.name}
+              </Link>
+            );
+          })}
           <Link href="/drops" className="text-[#3f3a34] hover:text-foreground">
             Drops
           </Link>
@@ -88,7 +92,7 @@ export function Header({
           <Link href="/products" className="text-[#3f3a34] hover:text-foreground">
             All
           </Link>
-          {categories.length > 4 ? (
+          {categories.length > 0 ? (
             <div className="relative" data-more-menu>
               <button
                 onClick={() => setMoreOpen((o) => !o)}
@@ -100,7 +104,7 @@ export function Header({
               </button>
               {moreOpen ? (
                 <div className="absolute top-full mt-2 w-44 rounded-2xl border border-line bg-card p-1 shadow-lg">
-                  {categories.slice(4).map((c) => (
+                  {categories.map((c) => (
                     <Link
                       key={c.slug}
                       href={`/category/${c.slug}`}
