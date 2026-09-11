@@ -93,11 +93,10 @@ export function Header({
             <div className="relative" data-more-menu>
               <button
                 onClick={() => setMoreOpen((o) => !o)}
-                className="inline-flex items-center gap-1 rounded-full border border-line bg-card px-3 py-1.5 text-[#3f3a34] hover:border-[#c4b8a8]"
+                className="text-[#3f3a34] hover:text-foreground"
                 aria-expanded={moreOpen}
               >
-                More
-                <span className="mt-0.5">▼</span>
+                More <span className="text-[10px]">▼</span>
               </button>
               {moreOpen ? (
                 <div className="absolute top-full mt-2 w-44 rounded-2xl border border-line bg-card p-1 shadow-lg">
