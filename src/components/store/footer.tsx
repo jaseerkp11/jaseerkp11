@@ -21,19 +21,29 @@ export async function Footer({
         <div>
           <p className="text-sm font-semibold">Shop</p>
           <ul className="mt-3 space-y-2 text-sm">
-            {categories.slice(0, 8).map((c) => (
-              <li key={c.slug}>
-                <Link href={`/category/${c.slug}`}>{c.name}</Link>
-              </li>
-            ))}
             <li>
-              <Link href="/drops">Drops</Link>
+              <Link href="/products?sort=new">New & Trending</Link>
             </li>
             <li>
-              <Link href="/finds">Finds</Link>
+              <Link href="/">Home</Link>
             </li>
             <li>
-              <Link href="/collections">Collections</Link>
+              <Link href="/category/style">Style</Link>
+            </li>
+            <li>
+              <Link href="/category/beauty">Beauty</Link>
+            </li>
+            <li>
+              <Link href="/category/kids">Kids</Link>
+            </li>
+            <li>
+              <Link href="/category/gifts">Gifts</Link>
+            </li>
+            <li>
+              <Link href="/finds">Clever Finds</Link>
+            </li>
+            <li>
+              <Link href="/products">All Products</Link>
             </li>
           </ul>
         </div>
@@ -84,14 +94,23 @@ export async function Footer({
             </li>
           </ul>
           <p className="mt-6 text-sm text-muted">
-            {brand.supportEmail}
-            <br />
-            {brand.supportPhone}
+            {brand.supportEmail && brand.supportEmail !== "hello@example.com" ? (
+              <>
+                <Link href={`mailto:${brand.supportEmail}`}>{brand.supportEmail}</Link>
+                <br />
+              </>
+            ) : null}
+            {brand.supportPhone && brand.supportPhone !== "+91 98765 43210" ? (
+              <Link href={`tel:${brand.supportPhone.replace(/\s+/g, "")}`}>{brand.supportPhone}</Link>
+            ) : null}
+            {(!brand.supportEmail || brand.supportEmail === "hello@example.com") && (!brand.supportPhone || brand.supportPhone === "+91 98765 43210") ? (
+              <span>Customer support details coming soon</span>
+            ) : null}
           </p>
         </div>
       </div>
       <div className="border-t border-line py-4 text-center text-xs text-muted">
-        © {new Date().getFullYear()} {brand.legalName}
+        © {new Date().getFullYear()} TheRareify. All rights reserved.
       </div>
     </footer>
   );

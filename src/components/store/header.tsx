@@ -70,7 +70,7 @@ export function Header({
         <Link href="/" className="font-display">
           <Logo />
         </Link>
-        <nav className="ml-4 hidden min-w-0 flex-shrink-0 items-center gap-2 text-sm lg:flex">
+        <nav className="ml-4 hidden min-w-0 flex-shrink-0 items-center gap-3 text-sm lg:flex">
           <Link href="/products?sort=new" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
             New & Trending
           </Link>

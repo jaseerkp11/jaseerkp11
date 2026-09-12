@@ -22,6 +22,17 @@ export default async function HomePage() {
     orderBy: { sortOrder: "asc" },
     take: 8,
   });
+
+  const homepageCategories = [
+    { name: "Make Home Easier", slug: "make-home-easier", description: "Clever storage, organization & everyday home helpers" },
+    { name: "Kitchen, Smarter", slug: "kitchen-smarter", description: "Little things that make cooking and cleaning easier" },
+    { name: "Style & Accessories", slug: "style-accessories", description: "Easy ways to add something special to your everyday look" },
+    { name: "Beauty & Self-Care", slug: "beauty-self-care", description: "Simple tools and accessories for your daily routine" },
+    { name: "Kids & Family", slug: "kids-family", description: "Clever finds that make everyday family life easier" },
+    { name: "Gifts They'll Love", slug: "gifts", description: "Interesting little finds worth giving" },
+    { name: "Clever Finds", slug: "clever-finds", description: "Products you didn't know you needed" },
+    { name: "New & Trending", slug: "new-trending", description: "Fresh finds we're currently loving" },
+  ];
   const [trending, best, neu, deals] = await Promise.all([
     prisma.product.findMany({ where: { status: "ACTIVE", trending: true }, include: productCardInclude, take: 8 }),
     prisma.product.findMany({ where: { status: "ACTIVE", bestSeller: true }, include: productCardInclude, take: 8 }),
@@ -127,18 +138,18 @@ export default async function HomePage() {
               All products
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {categories.map((c) => (
-              <Link
-                key={c.id}
-                href={`/category/${c.slug}`}
-                className="group rounded-[1.25rem] border border-[#e3ddd4] bg-white p-6 text-center transition hover:border-[#c4b8a8] hover:shadow-md"
-              >
-                <p className="font-display text-lg text-[#161513] truncate">{c.name}</p>
-                <p className="mt-1 line-clamp-2 text-xs text-[#5c564e]">{c.description}</p>
-              </Link>
-            ))}
-          </div>
+           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+             {homepageCategories.map((c) => (
+               <Link
+                 key={c.slug}
+                 href={`/category/${c.slug}`}
+                 className="group rounded-[1.25rem] border border-[#e3ddd4] bg-white p-6 text-center transition hover:border-[#c4b8a8] hover:shadow-md"
+               >
+                 <p className="font-display text-lg text-[#161513] truncate">{c.name}</p>
+                 <p className="mt-1 line-clamp-2 text-xs text-[#5c564e]">{c.description}</p>
+               </Link>
+             ))}
+           </div>
         </section>
       ) : null}
 
@@ -240,7 +251,7 @@ export default async function HomePage() {
           {show("bestsellers") && best.length > 0 ? (
             <section className="mb-16">
               <div className="flex items-end justify-between">
-                <h2 className="font-display text-3xl text-[#161513]">Best sellers</h2>
+                 <h2 className="font-display text-3xl text-[#161513]">Popular Finds</h2>
                 <Link href="/products?sort=best" className="text-sm underline">View all</Link>
               </div>
               <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -307,8 +318,8 @@ export default async function HomePage() {
             </span>
           </Link>
           <Link href="/products?sort=best" className="group rounded-[2rem] border border-[#e3ddd4] bg-white p-8 transition hover:shadow-md">
-            <h3 className="font-display text-2xl text-[#161513]">Best sellers</h3>
-            <p className="mt-2 text-sm text-[#5c564e]">The pieces our customers keep choosing.</p>
+            <h3 className="font-display text-2xl text-[#161513]">Popular Finds</h3>
+            <p className="mt-2 text-sm text-[#5c564e]">A curated selection worth a second look.</p>
             <span className="mt-4 inline-flex h-10 items-center rounded-full bg-[#c4a574] px-5 text-sm text-[#161513] transition group-hover:bg-[#b49a6a]">
               Shop best sellers
             </span>
