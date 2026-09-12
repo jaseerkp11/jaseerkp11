@@ -15,7 +15,6 @@ export async function Footer({
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div>
           <p className="font-display text-2xl">{brand.brandName}</p>
-          <p className="mt-3 max-w-xs text-sm text-muted">{brand.tagline}</p>
           {settings.gstin ? <p className="mt-3 text-xs text-muted">GSTIN {settings.gstin}</p> : null}
         </div>
         <div>
