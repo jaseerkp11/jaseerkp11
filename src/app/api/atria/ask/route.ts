@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     });
     return Response.json(result);
   } catch {
-    return Response.json({ products: [], message: "THERAREIFY is taking a quick break. Try again shortly." }, { status: 500 });
+    return Response.json({ products: [], message: "TheRareify is taking a quick break. Try again shortly." }, { status: 500 });
   }
 }
 
@@ -33,6 +33,6 @@ export async function GET(request: NextRequest) {
     });
     return Response.json(result);
   } catch {
-    return Response.json({ products: [], message: "THERAREIFY is taking a quick break. Try again shortly." }, { status: 500 });
+    return Response.json({ products: [], message: "TheRareify is taking a quick break. Try again shortly." }, { status: 500 });
   }
 }

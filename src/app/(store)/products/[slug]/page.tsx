@@ -221,7 +221,7 @@ export default async function ProductPage({
       ) : null}
       {discoveryReasons.length > 0 ? (
         <section className="mt-12 rounded-2xl border border-line bg-card p-5">
-          <h2 className="font-display text-2xl">Why THERAREIFY picked this</h2>
+          <h2 className="font-display text-2xl">Why TheRareify picked this</h2>
           <ul className="mt-3 list-disc pl-5 text-sm text-muted">
             {discoveryReasons.map((reason) => (
               <li key={reason}>{reason}</li>

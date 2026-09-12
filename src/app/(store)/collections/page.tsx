@@ -11,7 +11,7 @@ export async function generateMetadata() {
   const brand = getBrand();
   return {
     title: `Collections · ${brand.brandName}`,
-    description: "Curated product collections from THERAREIFY.",
+    description: "Curated product collections from TheRareify.",
   };
 }
 
@@ -24,7 +24,7 @@ export default async function CollectionsPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-           name: "THERAREIFY Collections",
+           name: "TheRareify Collections",
           url: publicUrl("/collections"),
         }}
       />
@@ -35,7 +35,7 @@ export default async function CollectionsPage() {
 
       {collections.length === 0 ? (
         <EmptyState
-            title="THERAREIFY is still discovering."
+            title="TheRareify is still discovering."
           description="Check back soon for curated collections."
         />
       ) : (

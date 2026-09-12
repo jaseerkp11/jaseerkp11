@@ -14,7 +14,7 @@ export default async function DemandSignalsPage({
   return (
     <div>
       <h1 className="font-display text-3xl">Demand Signals</h1>
-       <p className="mt-1 text-sm text-muted">Normalized demand signals from searches, Ask THERAREIFY, and product interest.</p>
+       <p className="mt-1 text-sm text-muted">Normalized demand signals from searches, Ask TheRareify, and product interest.</p>
       <div className="mt-4 flex gap-2 text-sm">
         {["7", "30", "90"].map((d) => (
           <a key={d} href={`/admin/demand-signals?range=${d}`} className="rounded-full border border-line bg-card px-3 py-1">

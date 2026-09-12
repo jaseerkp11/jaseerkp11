@@ -51,7 +51,7 @@ export function AskTherareify() {
       }
       trackClientEvent("ai_query", { query: q, resultCount: data.products?.length ?? 0 });
     } catch {
-      setMessage("THERAREIFY is taking a quick break. Try again shortly.");
+      setMessage("TheRareify is taking a quick break. Try again shortly.");
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ export function AskTherareify() {
       }
       trackClientEvent("surprise_me");
     } catch {
-      setMessage("THERAREIFY is taking a quick break. Try again shortly.");
+      setMessage("TheRareify is taking a quick break. Try again shortly.");
     } finally {
       setLoading(false);
     }
@@ -81,7 +81,7 @@ export function AskTherareify() {
       <div className="rounded-[2rem] border border-line bg-card p-6 sm:p-10">
         <h2 className="font-display text-3xl">What are you looking for?</h2>
         <p className="mt-2 max-w-md text-sm text-muted">
-          Tell THERAREIFY what you need. We&apos;ll find the best matches from our catalogue.
+          Tell TheRareify what you need. We&apos;ll find the best matches from our catalogue.
         </p>
         <form
           className="mt-6"
@@ -94,9 +94,9 @@ export function AskTherareify() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="✨ Ask THERAREIFY anything..."
+              placeholder="✨ Ask TheRareify anything..."
               className="h-12 w-full rounded-full border border-line bg-background px-4 text-sm sm:flex-1"
-              aria-label="Ask THERAREIFY"
+              aria-label="Ask TheRareify"
             />
             <div className="flex gap-2">
               <Button type="submit" disabled={loading} className="h-12 flex-1 px-6 sm:flex-none">

@@ -11,7 +11,7 @@ export async function generateMetadata() {
   const brand = getBrand();
   return {
     title: `Finds · ${brand.brandName}`,
-    description: "Curated permanent discoveries from THERAREIFY.",
+    description: "Curated permanent discoveries from TheRareify.",
   };
 }
 
@@ -24,7 +24,7 @@ export default async function FindsPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-           name: "THERAREIFY Finds",
+           name: "TheRareify Finds",
           url: publicUrl("/finds"),
         }}
       />
@@ -35,7 +35,7 @@ export default async function FindsPage() {
 
       {finds.length === 0 ? (
         <EmptyState
-            title="THERAREIFY is still discovering."
+            title="TheRareify is still discovering."
           description="Check back soon for curated finds."
         />
       ) : (

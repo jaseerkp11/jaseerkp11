@@ -22,7 +22,7 @@ class ResendEmailProvider implements EmailProvider {
         reason: "No email provider is configured. Set RESEND_API_KEY to send mail.",
       };
     }
-    const from = process.env.EMAIL_FROM?.trim() || "THERAREIFY <beth.t@example.com>";
+    const from = process.env.EMAIL_FROM?.trim() || "TheRareify <beth.t@example.com>";
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {

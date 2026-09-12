@@ -189,7 +189,7 @@ export default async function HomePage() {
             <section className="mb-16">
               <div className="flex items-end justify-between">
                 <div>
-                  <h2 className="font-display text-3xl text-[#161513]">THERAREIFY Finds</h2>
+                  <h2 className="font-display text-3xl text-[#161513]">TheRareify Finds</h2>
                   <p className="mt-2 text-sm text-[#5c564e]">Curated discoveries for specific moments and needs.</p>
                 </div>
                 <Link href="/finds" className="text-sm underline">View all</Link>
@@ -319,7 +319,7 @@ export default async function HomePage() {
           <div className="grid gap-0 md:grid-cols-2">
             <div className="p-8 md:p-10">
               <span className="inline-flex rounded-full bg-[#1f3d34] px-3 py-1 text-xs font-medium text-white">Limited drops</span>
-               <h3 className="mt-4 font-display text-2xl text-[#161513]">THERAREIFY Drops</h3>
+                <h3 className="mt-4 font-display text-2xl text-[#161513]">TheRareify Drops</h3>
               <p className="mt-2 text-sm text-[#5c564e]">Curated temporary collections with limited availability.</p>
               <span className="mt-4 inline-flex h-10 items-center rounded-full border border-[#d5cfc6] px-5 text-sm transition group-hover:bg-[#f3ece3]">
                 Explore drops

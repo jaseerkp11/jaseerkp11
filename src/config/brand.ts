@@ -42,13 +42,13 @@ function absoluteSiteUrl(): string {
 
 export function getBrand(): BrandConfig {
   return {
-    brandName: env("NEXT_PUBLIC_BRAND_NAME", "THERAREIFY"),
+    brandName: env("NEXT_PUBLIC_BRAND_NAME", "TheRareify"),
     tagline: env(
       "NEXT_PUBLIC_BRAND_TAGLINE",
       "Thoughtful everyday goods for modern Indian homes",
     ),
-    legalName: env("NEXT_PUBLIC_LEGAL_NAME", "THERAREIFY Retail Private Limited"),
-    logoText: env("NEXT_PUBLIC_LOGO_TEXT", "THERAREIFY"),
+    legalName: env("NEXT_PUBLIC_LEGAL_NAME", "TheRareify Retail Private Limited"),
+    logoText: env("NEXT_PUBLIC_LOGO_TEXT", "TheRareify"),
     logoUrl: process.env.NEXT_PUBLIC_LOGO_URL?.trim() || null,
     faviconUrl: env("NEXT_PUBLIC_FAVICON_URL", "/favicon.ico"),
     primaryColor: env("NEXT_PUBLIC_PRIMARY_COLOR", "#1f3d34"),

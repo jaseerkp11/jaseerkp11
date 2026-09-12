@@ -18,7 +18,7 @@ type ProductWithRelations = {
 
 export function whyTherareifyPicked(product: ProductWithRelations, query?: string) {
   const reasons: string[] = [];
-  if (product.featured) reasons.push("Featured by THERAREIFY");
+  if (product.featured) reasons.push("Featured by TheRareify");
   if (product.trending) reasons.push("Trending now");
   if (product.bestSeller) reasons.push("Best seller");
   if (product.newArrival) reasons.push("New arrival");

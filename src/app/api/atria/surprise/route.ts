@@ -15,6 +15,6 @@ export async function GET(request: NextRequest) {
     if (!product) return jsonError("No products available right now.", 404);
     return Response.json({ product });
   } catch {
-    return jsonError("THERAREIFY is taking a quick break. Try again shortly.", 500);
+    return jsonError("TheRareify is taking a quick break. Try again shortly.", 500);
   }
 }
