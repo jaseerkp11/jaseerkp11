@@ -24,12 +24,12 @@ export function AskTherareify() {
   const [message, setMessage] = useState("");
 
   const suggestions = [
-    "Make my desk better",
+    "Make my home easier",
     "Find a gift under ₹1,000",
-    "Upgrade my room",
-    "I'm travelling soon",
+    "Make my room better",
+    "Make travelling easier",
     "Make studying easier",
-    "Surprise me",
+    "Show me something clever",
   ];
 
   async function submit(q: string) {
@@ -81,7 +81,7 @@ export function AskTherareify() {
       <div className="rounded-[2rem] border border-line bg-card p-6 sm:p-10">
         <h2 className="font-display text-3xl">What are you looking for?</h2>
         <p className="mt-2 max-w-md text-sm text-muted">
-          Tell TheRareify what you need. We&apos;ll find the best matches from our catalogue.
+          Tell TheRareify what you need. We&apos;ll find something worth discovering.
         </p>
         <form
           className="mt-6"

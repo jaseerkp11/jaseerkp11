@@ -70,30 +70,36 @@ export function Header({
         <Link href="/" className="font-display">
           <Logo />
         </Link>
-        <nav className="ml-6 hidden min-w-0 flex-shrink items-center gap-3 text-sm lg:flex">
-          {["fashion", "beauty", "gadgets", "accessories", "home-kitchen"].map((slug) => {
-            const category = categories.find((c) => c.slug === slug);
-            if (!category) return null;
-            return (
-              <Link key={category.slug} href={`/category/${category.slug}`} className="text-[#3f3a34] hover:text-foreground whitespace-nowrap" title={category.name}>
-                {category.name}
-              </Link>
-            );
-          })}
-          <Link href="/drops" className="text-[#3f3a34] hover:text-foreground">
-            Drops
+        <nav className="ml-4 hidden min-w-0 flex-shrink-0 items-center gap-2 text-sm lg:flex">
+          <Link href="/products?sort=new" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
+            New & Trending
           </Link>
-          <Link href="/collections" className="text-[#3f3a34] hover:text-foreground">
-            Collections
+          <Link href="/" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
+            Home
           </Link>
-          <Link href="/products" className="text-[#3f3a34] hover:text-foreground">
+          <Link href="/category/style" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
+            Style
+          </Link>
+          <Link href="/category/beauty" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
+            Beauty
+          </Link>
+          <Link href="/category/kids" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
+            Kids
+          </Link>
+          <Link href="/category/gifts" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
+            Gifts
+          </Link>
+          <Link href="/finds" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
+            Clever Finds
+          </Link>
+          <Link href="/products" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
             All
           </Link>
           {categories.length > 0 ? (
             <div className="relative" data-more-menu>
               <button
                 onClick={() => setMoreOpen((o) => !o)}
-                className="text-[#3f3a34] hover:text-foreground"
+                className="text-[#3f3a34] hover:text-foreground whitespace-nowrap"
                 aria-expanded={moreOpen}
               >
                 More <span className="text-[10px]">▼</span>
@@ -101,7 +107,7 @@ export function Header({
               {moreOpen ? (
                 <div className="absolute top-full mt-2 w-44 rounded-2xl border border-line bg-card p-1 shadow-lg">
                   {categories
-                    .filter((c) => !["fashion", "beauty", "gadgets", "accessories", "home-kitchen"].includes(c.slug))
+                    .filter((c) => !["new-trending", "home", "style", "beauty", "kids", "gifts"].includes(c.slug))
                     .map((c) => (
                       <Link
                         key={c.slug}
@@ -117,15 +123,15 @@ export function Header({
             </div>
           ) : null}
         </nav>
-        <div className="ml-auto flex items-center gap-3">
-          <div className="relative hidden md:block">
+        <div className="ml-auto flex items-center gap-2">
+          <div className="relative hidden md:block flex-1 min-w-0 max-w-[18rem]">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setSearchOpen(true)}
               placeholder="Search products"
-               className="h-10 w-48 rounded-full border border-line bg-card pl-9 pr-4 text-sm lg:w-64"
+              className="h-10 w-full rounded-full border border-line bg-card pl-9 pr-4 text-sm"
               aria-label="Search"
             />
             {searchOpen && (visibleHits.length > 0 || query.length >= 2) ? (

@@ -90,50 +90,131 @@ async function main() {
     },
   });
 
+  const makeHomeEasier = await prisma.category.create({
+    data: {
+      name: "Make Home Easier",
+      slug: "make-home-easier",
+      description: "Clever storage, organization & everyday home helpers",
+      sortOrder: 1,
+      seoTitle: "Make Home Easier",
+      seoDescription: "Shop home organization and everyday helpers.",
+    },
+  });
+  const kitchenSmarter = await prisma.category.create({
+    data: {
+      name: "Kitchen, Smarter",
+      slug: "kitchen-smarter",
+      description: "Little things that make cooking and cleaning easier",
+      sortOrder: 2,
+      seoTitle: "Kitchen, Smarter",
+      seoDescription: "Shop kitchen tools and helpers.",
+    },
+  });
+  const styleAccessories = await prisma.category.create({
+    data: {
+      name: "Style & Accessories",
+      slug: "style-accessories",
+      description: "Easy ways to add something special to your everyday look",
+      sortOrder: 3,
+      seoTitle: "Style & Accessories",
+      seoDescription: "Shop style and accessories.",
+    },
+  });
+  const beautySelfCare = await prisma.category.create({
+    data: {
+      name: "Beauty & Self-Care",
+      slug: "beauty-self-care",
+      description: "Simple tools and accessories for your daily routine",
+      sortOrder: 4,
+      seoTitle: "Beauty & Self-Care",
+      seoDescription: "Shop beauty and self-care essentials.",
+    },
+  });
+  const kidsFamily = await prisma.category.create({
+    data: {
+      name: "Kids & Family",
+      slug: "kids-family",
+      description: "Clever finds that make everyday family life easier",
+      sortOrder: 5,
+      seoTitle: "Kids & Family",
+      seoDescription: "Shop kids and family products.",
+    },
+  });
+  const gifts = await prisma.category.create({
+    data: {
+      name: "Gifts They'll Love",
+      slug: "gifts",
+      description: "Interesting little finds worth giving",
+      sortOrder: 6,
+      seoTitle: "Gifts They'll Love",
+      seoDescription: "Shop gift ideas.",
+    },
+  });
+  const cleverFinds = await prisma.category.create({
+    data: {
+      name: "Clever Finds",
+      slug: "clever-finds",
+      description: "Products you didn't know you needed",
+      sortOrder: 7,
+      seoTitle: "Clever Finds",
+      seoDescription: "Shop clever finds and unexpected products.",
+    },
+  });
+  const newTrending = await prisma.category.create({
+    data: {
+      name: "New & Trending",
+      slug: "new-trending",
+      description: "Fresh finds we're currently loving",
+      sortOrder: 8,
+      seoTitle: "New & Trending",
+      seoDescription: "Shop new and trending products.",
+    },
+  });
+
   const fashion = await prisma.category.create({
     data: {
       name: "Fashion",
       slug: "fashion",
       description: "Apparel and everyday wear with a quiet, considered cut.",
-      sortOrder: 1,
+      sortOrder: 9,
       seoTitle: "Fashion",
       seoDescription: "Shop fashion essentials.",
     },
   });
   const beauty = await prisma.category.create({
-    data: { name: "Beauty", slug: "beauty", description: "Skin and hair care with simple formulas.", sortOrder: 2 },
+    data: { name: "Beauty", slug: "beauty", description: "Skin and hair care with simple formulas.", sortOrder: 10 },
   });
   const electronics = await prisma.category.create({
-    data: { name: "Electronics", slug: "electronics", description: "Small gadgets chosen for daily usefulness.", sortOrder: 3 },
+    data: { name: "Electronics", slug: "electronics", description: "Small gadgets chosen for daily usefulness.", sortOrder: 11 },
   });
   const home = await prisma.category.create({
-    data: { name: "Home & Kitchen", slug: "home-kitchen", description: "Objects for cooking and living well.", sortOrder: 4 },
+    data: { name: "Home & Kitchen", slug: "home-kitchen", description: "Objects for cooking and living well.", sortOrder: 12 },
   });
   const accessories = await prisma.category.create({
-    data: { name: "Accessories", slug: "accessories", description: "Bags, belts, and finishing details.", sortOrder: 5 },
+    data: { name: "Accessories", slug: "accessories", description: "Bags, belts, and finishing details.", sortOrder: 13 },
   });
   const kids = await prisma.category.create({
-    data: { name: "Kids", slug: "kids", description: "Thoughtful goods for children.", sortOrder: 6 },
+    data: { name: "Kids", slug: "kids", description: "Thoughtful goods for children.", sortOrder: 14 },
   });
   const lifestyle = await prisma.category.create({
-    data: { name: "Lifestyle", slug: "lifestyle", description: "Home fragrance, journals, and daily rituals.", sortOrder: 7 },
+    data: { name: "Lifestyle", slug: "lifestyle", description: "Home fragrance, journals, and daily rituals.", sortOrder: 15 },
   });
   const gadgets = await prisma.category.create({
-    data: { name: "Gadgets", slug: "gadgets", description: "Compact tools and desk devices.", sortOrder: 8 },
+    data: { name: "Gadgets", slug: "gadgets", description: "Compact tools and desk devices.", sortOrder: 16 },
   });
   const care = await prisma.category.create({
-    data: { name: "Personal Care", slug: "personal-care", description: "Bath and grooming essentials.", sortOrder: 9 },
+    data: { name: "Personal Care", slug: "personal-care", description: "Bath and grooming essentials.", sortOrder: 17 },
   });
   const fitness = await prisma.category.create({
-    data: { name: "Fitness", slug: "fitness", description: "Simple equipment for home movement.", sortOrder: 10 },
+    data: { name: "Fitness", slug: "fitness", description: "Simple equipment for home movement.", sortOrder: 18 },
   });
   const stationery = await prisma.category.create({
-    data: { name: "Stationery", slug: "stationery", description: "Paper goods and writing tools.", sortOrder: 11 },
+    data: { name: "Stationery", slug: "stationery", description: "Paper goods and writing tools.", sortOrder: 19 },
   });
 
   await prisma.category.createMany({
     data: [
-      { name: "Trending", slug: "trending", description: "Currently moving quickly.", sortOrder: 20, parentId: fashion.id },
+      { name: "Trending", slug: "trending", description: "Currently moving quickly.", sortOrder: 20 },
       { name: "New Arrivals", slug: "new-arrivals", description: "Recently added to the catalogue.", sortOrder: 21 },
       { name: "Best Sellers", slug: "best-sellers", description: "Customer favourites.", sortOrder: 22 },
       { name: "Deals", slug: "deals", description: "Time-limited prices set by the store.", sortOrder: 23 },

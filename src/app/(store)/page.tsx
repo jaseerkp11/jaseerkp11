@@ -67,25 +67,27 @@ export default async function HomePage() {
             <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
               <div>
               <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea] animate-fade-in-up" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}>
-                {brand.tagline}
+                Things you&apos;ll be glad you discovered.
               </h1>
-              <div className="mt-6 h-px w-0 bg-[#c4a574] animate-expand-line" />
-                <div className="mt-8 flex flex-wrap gap-3 animate-fade-in-up animation-delay-200">
-                  <Link
-                    href={hero.href ?? "/products"}
-                    className="group relative inline-flex h-12 items-center rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition-all duration-300 hover:bg-[#b49a6a] hover:shadow-[0_8px_30px_rgba(196,165,116,0.35)] hover:-translate-y-0.5"
-                  >
-                    <span className="relative z-10">Shop the catalogue</span>
-                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  </Link>
-                  <Link
-                    href="/category/new-arrivals"
-                    className="group relative inline-flex h-12 items-center rounded-full border border-[#f6f1ea33] bg-transparent px-8 text-sm text-[#f6f1ea] transition-all duration-300 hover:bg-[#f6f1ea15] hover:-translate-y-0.5"
-                  >
-                    <span className="relative z-10">New arrivals</span>
-                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  </Link>
-                </div>
+              <p className="mt-6 max-w-lg text-base text-[#b7b0a6] animate-fade-in-up animation-delay-100">
+                Useful, beautiful and unexpectedly clever finds for everyday life.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3 animate-fade-in-up animation-delay-200">
+                <Link
+                  href="/products"
+                  className="group relative inline-flex h-12 items-center rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition-all duration-300 hover:bg-[#b49a6a] hover:shadow-[0_8px_30px_rgba(196,165,116,0.35)] hover:-translate-y-0.5"
+                >
+                  <span className="relative z-10">Shop the finds</span>
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                </Link>
+                <Link
+                  href="/category/new-arrivals"
+                  className="group relative inline-flex h-12 items-center rounded-full border border-[#f6f1ea33] bg-transparent px-8 text-sm text-[#f6f1ea] transition-all duration-300 hover:bg-[#f6f1ea15] hover:-translate-y-0.5"
+                >
+                  <span className="relative z-10">Discover something new</span>
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                </Link>
+              </div>
               </div>
               <div className="animate-fade-in-up animation-delay-300">
                 <HeroCarousel
@@ -118,8 +120,8 @@ export default async function HomePage() {
         <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6">
           <div className="mb-6 flex items-end justify-between">
             <div>
-              <h2 className="font-display text-3xl text-[#161513]">Shop by room of life</h2>
-              <p className="mt-2 text-sm text-[#5c564e]">Thoughtful goods for every part of your home.</p>
+               <h2 className="font-display text-3xl text-[#161513]">Shop by what you need</h2>
+               <p className="mt-2 text-sm text-[#5c564e]">Useful things, beautiful finds, and clever little discoveries for everyday life.</p>
             </div>
             <Link href="/products" className="text-sm underline">
               All products
@@ -189,7 +191,7 @@ export default async function HomePage() {
             <section className="mb-16">
               <div className="flex items-end justify-between">
                 <div>
-                  <h2 className="font-display text-3xl text-[#161513]">TheRareify Finds</h2>
+                   <h2 className="font-display text-3xl text-[#161513]">You Didn't Know You Needed These</h2>
                   <p className="mt-2 text-sm text-[#5c564e]">Curated discoveries for specific moments and needs.</p>
                 </div>
                 <Link href="/finds" className="text-sm underline">View all</Link>
@@ -224,7 +226,7 @@ export default async function HomePage() {
           {show("trending") && trending.length > 0 ? (
             <section className="mb-16">
               <div className="flex items-end justify-between">
-                <h2 className="font-display text-3xl text-[#161513]">Trending</h2>
+                 <h2 className="font-display text-3xl text-[#161513]">New Discoveries</h2>
                 <Link href="/products?sort=trending" className="text-sm underline">View all</Link>
               </div>
               <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
