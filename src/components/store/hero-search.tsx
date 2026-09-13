@@ -46,19 +46,16 @@ export function HeroSearch() {
 
   return (
     <div className="w-full max-w-2xl px-4 text-center">
-      <p className="text-xs uppercase tracking-[0.25em] text-white/70">
+      <p className="text-sm uppercase tracking-[0.3em] text-white">
         What are you looking for?
-      </p>
-      <p className="mt-2 text-[13px] leading-relaxed text-white/80">
-        Tell TheRarify what you need. We&apos;ll find something worth discovering.
       </p>
 
       <form onSubmit={onSubmit} className="mt-5">
         <label htmlFor="hero-search" className="sr-only">
           Ask TheRarify anything
         </label>
-        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 transition-colors focus-within:border-white/20 focus-within:bg-white/[0.07]">
-          <Sparkles className="h-4 w-4 shrink-0 text-white/50" />
+        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 transition-colors focus-within:border-white/10 focus-within:bg-white/5">
+          <Sparkles className="h-4 w-4 shrink-0 text-white/60" />
           <input
             id="hero-search"
             value={value}
@@ -96,7 +93,7 @@ export function HeroSearch() {
               setValue(chip);
               router.push(`/search?q=${encodeURIComponent(chip)}`);
             }}
-            className="rounded-full px-3 py-1.5 text-[11px] tracking-wide text-white/60 transition hover:text-white hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-white/30"
+            className="rounded-full border border-white/10 bg-transparent px-3 py-1.5 text-[11px] tracking-wide text-white/70 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-1 focus:ring-white/30"
           >
             {chip}
           </button>
