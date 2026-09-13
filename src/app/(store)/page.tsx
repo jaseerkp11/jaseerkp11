@@ -5,11 +5,9 @@ import { ProductCard } from "@/components/store/product-card";
 import { productCardInclude } from "@/lib/catalog";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Truck, RotateCcw, ShieldCheck, Headset } from "lucide-react";
-import { AskTherareify } from "@/components/store/ask-therareify";
-import { HeroCarousel } from "@/components/store/hero-carousel";
+import { HeroSearch } from "@/components/store/hero-search";
 import { getPublicDrops, getPublicFinds, parseSectionConfig } from "@/lib/services/atria-banners";
 import { NewsletterForm } from "@/components/store/newsletter-form";
-import { HeroAnimations } from "@/components/store/hero-animations";
 
 export const dynamic = "force-dynamic";
 
@@ -68,62 +66,15 @@ export default async function HomePage() {
       />
 
       {show("hero") && hero ? (
-        <section className="relative overflow-hidden">
+        <section className="relative overflow-hidden h-[52vh] sm:h-[60vh] lg:h-[72vh]">
           <div
-            className="absolute inset-0 bg-cover bg-center animate-zoom-slow"
+            className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: "url('/images/hero-bg.png')" }}
           />
-          <div className="absolute inset-0 bg-[#161513]/60" />
-          <HeroAnimations>
-            <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
-              <div>
-              <h1 className="font-display text-4xl leading-[1.15] sm:text-5xl lg:text-6xl text-[#f6f1ea] animate-fade-in-up" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}>
-                Things you&apos;ll be glad you discovered.
-              </h1>
-              <p className="mt-6 max-w-lg text-base text-[#b7b0a6] animate-fade-in-up animation-delay-100">
-                Useful, beautiful and unexpectedly clever finds for everyday life.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3 animate-fade-in-up animation-delay-200">
-                <Link
-                  href="/products"
-                  className="group relative inline-flex h-12 items-center rounded-full bg-[#c4a574] px-8 text-sm font-medium text-[#161513] transition-all duration-300 hover:bg-[#b49a6a] hover:shadow-[0_8px_30px_rgba(196,165,116,0.35)] hover:-translate-y-0.5"
-                >
-                  <span className="relative z-10">Shop the finds</span>
-                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                </Link>
-                <Link
-                  href="/category/new-arrivals"
-                  className="group relative inline-flex h-12 items-center rounded-full border border-[#f6f1ea33] bg-transparent px-8 text-sm text-[#f6f1ea] transition-all duration-300 hover:bg-[#f6f1ea15] hover:-translate-y-0.5"
-                >
-                  <span className="relative z-10">Discover something new</span>
-                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                </Link>
-              </div>
-              </div>
-              <div className="animate-fade-in-up animation-delay-300">
-                <HeroCarousel
-                  slides={[
-                    {
-                      id: hero.id,
-                      name: hero.title,
-                      slug: hero.href.replace("/products/", "").replace("/", ""),
-                      sellingPaise: 0,
-                      compareAtPaise: null,
-                      images: hero.imageUrl ? [{ url: hero.imageUrl, alt: hero.title }] : [],
-                    },
-                    ...(trending.slice(0, 3).map((p) => ({
-                      id: p.id,
-                      name: p.name,
-                      slug: p.slug,
-                      sellingPaise: p.sellingPaise,
-                      compareAtPaise: p.compareAtPaise,
-                      images: p.images,
-                    })) ?? []),
-                  ]}
-                />
-              </div>
-            </div>
-          </HeroAnimations>
+          <div className="absolute inset-0 bg-[#161513]/50" />
+          <div className="relative flex items-center justify-center h-full">
+            <HeroSearch />
+          </div>
         </section>
       ) : null}
 
@@ -155,9 +106,6 @@ export default async function HomePage() {
 
       <section className="bg-[#efe8de]/40">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-          <section className="mb-6">
-            <AskTherareify />
-          </section>
 
           {(liveDrop || upcomingDrop) && (
             <section className="mb-16">
