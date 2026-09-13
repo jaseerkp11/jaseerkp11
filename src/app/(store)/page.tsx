@@ -68,7 +68,7 @@ export default async function HomePage() {
       {show("hero") && hero ? (
         <section className="relative overflow-hidden h-[52vh] sm:h-[60vh] lg:h-[72vh]">
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center animate-zoom-slow"
             style={{ backgroundImage: "url('/images/hero-bg.png')" }}
           />
           <div className="absolute inset-0 bg-[#161513]/50" />

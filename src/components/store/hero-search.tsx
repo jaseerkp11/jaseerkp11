@@ -62,7 +62,7 @@ export function HeroSearch() {
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="✨ Ask TheRarify anything..."
-            className="h-11 flex-1 bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+            className="hero-input h-11 flex-1 bg-transparent text-sm text-white placeholder:text-white/40"
             autoComplete="off"
           />
           <button

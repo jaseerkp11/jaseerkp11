@@ -131,3 +131,8 @@ h3,
 .hero-visible .animate-expand-line {
   animation: expand-line 0.8s ease-out forwards;
 }
+
+.hero-input:focus {
+  outline: none;
+  box-shadow: none;
+}
