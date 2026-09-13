@@ -89,9 +89,10 @@ h3,
 }
 
 @keyframes pan-slow {
-  0% { transform: scale(1.05) translate(0, 0); }
-  50% { transform: scale(1.12) translate(-1%, -1%); }
-  100% { transform: scale(1.05) translate(0, 0); }
+  0% { transform: scale(1) translate(0, 0); }
+  33% { transform: scale(1.07) translate(-0.8%, -0.4%); }
+  66% { transform: scale(1.04) translate(0.6%, -0.8%); }
+  100% { transform: scale(1) translate(0, 0); }
 }
 
 @keyframes expand-line {
@@ -100,7 +101,7 @@ h3,
 }
 
 .animate-zoom-slow {
-  animation: pan-slow 22s ease-in-out infinite;
+  animation: pan-slow 28s ease-in-out infinite;
 }
 
 .animate-fade-in-up {
