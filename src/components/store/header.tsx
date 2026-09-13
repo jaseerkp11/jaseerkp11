@@ -70,15 +70,15 @@ export function Header({
         <Link href="/" className="font-display">
           <Logo />
         </Link>
-        <nav className="ml-4 hidden min-w-0 flex-shrink-0 items-center gap-3 text-sm lg:flex">
+        <nav className="ml-2 hidden min-w-0 flex-shrink-0 items-center gap-3 text-sm lg:flex">
+          <Link href="/" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
+            Home
+          </Link>
           <Link href="/products?sort=new" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
             New & Trending
           </Link>
           <Link href="/products?sort=new" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
             New Arrivals
-          </Link>
-          <Link href="/" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
-            Home
           </Link>
           <Link href="/category/style" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
             Style
@@ -127,7 +127,7 @@ export function Header({
           ) : null}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <div className="relative hidden md:block flex-1 min-w-0 max-w-[18rem]">
+          <div className="relative hidden md:block flex-1 min-w-0 max-w-[24rem]">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
             <input
               value={query}
