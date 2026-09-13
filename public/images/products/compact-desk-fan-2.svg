@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <rect width="1200" height="1500" fill="#e7eee8"/>
+  <circle cx="220" cy="180" r="260" fill="#2c4a3e" opacity="0.35"/>
+  <circle cx="980" cy="1280" r="320" fill="#b4553a" opacity="0.28"/>
+  <rect x="260" y="360" width="680" height="780" rx="48" fill="#c5d1c8" opacity="0.92"/>
+  <rect x="330" y="430" width="540" height="540" rx="32" fill="#e7eee8" opacity="0.35"/>
+  <text x="600" y="1320" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="#161513">Compact Desk Fan</text>
+</svg>

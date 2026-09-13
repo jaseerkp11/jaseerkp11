@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <rect width="1200" height="1500" fill="#ece7ef"/>
+  <circle cx="220" cy="180" r="260" fill="#3a2f45" opacity="0.35"/>
+  <circle cx="980" cy="1280" r="320" fill="#8a6d8f" opacity="0.28"/>
+  <rect x="260" y="360" width="680" height="780" rx="48" fill="#d9cfe0" opacity="0.92"/>
+  <rect x="330" y="430" width="540" height="540" rx="32" fill="#ece7ef" opacity="0.35"/>
+  <text x="600" y="1320" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="#161513">Hand-Thrown Mug</text>
+</svg>

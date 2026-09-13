@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <rect width="1200" height="1500" fill="#efe6d9"/>
+  <circle cx="220" cy="180" r="260" fill="#1f3d34" opacity="0.35"/>
+  <circle cx="980" cy="1280" r="320" fill="#c4a574" opacity="0.28"/>
+  <rect x="260" y="360" width="680" height="780" rx="48" fill="#d8c3a5" opacity="0.92"/>
+  <rect x="330" y="430" width="540" height="540" rx="32" fill="#efe6d9" opacity="0.35"/>
+  <text x="600" y="1320" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="#161513">Copper Water Bottle</text>
+</svg>
