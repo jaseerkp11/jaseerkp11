@@ -4,7 +4,7 @@ import { getBrand, publicUrl } from "@/config/brand";
 import { ProductCard } from "@/components/store/product-card";
 import { productCardInclude } from "@/lib/catalog";
 import { JsonLd } from "@/components/seo/json-ld";
-import { Truck, RotateCcw, ShieldCheck, Headset } from "lucide-react";
+import { Truck, RotateCcw, ShieldCheck, Headset, Home, UtensilsCrossed, Shirt, Sparkles, Baby, Gift, Lightbulb, TrendingUp, ArrowRight } from "lucide-react";
 import { HeroSearch } from "@/components/store/hero-search";
 import { getPublicDrops, getPublicFinds, parseSectionConfig } from "@/lib/services/atria-banners";
 import { NewsletterForm } from "@/components/store/newsletter-form";
@@ -22,14 +22,14 @@ export default async function HomePage() {
   });
 
   const homepageCategories = [
-    { name: "Make Home Easier", slug: "make-home-easier", description: "Clever storage, organization & everyday home helpers" },
-    { name: "Kitchen, Smarter", slug: "kitchen-smarter", description: "Little things that make cooking and cleaning easier" },
-    { name: "Style & Accessories", slug: "style-accessories", description: "Easy ways to add something special to your everyday look" },
-    { name: "Beauty & Self-Care", slug: "beauty-self-care", description: "Simple tools and accessories for your daily routine" },
-    { name: "Kids & Family", slug: "kids-family", description: "Clever finds that make everyday family life easier" },
-    { name: "Gifts They'll Love", slug: "gifts", description: "Interesting little finds worth giving" },
-    { name: "Clever Finds", slug: "clever-finds", description: "Products you didn't know you needed" },
-    { name: "New & Trending", slug: "new-trending", description: "Fresh finds we're currently loving" },
+    { name: "Make Home Easier", slug: "make-home-easier", description: "Clever storage, organization & everyday home helpers", icon: Home },
+    { name: "Kitchen, Smarter", slug: "kitchen-smarter", description: "Little things that make cooking and cleaning easier", icon: UtensilsCrossed },
+    { name: "Style & Accessories", slug: "style-accessories", description: "Easy ways to add something special to your everyday look", icon: Shirt },
+    { name: "Beauty & Self-Care", slug: "beauty-self-care", description: "Simple tools and accessories for your daily routine", icon: Sparkles },
+    { name: "Kids & Family", slug: "kids-family", description: "Clever finds that make everyday family life easier", icon: Baby },
+    { name: "Gifts They'll Love", slug: "gifts", description: "Interesting little finds worth giving", icon: Gift },
+    { name: "Clever Finds", slug: "clever-finds", description: "Products you didn't know you needed", icon: Lightbulb },
+    { name: "New & Trending", slug: "new-trending", description: "Fresh finds we're currently loving", icon: TrendingUp },
   ];
   const [trending, best, neu, deals] = await Promise.all([
     prisma.product.findMany({ where: { status: "ACTIVE", trending: true }, include: productCardInclude, take: 8 }),
@@ -81,25 +81,30 @@ export default async function HomePage() {
       {show("categories") ? (
         <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6">
           <div className="mb-6 flex items-end justify-between">
-            <div>
-               <h2 className="font-display text-3xl text-[#161513]">Shop by what you need</h2>
-               <p className="mt-2 text-sm text-[#5c564e]">Useful things, beautiful finds, and clever little discoveries for everyday life.</p>
-            </div>
+            <h2 className="font-display text-3xl text-[#161513]">Shop by what you need</h2>
             <Link href="/products" className="text-sm underline">
               All products
             </Link>
           </div>
            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-             {homepageCategories.map((c) => (
-               <Link
-                 key={c.slug}
-                 href={`/category/${c.slug}`}
-                 className="group rounded-[1.25rem] border border-[#e3ddd4] bg-white p-6 text-center transition hover:border-[#c4b8a8] hover:shadow-md"
-               >
-                 <p className="font-display text-lg text-[#161513] truncate">{c.name}</p>
-                 <p className="mt-1 line-clamp-2 text-xs text-[#5c564e]">{c.description}</p>
-               </Link>
-             ))}
+             {homepageCategories.map((c) => {
+               const Icon = c.icon;
+               return (
+                 <Link
+                   key={c.slug}
+                   href={`/category/${c.slug}`}
+                   className="group flex items-center justify-between rounded-[1.25rem] border border-[#e3ddd4] bg-[#efe8de] px-5 py-4 transition hover:border-[#c4b8a8] hover:bg-[#e6ddd1]"
+                 >
+                   <span className="flex items-center gap-3">
+                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-[#161513]">
+                       <Icon className="h-4 w-4" />
+                     </span>
+                     <span className="font-display text-base text-[#161513]">{c.name}</span>
+                   </span>
+                   <ArrowRight className="h-4 w-4 text-[#5c564e] transition group-hover:translate-x-0.5" />
+                 </Link>
+               );
+             })}
            </div>
         </section>
       ) : null}
