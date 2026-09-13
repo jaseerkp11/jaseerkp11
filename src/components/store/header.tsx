@@ -74,6 +74,9 @@ export function Header({
           <Link href="/products?sort=new" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
             New & Trending
           </Link>
+          <Link href="/products?sort=new" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
+            New Arrivals
+          </Link>
           <Link href="/" className="text-[#3f3a34] hover:text-foreground whitespace-nowrap">
             Home
           </Link>
