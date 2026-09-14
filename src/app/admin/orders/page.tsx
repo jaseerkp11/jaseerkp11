@@ -7,6 +7,22 @@ import { Pagination } from "@/components/admin/pagination";
 import { AdminDeleteForm } from "@/components/admin/admin-delete-form";
 import type { OrderStatus } from "@prisma/client";
 
+const ORDER_STATUS_OPTIONS = [
+  { value: "PENDING", label: "Pending" },
+  { value: "CONFIRMED", label: "Confirmed" },
+  { value: "PROCESSING", label: "Processing" },
+  { value: "PACKED", label: "Packed" },
+  { value: "SHIPPED", label: "Shipped" },
+  { value: "OUT_FOR_DELIVERY", label: "Out for delivery" },
+  { value: "DELIVERED", label: "Delivered" },
+  { value: "CANCELLED", label: "Cancelled" },
+  { value: "FAILED", label: "Failed" },
+  { value: "RETURN_REQUESTED", label: "Return requested" },
+  { value: "RETURNED", label: "Returned" },
+  { value: "REFUNDED", label: "Refunded" },
+  { value: "PARTIALLY_REFUNDED", label: "Partially refunded" },
+];
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage({
@@ -51,7 +67,7 @@ export default async function AdminOrdersPage({
           </Link>
         ))}
       </div>
-      <AdminFilters defaultQ={q ?? ""} />
+      <AdminFilters defaultQ={q ?? ""} defaultStatus={status ?? ""} statusOptions={ORDER_STATUS_OPTIONS} />
       {orders.length === 0 ? (
         <div className="mt-8">
           <EmptyState title="No orders" description="Orders appear after a real checkout." />

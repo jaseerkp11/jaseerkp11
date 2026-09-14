@@ -43,6 +43,8 @@ export async function DELETE(
   }
   if (!hasPermission(session!.role, PERMISSIONS.manageMarketing)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
+  const existing = await prisma.coupon.findUnique({ where: { id } });
+  if (!existing) return jsonError("Not found", 404);
   await prisma.coupon.delete({ where: { id } });
   await writeAudit({
     actorId: session!.id,

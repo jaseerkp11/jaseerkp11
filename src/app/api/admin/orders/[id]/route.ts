@@ -130,6 +130,8 @@ export async function DELETE(
   }
   if (!hasPermission(session!.role, PERMISSIONS.refundOrders)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
+  const existing = await prisma.order.findUnique({ where: { id } });
+  if (!existing) return jsonError("Not found", 404);
   await prisma.order.delete({ where: { id } });
   await writeAudit({
     actorId: session!.id,
