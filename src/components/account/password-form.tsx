@@ -9,8 +9,14 @@ export function PasswordForm() {
   return (
     <form action="/api/account/password" method="post" className="mt-6 space-y-3">
       {error ? <p className="text-sm text-[#9b2c2c]">{error}</p> : null}
-      <input name="current" type="password" required placeholder="Current password" className="h-11 w-full rounded-xl border border-line px-3 text-sm" />
-      <input name="next" type="password" required placeholder="New password" className="h-11 w-full rounded-xl border border-line px-3 text-sm" />
+      <label className="block text-sm">
+        Current password
+        <input name="current" type="password" required className="mt-1 h-11 w-full rounded-xl border border-line px-3 text-sm" />
+      </label>
+      <label className="block text-sm">
+        New password
+        <input name="next" type="password" required className="mt-1 h-11 w-full rounded-xl border border-line px-3 text-sm" />
+      </label>
       <SubmitButton className="h-11 w-full rounded-full bg-primary text-sm text-[#f6f1ea]">Update password</SubmitButton>
     </form>
   );

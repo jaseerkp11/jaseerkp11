@@ -86,7 +86,7 @@ export default async function AdminProductsPage({
                       )}
                       <span>
                         <span className="block font-medium underline">{p.name}</span>
-                        <span className="block text-xs text-muted no-underline">{p.category.name}</span>
+                         <span className="block text-xs text-muted no-underline">{p.category?.name ?? "Uncategorized"}</span>
                       </span>
                     </Link>
                   </div>
