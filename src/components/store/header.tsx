@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
-import { getBrand } from "@/config/brand";
 import { Logo } from "@/components/store/logo";
 import type { SearchHit } from "@/lib/search/provider";
 
@@ -18,7 +17,6 @@ export function Header({
   cartCount: number;
   brandName: string;
 }) {
-  const brand = getBrand();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);

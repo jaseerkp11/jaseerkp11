@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import { ProductCard } from "@/components/store/product-card";
 import { productCardInclude } from "@/lib/catalog";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -47,11 +48,30 @@ export default async function ProductsPage({
           />
         </div>
       ) : (
-        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <>
+          <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+          {total > take ? (
+            <div className="mt-8 flex items-center justify-between text-sm">
+              <Link
+                href={`/products?${new URLSearchParams({ ...(params.sort ? { sort: params.sort } : {}), page: String(page - 1) }).toString()}`}
+                className={page <= 1 ? "invisible" : "inline-flex h-10 items-center rounded-full border border-line px-4 transition hover:bg-[#f3ece3]"}
+              >
+                Previous
+              </Link>
+              <span className="text-muted">Page {page}</span>
+              <Link
+                href={`/products?${new URLSearchParams({ ...(params.sort ? { sort: params.sort } : {}), page: String(page + 1) }).toString()}`}
+                className={page * take >= total ? "invisible" : "inline-flex h-10 items-center rounded-full border border-line px-4 transition hover:bg-[#f3ece3]"}
+              >
+                Next
+              </Link>
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );

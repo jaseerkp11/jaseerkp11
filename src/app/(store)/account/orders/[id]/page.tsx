@@ -4,6 +4,40 @@ import { getCurrentUser, isStaff } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Pending",
+  CONFIRMED: "Confirmed",
+  PROCESSING: "Processing",
+  PACKED: "Packed",
+  SHIPPED: "Shipped",
+  OUT_FOR_DELIVERY: "Out for delivery",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
+  FAILED: "Failed",
+  RETURN_REQUESTED: "Return requested",
+  RETURNED: "Returned",
+  REFUNDED: "Refunded",
+  PARTIALLY_REFUNDED: "Partially refunded",
+};
+
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Pending",
+  AUTHORIZED: "Authorized",
+  PAID: "Paid",
+  FAILED: "Failed",
+  REFUNDED: "Refunded",
+  PARTIALLY_REFUNDED: "Partially refunded",
+  COD_PENDING: "Cash on delivery pending",
+};
+
+function formatOrderStatus(status: string) {
+  return ORDER_STATUS_LABELS[status] ?? status;
+}
+
+function formatPaymentStatus(status: string) {
+  return PAYMENT_STATUS_LABELS[status] ?? status;
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function OrderDetailPage({
@@ -25,7 +59,7 @@ export default async function OrderDetailPage({
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="font-display text-4xl">{order.orderNumber}</h1>
       <p className="mt-2 text-sm text-muted">
-        {order.status} · payment {order.paymentStatus} · {formatMoney(order.totalPaise)}
+        {formatOrderStatus(order.status)} · payment {formatPaymentStatus(order.paymentStatus)} · {formatMoney(order.totalPaise)}
       </p>
       <Link href={`/orders/${order.id}/invoice`} className="mt-4 inline-flex h-10 items-center rounded-full border border-line px-4 text-sm">
         View invoice

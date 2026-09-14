@@ -51,10 +51,12 @@ export default async function CategoryPage({
   if (slug === "best-sellers") where.bestSeller = true;
   if (slug === "deals") where.compareAtPaise = { not: null };
   if (filters.brand) where.brand = filters.brand;
-  if (filters.min || filters.max) {
+  const min = Number(filters.min);
+  const max = Number(filters.max);
+  if (!Number.isNaN(min) || !Number.isNaN(max)) {
     where.sellingPaise = {};
-    if (filters.min) where.sellingPaise.gte = Math.round(Number(filters.min) * 100);
-    if (filters.max) where.sellingPaise.lte = Math.round(Number(filters.max) * 100);
+    if (!Number.isNaN(min)) where.sellingPaise.gte = Math.round(min * 100);
+    if (!Number.isNaN(max)) where.sellingPaise.lte = Math.round(max * 100);
   }
 
   const products = await prisma.product.findMany({
@@ -68,7 +70,7 @@ export default async function CategoryPage({
           : { createdAt: "desc" },
   });
 
-  const title = category?.name ?? slug.replace("-", " ");
+  const title = category?.name ?? slug.replace(/-/g, " ");
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">

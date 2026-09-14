@@ -1,7 +1,22 @@
 "use client";
 import { useFormStatus } from "react-dom";
 
-export function AdminFilters({ defaultQ = "", defaultStatus = "" }: { defaultQ?: string; defaultStatus?: string }) {
+const PRODUCT_STATUS_OPTIONS = [
+  { value: "DRAFT", label: "Draft" },
+  { value: "ACTIVE", label: "Active" },
+  { value: "ARCHIVED", label: "Archived" },
+  { value: "OUT_OF_STOCK", label: "Out of stock" },
+];
+
+export function AdminFilters({
+  defaultQ = "",
+  defaultStatus = "",
+  statusOptions = PRODUCT_STATUS_OPTIONS,
+}: {
+  defaultQ?: string;
+  defaultStatus?: string;
+  statusOptions?: Array<{ value: string; label: string }>;
+}) {
   const { pending } = useFormStatus();
   return (
     <form method="get" className="mt-4 flex flex-wrap items-center gap-2">
@@ -13,10 +28,9 @@ export function AdminFilters({ defaultQ = "", defaultStatus = "" }: { defaultQ?:
       />
       <select name="status" defaultValue={defaultStatus} className="h-11 rounded-xl border border-line bg-card px-3 text-sm">
         <option value="">All statuses</option>
-        <option value="DRAFT">Draft</option>
-        <option value="ACTIVE">Active</option>
-        <option value="ARCHIVED">Archived</option>
-        <option value="OUT_OF_STOCK">Out of stock</option>
+        {statusOptions.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
       </select>
       <button type="submit" disabled={pending} className="h-11 rounded-full border border-line px-4 text-sm">
         {pending ? "Searching..." : "Filter"}

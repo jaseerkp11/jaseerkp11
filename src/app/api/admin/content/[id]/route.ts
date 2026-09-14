@@ -18,14 +18,25 @@ export async function POST(
   if (!hasPermission(session!.role, PERMISSIONS.manageContent)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
   const form = await request.formData();
+  const type = (form.get("_type") as string | null) ?? "page";
   if (form.get("_method") === "DELETE") {
-    await prisma.cmsPage.delete({ where: { id } });
-    await writeAudit({
-      actorId: session!.id,
-      action: "cms.delete",
-      entity: "CmsPage",
-      entityId: id,
-    });
+    if (type === "banner") {
+      await prisma.banner.delete({ where: { id } });
+      await writeAudit({
+        actorId: session!.id,
+        action: "banner.delete",
+        entity: "Banner",
+        entityId: id,
+      });
+    } else {
+      await prisma.cmsPage.delete({ where: { id } });
+      await writeAudit({
+        actorId: session!.id,
+        action: "cms.delete",
+        entity: "CmsPage",
+        entityId: id,
+      });
+    }
     return Response.json({ ok: true });
   }
   return jsonError("Invalid method", 405);
@@ -43,12 +54,25 @@ export async function DELETE(
   }
   if (!hasPermission(session!.role, PERMISSIONS.manageContent)) return jsonError("Forbidden", 403);
   const { id } = await context.params;
-  await prisma.cmsPage.delete({ where: { id } });
-  await writeAudit({
-    actorId: session!.id,
-    action: "cms.delete",
-    entity: "CmsPage",
-    entityId: id,
-  });
+  const body = await request.text();
+  const params = new URLSearchParams(body);
+  const type = params.get("_type") ?? "page";
+  if (type === "banner") {
+    await prisma.banner.delete({ where: { id } });
+    await writeAudit({
+      actorId: session!.id,
+      action: "banner.delete",
+      entity: "Banner",
+      entityId: id,
+    });
+  } else {
+    await prisma.cmsPage.delete({ where: { id } });
+    await writeAudit({
+      actorId: session!.id,
+      action: "cms.delete",
+      entity: "CmsPage",
+      entityId: id,
+    });
+  }
   return Response.json({ ok: true });
 }

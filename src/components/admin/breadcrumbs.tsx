@@ -33,7 +33,7 @@ export function Breadcrumbs() {
   let current = "";
   for (let i = 1; i < segments.length; i++) {
     current += `/${segments[i]}`;
-    const key = segments.slice(1).join("/");
+    const key = segments.slice(1, i + 1).join("/");
     const label = LABELS[key] || segments[i];
     crumbs.push({ href: `/admin${current}`, label });
   }

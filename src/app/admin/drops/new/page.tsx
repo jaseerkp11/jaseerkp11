@@ -29,7 +29,6 @@ export default async function NewDropPage() {
         </div>
         <select name="status" className="h-11 rounded-xl border border-line px-3 text-sm">
           <option>DRAFT</option>
-          <option>SCHEDULED</option>
           <option>LIVE</option>
           <option>ENDED</option>
           <option>ARCHIVED</option>

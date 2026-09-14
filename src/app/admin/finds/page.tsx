@@ -10,6 +10,7 @@ export default async function AdminFindsPage({
   searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
   const { q, status, page: pageParam } = await searchParams;
+  const normalizedStatus = status?.toLowerCase();
   const page = Math.max(1, Number(pageParam ?? "1"));
   const pageSize = 20;
   const where: Record<string, unknown> = { key: { startsWith: "find-" } };
@@ -18,8 +19,8 @@ export default async function AdminFindsPage({
       { title: { contains: q } },
     ];
   }
-  if (status === "live" || status === "draft") {
-    where.config = { contains: `"status":"${status.toUpperCase()}"` };
+  if (normalizedStatus === "live" || normalizedStatus === "draft") {
+    where.config = { contains: `"status":"${normalizedStatus.toUpperCase()}"` };
   }
   const [finds, total] = await Promise.all([
     prisma.homepageSection.findMany({

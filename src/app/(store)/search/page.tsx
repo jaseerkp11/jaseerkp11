@@ -1,4 +1,3 @@
-import { searchProvider } from "@/lib/search/provider";
 import { ProductCard } from "@/components/store/product-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { prisma } from "@/lib/prisma";
@@ -28,12 +27,11 @@ export default async function SearchPage({
         take: 48,
       })
     : [];
-  void searchProvider;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <h1 className="font-display text-4xl">Search</h1>
-      <form className="mt-6 max-w-xl">
+      <form action="/search" method="get" className="mt-6 flex max-w-xl items-center gap-2">
         <label htmlFor="q" className="sr-only">
           Search
         </label>
@@ -42,8 +40,11 @@ export default async function SearchPage({
           name="q"
           defaultValue={query}
           placeholder="Search the catalogue"
-          className="h-12 w-full rounded-full border border-line bg-card px-5"
+          className="h-12 flex-1 rounded-full border border-line bg-card px-5"
         />
+        <button type="submit" className="h-12 shrink-0 rounded-full bg-primary px-6 text-sm text-[#f6f1ea]">
+          Search
+        </button>
       </form>
       {query && products.length === 0 ? (
         <div className="mt-10">
@@ -56,7 +57,7 @@ export default async function SearchPage({
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product as any} />
           ))}
         </div>
       )}

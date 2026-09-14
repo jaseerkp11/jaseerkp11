@@ -5,6 +5,26 @@ import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { EmptyState } from "@/components/ui/empty-state";
 
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Pending",
+  CONFIRMED: "Confirmed",
+  PROCESSING: "Processing",
+  PACKED: "Packed",
+  SHIPPED: "Shipped",
+  OUT_FOR_DELIVERY: "Out for delivery",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
+  FAILED: "Failed",
+  RETURN_REQUESTED: "Return requested",
+  RETURNED: "Returned",
+  REFUNDED: "Refunded",
+  PARTIALLY_REFUNDED: "Partially refunded",
+};
+
+function formatOrderStatus(status: string) {
+  return ORDER_STATUS_LABELS[status] ?? status;
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function OrdersPage() {
@@ -29,7 +49,7 @@ export default async function OrdersPage() {
           <li key={order.id}>
             <Link href={`/account/orders/${order.id}`} className="flex items-center justify-between rounded-2xl border border-line bg-card px-4 py-4 text-sm">
               <span>{order.orderNumber}</span>
-              <span>{order.status}</span>
+              <span>{formatOrderStatus(order.status)}</span>
               <span>{formatMoney(order.totalPaise)}</span>
             </Link>
           </li>

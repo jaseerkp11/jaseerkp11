@@ -114,7 +114,9 @@ export default async function ProductPage({
       <Breadcrumbs
         items={[
           { href: "/", label: "Home" },
-          { href: `/category/${product.category.slug}`, label: product.category.name },
+          ...(product.category
+            ? [{ href: `/category/${product.category.slug}`, label: product.category.name }]
+            : []),
           { label: product.name },
         ]}
       />
@@ -258,15 +260,24 @@ export default async function ProductPage({
         </section>
       ))}
       <div className="sticky bottom-0 -mx-4 mt-10 border-t border-line bg-background/95 p-3 backdrop-blur sm:hidden">
-        <form action="/api/cart" method="post" className="flex gap-2">
+        <form action="/api/cart" method="post" className="flex flex-col gap-2">
           <input type="hidden" name="productId" value={product.id} />
           <input type="hidden" name="quantity" value="1" />
-          <SubmitButton className="h-12 flex-1 rounded-full bg-primary text-sm text-[#f6f1ea]" disabled={available <= 0}>
-            Add · {formatMoney(product.sellingPaise)}
-          </SubmitButton>
-          <SubmitButton className="h-12 flex-1 rounded-full bg-[#161513] text-sm text-[#f6f1ea]" disabled={available <= 0} name="buyNow" value="1">
-            Buy now
-          </SubmitButton>
+          {product.variants.length > 0 ? (
+            <select name="variantId" defaultValue={product.variants[0]?.id} className="h-11 w-full rounded-xl border border-line bg-card px-3 text-sm">
+              {product.variants.map((v) => (
+                <option key={v.id} value={v.id}>{v.name}</option>
+              ))}
+            </select>
+          ) : null}
+          <div className="flex gap-2">
+            <SubmitButton className="h-12 flex-1 rounded-full bg-primary text-sm text-[#f6f1ea]" disabled={available <= 0}>
+              Add · {formatMoney(product.sellingPaise)}
+            </SubmitButton>
+            <SubmitButton className="h-12 flex-1 rounded-full bg-[#161513] text-sm text-[#f6f1ea]" disabled={available <= 0} name="buyNow" value="1">
+              Buy now
+            </SubmitButton>
+          </div>
         </form>
       </div>
     </div>

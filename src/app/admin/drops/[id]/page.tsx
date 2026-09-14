@@ -45,7 +45,6 @@ export default async function EditDropPage({
         </div>
         <select name="status" defaultValue={cfg.status ?? "DRAFT"} className="h-11 rounded-xl border border-line px-3 text-sm">
           <option>DRAFT</option>
-          <option>SCHEDULED</option>
           <option>LIVE</option>
           <option>ENDED</option>
           <option>ARCHIVED</option>

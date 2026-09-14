@@ -26,7 +26,7 @@ export default async function ContentPage() {
           <details key={page.id} className="rounded-xl border border-line p-3">
             <summary className="flex cursor-pointer items-center justify-between text-sm font-medium">
               <span>{page.title} ({page.slug})</span>
-              <AdminDeleteForm action={`/api/admin/content/${page.id}`} label="page" />
+              <AdminDeleteForm action={`/api/admin/content/${page.id}`} label="page" _type="page" />
             </summary>
             <input name={`title_${page.id}`} defaultValue={page.title} className="mt-3 h-11 w-full rounded-xl border border-line px-3 text-sm" />
             <textarea name={`body_${page.id}`} defaultValue={page.body} className="mt-2 min-h-32 w-full rounded-xl border border-line px-3 py-2 text-sm" />
@@ -57,7 +57,7 @@ export default async function ContentPage() {
           {banners.map((b) => (
             <li key={b.id} className="flex items-center justify-between gap-2">
               <span>{b.placement}: {b.title} ({b.imageUrl})</span>
-              <AdminDeleteForm action={`/api/admin/content/${b.id}`} label="banner" />
+              <AdminDeleteForm action={`/api/admin/content/${b.id}`} label="banner" _type="banner" />
             </li>
           ))}
         </ul>

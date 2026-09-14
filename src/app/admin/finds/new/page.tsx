@@ -20,7 +20,8 @@ export default async function NewFindPage() {
         <input name="sortOrder" type="number" defaultValue={0} className="h-11 rounded-xl border border-line px-3 text-sm" />
         <select name="status" className="h-11 rounded-xl border border-line px-3 text-sm">
           <option>DRAFT</option>
-          <option>ACTIVE</option>
+          <option>LIVE</option>
+          <option>ENDED</option>
           <option>ARCHIVED</option>
         </select>
         <fieldset>

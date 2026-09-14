@@ -34,12 +34,14 @@ export default async function CartPage() {
             const price = item.variant?.sellingPaise ?? item.product.sellingPaise;
             return (
               <li key={item.id} className="flex gap-4 rounded-2xl border border-line bg-card p-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={item.product.images[0]?.url}
-                  alt=""
-                  className="h-24 w-20 rounded-xl object-cover"
-                />
+                <div className="h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-[#efe8de]">
+                  {item.product.images[0]?.url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.product.images[0].url} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center text-[10px] text-muted">No image</span>
+                  )}
+                </div>
                 <div className="flex-1">
                   <p className="font-medium">{item.product.name}</p>
                   {item.variant ? <p className="text-xs text-muted">{item.variant.name}</p> : null}
